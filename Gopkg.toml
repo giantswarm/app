@@ -24,16 +24,13 @@
 #   go-tests = true
 #   unused-packages = true
 
-[[constraint]]
-  name = "github.com/ghodss/yaml"
-  version = "=1.0.0"
-  
-[[constraint]]
-  name = "gopkg.in/yaml.v2"
-  version = "=2.2.2"
 
 [[constraint]]
-  branch = "master"
+  name = "github.com/ghodss/yaml"
+  version = "1.0.0"
+
+[[constraint]]
+  branch = "add_calico_ipip"
   name = "github.com/giantswarm/apiextensions"
 
 [[constraint]]
@@ -42,7 +39,7 @@
 
 [[constraint]]
   name = "k8s.io/apimachinery"
-  version = "kubernetes-1.15.4"
+  version = "kubernetes-1.13.2"
 
 [prune]
   go-tests = true
