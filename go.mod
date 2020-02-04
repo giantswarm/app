@@ -5,9 +5,9 @@ go 1.13
 require (
 	github.com/ghodss/yaml v1.0.1-0.20190212211648-25d852aebe32
 	github.com/giantswarm/apiextensions v0.0.0-20191209114846-a4fd7939e26e
-	github.com/giantswarm/microerror v0.0.0-20191011121515-e0ebc4ecf5a5
+	github.com/giantswarm/microerror v0.1.1-0.20200204123133-8f12df8fee02
 	github.com/gogo/protobuf v1.3.1 // indirect
-	github.com/juju/errgo v0.0.0-20140925100237-08cceb5d0b53 // indirect
+	github.com/google/go-cmp v0.3.1 // indirect
 	golang.org/x/net v0.0.0-20191209160850-c0dbc17a3553 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/yaml.v2 v2.2.7 // indirect
