@@ -11,14 +11,22 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+type Config struct {
+	AppCatalog   string
+	AppName      string
+	AppNamespace string
+	AppVersion   string
+	Name         string
+}
+
 // NewCR returns new application CR.
 //
 // AppCatalog is the name of the app catalog where the app stored.
-func NewCR(name, appName, appNamespace, appVersion, appCatalog string) *applicationv1alpha1.App {
+func NewCR(c Config) *applicationv1alpha1.App {
 	appCR := &applicationv1alpha1.App{
 		TypeMeta: applicationv1alpha1.NewAppTypeMeta(),
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      name,
+			Name:      c.Name,
 			Namespace: "giantswarm",
 			Annotations: map[string]string{
 				"chart-operator.giantswarm.io/force-helm-upgrade": "true",
@@ -28,13 +36,13 @@ func NewCR(name, appName, appNamespace, appVersion, appCatalog string) *applicat
 			},
 		},
 		Spec: applicationv1alpha1.AppSpec{
-			Catalog: appCatalog,
+			Catalog: c.AppCatalog,
 			KubeConfig: applicationv1alpha1.AppSpecKubeConfig{
 				InCluster: true,
 			},
-			Name:      appName,
-			Namespace: appNamespace,
-			Version:   appVersion,
+			Name:      c.AppName,
+			Namespace: c.AppNamespace,
+			Version:   c.AppVersion,
 		},
 	}
 
