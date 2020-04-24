@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- fix module path (was accidentaly declared as gitlab.com/...)
+- Fix module path (was accidentaly declared as gitlab.com/...).
 
 ## [0.2.0] - 2020-04-24
 
