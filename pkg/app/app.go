@@ -18,6 +18,7 @@ type Config struct {
 	AppVersion          string
 	DisableForceUpgrade bool
 	Name                string
+	VersionLabelValue   string
 }
 
 // NewCR returns new application CR.
@@ -40,7 +41,7 @@ func NewCR(c Config) *applicationv1alpha1.App {
 			Namespace:   "giantswarm",
 			Annotations: annotations,
 			Labels: map[string]string{
-				"app-operator.giantswarm.io/version": "1.0.0",
+				"app-operator.giantswarm.io/version": c.VersionLabelValue,
 			},
 		},
 		Spec: applicationv1alpha1.AppSpec{
