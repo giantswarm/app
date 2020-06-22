@@ -3,7 +3,7 @@ module github.com/giantswarm/app
 go 1.13
 
 require (
-	github.com/giantswarm/apiextensions v0.4.8-0.20200616142319-00cb58c2f1cc
+	github.com/giantswarm/apiextensions v0.4.8
 	github.com/giantswarm/microerror v0.2.0
 	github.com/gogo/protobuf v1.3.1 // indirect
 	github.com/stretchr/testify v1.4.0 // indirect
