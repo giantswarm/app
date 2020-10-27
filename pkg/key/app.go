@@ -15,30 +15,6 @@ const (
 	ChartOperatorAppName = "chart-operator"
 )
 
-func AppCatalogTitle(customResource v1alpha1.AppCatalog) string {
-	return customResource.Spec.Title
-}
-
-func AppCatalogStorageURL(customResource v1alpha1.AppCatalog) string {
-	return customResource.Spec.Storage.URL
-}
-
-func AppCatalogConfigMapName(customResource v1alpha1.AppCatalog) string {
-	return customResource.Spec.Config.ConfigMap.Name
-}
-
-func AppCatalogConfigMapNamespace(customResource v1alpha1.AppCatalog) string {
-	return customResource.Spec.Config.ConfigMap.Namespace
-}
-
-func AppCatalogSecretName(customResource v1alpha1.AppCatalog) string {
-	return customResource.Spec.Config.Secret.Name
-}
-
-func AppCatalogSecretNamespace(customResource v1alpha1.AppCatalog) string {
-	return customResource.Spec.Config.Secret.Namespace
-}
-
 func AppConfigMapName(customResource v1alpha1.App) string {
 	return customResource.Spec.Config.ConfigMap.Name
 }
@@ -65,18 +41,6 @@ func AppStatus(customResource v1alpha1.App) v1alpha1.AppStatus {
 
 func CatalogName(customResource v1alpha1.App) string {
 	return customResource.Spec.Catalog
-}
-
-func ChartStatus(customResource v1alpha1.Chart) v1alpha1.ChartStatus {
-	return customResource.Status
-}
-
-func ChartConfigMapName(customResource v1alpha1.App) string {
-	return fmt.Sprintf("%s-chart-values", customResource.GetName())
-}
-
-func ChartSecretName(customResource v1alpha1.App) string {
-	return fmt.Sprintf("%s-chart-secrets", customResource.GetName())
 }
 
 func ClusterID(customResource v1alpha1.App) string {
@@ -110,17 +74,6 @@ func InCluster(customResource v1alpha1.App) bool {
 func IsAppCordoned(customResource v1alpha1.App) bool {
 	_, reasonOk := customResource.Annotations[fmt.Sprintf("%s/%s", annotation.AppOperatorPrefix, annotation.CordonReason)]
 	_, untilOk := customResource.Annotations[fmt.Sprintf("%s/%s", annotation.AppOperatorPrefix, annotation.CordonUntil)]
-
-	if reasonOk && untilOk {
-		return true
-	}
-
-	return false
-}
-
-func IsChartCordoned(customResource v1alpha1.Chart) bool {
-	_, reasonOk := customResource.Annotations[fmt.Sprintf("%s/%s", annotation.ChartOperatorPrefix, annotation.CordonReason)]
-	_, untilOk := customResource.Annotations[fmt.Sprintf("%s/%s", annotation.ChartOperatorPrefix, annotation.CordonUntil)]
 
 	if reasonOk && untilOk {
 		return true
