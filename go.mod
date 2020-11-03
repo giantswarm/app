@@ -1,6 +1,6 @@
-module github.com/giantswarm/app/v2
+module github.com/giantswarm/app/v3
 
-go 1.14
+go 1.15
 
 require (
 	github.com/giantswarm/apiextensions/v3 v3.4.2-0.20201103105314-dd1460e43e4f
