@@ -3,7 +3,8 @@ package key
 import (
 	"fmt"
 
-	"github.com/giantswarm/apiextensions/v2/pkg/apis/application/v1alpha1"
+	"github.com/giantswarm/apiextensions/v3/pkg/apis/application/v1alpha1"
+
 	"github.com/giantswarm/app/v2/pkg/annotation"
 )
 
