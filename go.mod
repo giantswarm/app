@@ -11,5 +11,11 @@ require (
 	sigs.k8s.io/yaml v1.2.0
 )
 
-// Apply fix for CVE-2020-15114 not yet released in github.com/spf13/viper.
-replace github.com/bketelsen/crypt => github.com/bketelsen/crypt v0.0.3
+replace (
+	// Apply fix for CVE-2020-15114 not yet released in github.com/spf13/viper.
+	github.com/bketelsen/crypt => github.com/bketelsen/crypt v0.0.3
+	// Apply security fix not present in v1.4.0.
+	github.com/gorilla/websocket => github.com/gorilla/websocket v1.4.2
+	// Use fork of CAPI with Kubernetes 1.18 support.
+	sigs.k8s.io/cluster-api => github.com/giantswarm/cluster-api v0.3.10-gs
+)
