@@ -11,4 +11,5 @@ require (
 	sigs.k8s.io/yaml v1.2.0
 )
 
-replace sigs.k8s.io/cluster-api => github.com/giantswarm/cluster-api v0.3.10-gs
+// Apply fix for CVE-2020-15114 not yet released in github.com/spf13/viper.
+replace github.com/bketelsen/crypt => github.com/bketelsen/crypt v0.0.3
