@@ -9,7 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Add key package extracted from app-operator.
+- Add annotation and key packages extracted from app-operator.
+
+### Changed
+
+- Updated apiextensions to v3.4.0.
+- Prepare module v3.
 
 ## [2.0.0] - 2020-08-11
 
