@@ -15,7 +15,7 @@ import (
 	clientgofake "k8s.io/client-go/kubernetes/fake"
 )
 
-func Test_validateCatalog(t *testing.T) {
+func Test_ValidateApp(t *testing.T) {
 	ctx := context.Background()
 
 	tests := []struct {
