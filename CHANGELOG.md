@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.0] - 2020-11-04
+
+- Add values service extracted from app-operator.
+
 ### Added
 
 - Add annotation and key packages extracted from app-operator.
@@ -33,7 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Set version label value to 0.0.0 so control plane app CRs are reconciled by
-  app-operator-unique. 
+  app-operator-unique.
 
 ## [0.2.1] - 2020-04-24
 
@@ -51,7 +55,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - First release
 
-[Unreleased]: https://github.com/giantswarm/app/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/giantswarm/app/compare/v3.0.0...HEAD
+[3.0.0]: https://github.com/giantswarm/app/compare/v2.0.0...v3.0.0
 [2.0.0]: https://github.com/giantswarm/app/compare/v0.2.3...v2.0.0
 [0.2.3]: https://github.com/giantswarm/app/compare/v0.2.2...v0.2.3
 [0.2.2]: https://github.com/giantswarm/app/compare/v0.2.1...v0.2.2
