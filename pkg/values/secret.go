@@ -4,12 +4,13 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/giantswarm/apiextensions/pkg/apis/application/v1alpha1"
+	"github.com/giantswarm/apiextensions/v3/pkg/apis/application/v1alpha1"
+	"github.com/giantswarm/helmclient/v3/pkg/helmclient"
 	"github.com/giantswarm/microerror"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/giantswarm/app-operator/service/controller/app/key"
+	"github.com/giantswarm/app/v3/pkg/key"
 )
 
 // MergeSecretData merges the data from the catalog, app and user secretss
@@ -39,7 +40,11 @@ func (v *Values) MergeSecretData(ctx context.Context, app v1alpha1.App, appCatal
 	// Secrets are merged and in case of intersecting values the app level
 	// secrets are preferred.
 	mergedData, err := mergeSecretData(catalogData, appData)
-	if err != nil {
+	if helmclient.IsParsingDestFailedError(err) {
+		return nil, microerror.Maskf(parsingError, "failed to parse catalog secret")
+	} else if helmclient.IsParsingSrcFailedError(err) {
+		return nil, microerror.Maskf(parsingError, "failed to parse app secret")
+	} else if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
@@ -53,7 +58,11 @@ func (v *Values) MergeSecretData(ctx context.Context, app v1alpha1.App, appCatal
 		// Secrets are merged again and in case of intersecting values the user
 		// level secrets are preferred.
 		mergedData, err = mergeSecretData(mergedData, userData)
-		if err != nil {
+		if helmclient.IsParsingDestFailedError(err) {
+			return nil, microerror.Maskf(parsingError, "failed to parse previous merged secret")
+		} else if helmclient.IsParsingSrcFailedError(err) {
+			return nil, microerror.Maskf(parsingError, "failed to parse user secret")
+		} else if err != nil {
 			return nil, microerror.Mask(err)
 		}
 	}
@@ -69,7 +78,7 @@ func (v *Values) getSecret(ctx context.Context, secretName, secretNamespace stri
 
 	v.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("looking for secret %#q in namespace %#q", secretName, secretNamespace))
 
-	secret, err := v.k8sClient.CoreV1().Secrets(secretNamespace).Get(secretName, metav1.GetOptions{})
+	secret, err := v.k8sClient.CoreV1().Secrets(secretNamespace).Get(ctx, secretName, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
 		return nil, microerror.Maskf(notFoundError, "secret %#q in namespace %#q not found", secretName, secretNamespace)
 	} else if err != nil {

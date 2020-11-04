@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/giantswarm/apiextensions/pkg/apis/application/v1alpha1"
+	"github.com/giantswarm/apiextensions/v3/pkg/apis/application/v1alpha1"
 	"github.com/giantswarm/micrologger/microloggertest"
 	"github.com/google/go-cmp/cmp"
 	corev1 "k8s.io/api/core/v1"
@@ -312,6 +312,43 @@ func Test_MergeSecretData(t *testing.T) {
 				// "test: user" overrides "test: catalog" and "test: app".
 				"values": []byte("catalog: test\ncluster: test\ntest: user\nuser: test\n"),
 			},
+		},
+		{
+			name: "case 6: parsing error from wrong user values",
+			app: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "my-prometheus",
+					Namespace: "giantswarm",
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "app-catalog",
+					Name:      "prometheus",
+					Namespace: "monitoring",
+					UserConfig: v1alpha1.AppSpecUserConfig{
+						Secret: v1alpha1.AppSpecUserConfigSecret{
+							Name:      "test-cluster-user-secrets",
+							Namespace: "giantswarm",
+						},
+					},
+				},
+			},
+			appCatalog: v1alpha1.AppCatalog{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: "test-catalog",
+				},
+			},
+			secrets: []*corev1.Secret{
+				{
+					Data: map[string][]byte{
+						"secrets": []byte("cluster --\n"),
+					},
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "test-cluster-user-secrets",
+						Namespace: "giantswarm",
+					},
+				},
+			},
+			errorMatcher: IsParsingError,
 		},
 	}
 	ctx := context.Background()

@@ -4,12 +4,13 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/giantswarm/apiextensions/pkg/apis/application/v1alpha1"
+	"github.com/giantswarm/apiextensions/v3/pkg/apis/application/v1alpha1"
+	"github.com/giantswarm/helmclient/v3/pkg/helmclient"
 	"github.com/giantswarm/microerror"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/giantswarm/app/pkg/key"
+	"github.com/giantswarm/app/v3/pkg/key"
 )
 
 // MergeConfigMapData merges the data from the catalog, app and user configmaps
@@ -39,7 +40,11 @@ func (v *Values) MergeConfigMapData(ctx context.Context, app v1alpha1.App, appCa
 	// Config is merged and in case of intersecting values the app level
 	// config is preferred.
 	mergedData, err := mergeConfigMapData(catalogData, appData)
-	if err != nil {
+	if helmclient.IsParsingDestFailedError(err) {
+		return nil, microerror.Maskf(parsingError, "failed to parse catalog configmap, logs from merging: %s", err.Error())
+	} else if helmclient.IsParsingSrcFailedError(err) {
+		return nil, microerror.Maskf(parsingError, "failed to parse app configmap, logs from merging: %s", err.Error())
+	} else if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
@@ -53,7 +58,11 @@ func (v *Values) MergeConfigMapData(ctx context.Context, app v1alpha1.App, appCa
 		// Config is merged again and in case of intersecting values the user
 		// level config is preferred.
 		mergedData, err = mergeConfigMapData(mergedData, userData)
-		if err != nil {
+		if helmclient.IsParsingDestFailedError(err) {
+			return nil, microerror.Maskf(parsingError, "failed to parse previous merged configmap, logs from merging: %s", err.Error())
+		} else if helmclient.IsParsingSrcFailedError(err) {
+			return nil, microerror.Maskf(parsingError, "failed to parse user configmap, logs from merging: %s", err.Error())
+		} else if err != nil {
 			return nil, microerror.Mask(err)
 		}
 	}
@@ -69,7 +78,7 @@ func (v *Values) getConfigMap(ctx context.Context, configMapName, configMapNames
 
 	v.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("looking for configmap %#q in namespace %#q", configMapName, configMapNamespace))
 
-	configMap, err := v.k8sClient.CoreV1().ConfigMaps(configMapNamespace).Get(configMapName, metav1.GetOptions{})
+	configMap, err := v.k8sClient.CoreV1().ConfigMaps(configMapNamespace).Get(ctx, configMapName, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
 		return nil, microerror.Maskf(notFoundError, "configmap %#q in namespace %#q not found", configMapName, configMapNamespace)
 	} else if err != nil {
