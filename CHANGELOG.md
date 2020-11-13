@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add key functions for app labels.
+
 ### Fixed
 
 - Return separate validation error when the kubeconfig secret is not found
