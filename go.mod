@@ -3,7 +3,7 @@ module github.com/giantswarm/app/v3
 go 1.15
 
 require (
-	github.com/giantswarm/apiextensions/v3 v3.7.1-0.20201111144349-4ed00f3702ef
+	github.com/giantswarm/apiextensions/v3 v3.8.0
 	github.com/giantswarm/helmclient/v3 v3.0.1
 	github.com/giantswarm/microerror v0.2.1
 	github.com/giantswarm/micrologger v0.3.4
