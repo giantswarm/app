@@ -4,6 +4,24 @@ import (
 	"github.com/giantswarm/microerror"
 )
 
+var invalidConfigError = &microerror.Error{
+	Kind: "invalidConfigError",
+}
+
+// IsInvalidConfig asserts invalidConfigError.
+func IsInvalidConfig(err error) bool {
+	return microerror.Cause(err) == invalidConfigError
+}
+
+var kubeConfigNotFoundError = &microerror.Error{
+	Kind: "kubeConfigNotFoundError",
+}
+
+// IsKubeConfigNotFound asserts kubeConfigNotFoundError.
+func IsKubeConfigNotFound(err error) bool {
+	return microerror.Cause(err) == kubeConfigNotFoundError
+}
+
 var notAllowedError = &microerror.Error{
 	Kind: "notAllowedError",
 }
@@ -20,15 +38,6 @@ var notFoundError = &microerror.Error{
 // IsNotFound asserts notFoundError.
 func IsNotFound(err error) bool {
 	return microerror.Cause(err) == notFoundError
-}
-
-var invalidConfigError = &microerror.Error{
-	Kind: "invalidConfigError",
-}
-
-// IsInvalidConfig asserts invalidConfigError.
-func IsInvalidConfig(err error) bool {
-	return microerror.Cause(err) == invalidConfigError
 }
 
 var parsingFailedError = &microerror.Error{

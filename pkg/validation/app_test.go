@@ -298,7 +298,7 @@ func Test_ValidateApp(t *testing.T) {
 			catalogs: []*v1alpha1.AppCatalog{
 				newTestCatalog("giantswarm"),
 			},
-			expectedErr: "validation error: kubeconfig secret `eggs2-kubeconfig` in namespace `eggs2` not found",
+			expectedErr: "kube config not found error: kubeconfig secret `eggs2-kubeconfig` in namespace `eggs2` not found",
 		},
 		{
 			name: "case 9: spec.kubeConfig.secret no namespace specified",
