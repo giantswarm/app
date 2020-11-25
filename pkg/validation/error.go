@@ -1,8 +1,38 @@
 package validation
 
 import (
+	"strings"
+
 	"github.com/giantswarm/microerror"
 )
+
+const (
+	appConfigMapNotFoundPattern string = "admission webhook \"apps.app-admission-controller-unique.giantswarm.io\" denied the request: app config map not found error"
+	kubeConfigNotFoundPattern   string = "admission webhook \"apps.app-admission-controller-unique.giantswarm.io\" denied the request: kube config not found error"
+)
+
+var appConfigMapNotFoundError = &microerror.Error{
+	Kind: "appConfigMapNotFoundError",
+}
+
+// IsAppConfigMapNotFound asserts appConfigMapNotFoundError.
+func IsAppConfigMapNotFound(err error) bool {
+	if err == nil {
+		return false
+	}
+
+	c := microerror.Cause(err)
+
+	if strings.Contains(c.Error(), appConfigMapNotFoundPattern) {
+		return true
+	}
+
+	if c == appConfigMapNotFoundError { //nolint:gosimple
+		return true
+	}
+
+	return false
+}
 
 var invalidConfigError = &microerror.Error{
 	Kind: "invalidConfigError",
@@ -19,7 +49,21 @@ var kubeConfigNotFoundError = &microerror.Error{
 
 // IsKubeConfigNotFound asserts kubeConfigNotFoundError.
 func IsKubeConfigNotFound(err error) bool {
-	return microerror.Cause(err) == kubeConfigNotFoundError
+	if err == nil {
+		return false
+	}
+
+	c := microerror.Cause(err)
+
+	if strings.Contains(c.Error(), kubeConfigNotFoundPattern) {
+		return true
+	}
+
+	if c == appConfigMapNotFoundError { //nolint:gosimple
+		return true
+	}
+
+	return false
 }
 
 var notAllowedError = &microerror.Error{
