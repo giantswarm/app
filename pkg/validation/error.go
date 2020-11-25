@@ -1,6 +1,8 @@
 package validation
 
 import (
+	"fmt"
+	"os"
 	"strings"
 
 	"github.com/giantswarm/microerror"
@@ -22,6 +24,11 @@ func IsAppConfigMapNotFound(err error) bool {
 	}
 
 	c := microerror.Cause(err)
+
+	fmt.Fprintf(os.Stdout, "DEBUG APP CM ERR %#v", err)
+	fmt.Fprintf(os.Stdout, "DEBUG APP CM CAUSE %#v", c)
+	fmt.Fprintf(os.Stdout, "DEBUG APP CM STRING %#q", c.Error())
+	fmt.Fprint(os.Stdout, c.Error())
 
 	if strings.Contains(c.Error(), appConfigMapNotFoundPattern) {
 		return true
@@ -54,6 +61,11 @@ func IsKubeConfigNotFound(err error) bool {
 	}
 
 	c := microerror.Cause(err)
+
+	fmt.Fprintf(os.Stdout, "DEBUG KUBECONFIG ERR %#v", err)
+	fmt.Fprintf(os.Stdout, "DEBUG KUBECONFIG CAUSE %#v", c)
+	fmt.Fprintf(os.Stdout, "DEBUG KUBECONFIG STRING %#q", c.Error())
+	fmt.Fprint(os.Stdout, c.Error())
 
 	if strings.Contains(c.Error(), kubeConfigNotFoundPattern) {
 		return true
