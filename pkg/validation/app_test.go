@@ -173,7 +173,7 @@ func Test_ValidateApp(t *testing.T) {
 			catalogs: []*v1alpha1.AppCatalog{
 				newTestCatalog("control-plane-catalog"),
 			},
-			expectedErr: "validation error: configmap `dex-app-values` in namespace `giantswarm` not found",
+			expectedErr: "app config map not found error: configmap `dex-app-values` in namespace `giantswarm` not found",
 		},
 		{
 			name: "case 5: spec.config.configMap no namespace specified",
