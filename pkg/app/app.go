@@ -18,8 +18,8 @@ type Config struct {
 	AppVersion          string
 	DisableForceUpgrade bool
 	Name                string
-	ConfigMapName       string
-	SecretName          string
+	UserConfigMapName   string
+	UserSecretName      string
 }
 
 // NewCR returns new application CR.
@@ -36,16 +36,16 @@ func NewCR(c Config) *applicationv1alpha1.App {
 	}
 
 	var userConfig applicationv1alpha1.AppSpecUserConfig
-	if c.ConfigMapName != "" {
+	if c.UserConfigMapName != "" {
 
 		userConfig.ConfigMap = applicationv1alpha1.AppSpecUserConfigConfigMap{
-			Name:      c.ConfigMapName,
+			Name:      c.UserConfigMapName,
 			Namespace: "giantswarm",
 		}
 	}
-	if c.SecretName != "" {
+	if c.UserSecretName != "" {
 		userConfig.Secret = applicationv1alpha1.AppSpecUserConfigSecret{
-			Name:      c.SecretName,
+			Name:      c.UserSecretName,
 			Namespace: "giantswarm",
 		}
 	}
