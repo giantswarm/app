@@ -7,16 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Return separate errors for cluster kubeconfig and configmap not existing
+since there can be a delay creating them on cluster creation.
+
 ## [3.3.0] - 2020-11-23
 
 ### Added
 
 - Add key functions for app labels.
-
-### Fixed
-
-- Return separate validation error when the kubeconfig secret is not found
-to handle delay when it is created during cluster creation.
 
 ## [3.2.0] - 2020-11-11
 
