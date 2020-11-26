@@ -8,12 +8,12 @@ import (
 )
 
 const (
-	appAdmissionControllerText string = "admission webhook \"apps.app-admission-controller-unique.giantswarm.io\" denied the request: validation error:"
+	appAdmissionControllerText string = "admission webhook \"apps.app-admission-controller-unique.giantswarm.io\" denied the request:"
 )
 
 var (
-	appConfigMapPattern     = regexp.MustCompile(`configmap [\d\D]+ in namespace [\d\D]+ not found`)
-	kubeConfigSecretPattern = regexp.MustCompile(`kubeconfig secret [\d\D]+ in namespace [\d\D]+ not found`)
+	appConfigMapNotFoundPattern = regexp.MustCompile(`app config map not found error: configmap [\d\D]+ in namespace [\d\D]+ not found`)
+	kubeConfigNotFoundPattern   = regexp.MustCompile(`kube config not found error: kubeconfig secret [\d\D]+ in namespace [\d\D]+ not found`)
 )
 
 var appConfigMapNotFoundError = &microerror.Error{
@@ -28,7 +28,7 @@ func IsAppConfigMapNotFound(err error) bool {
 
 	c := microerror.Cause(err)
 
-	if strings.Contains(c.Error(), appAdmissionControllerText) && appConfigMapPattern.MatchString(c.Error()) {
+	if strings.Contains(c.Error(), appAdmissionControllerText) && appConfigMapNotFoundPattern.MatchString(c.Error()) {
 		return true
 	}
 
@@ -60,7 +60,7 @@ func IsKubeConfigNotFound(err error) bool {
 
 	c := microerror.Cause(err)
 
-	if strings.Contains(c.Error(), appAdmissionControllerText) && kubeConfigSecretPattern.MatchString(c.Error()) {
+	if strings.Contains(c.Error(), appAdmissionControllerText) && kubeConfigNotFoundPattern.MatchString(c.Error()) {
 		return true
 	}
 

@@ -13,7 +13,7 @@ func Test_IsAppConfigMapNotFound(t *testing.T) {
 	}{
 		{
 			name:          "case 0: good match",
-			errorMessage:  "admission webhook \"apps.app-admission-controller-unique.giantswarm.io\" denied the request: validation error: configmap `u9q0r-cluster-values` in namespace `u9q0r` not found",
+			errorMessage:  "admission webhook \"apps.app-admission-controller-unique.giantswarm.io\" denied the request: app config map not found error: configmap `u9q0r-cluster-values` in namespace `u9q0r` not found",
 			expectedMatch: true,
 		},
 		{
@@ -48,7 +48,7 @@ func Test_IsKubeConfigNotFound(t *testing.T) {
 	}{
 		{
 			name:          "case 0: good match",
-			errorMessage:  "admission webhook \"apps.app-admission-controller-unique.giantswarm.io\" denied the request: validation error: kubeconfig secret `u9q0r-kubeconfig` in namespace `u9q0r` not found",
+			errorMessage:  "admission webhook \"apps.app-admission-controller-unique.giantswarm.io\" denied the request: kube config not found error: kubeconfig secret `u9q0r-kubeconfig` in namespace `u9q0r` not found",
 			expectedMatch: true,
 		},
 		{
