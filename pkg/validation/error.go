@@ -1,16 +1,19 @@
 package validation
 
 import (
-	"fmt"
-	"os"
+	"regexp"
 	"strings"
 
 	"github.com/giantswarm/microerror"
 )
 
 const (
-	appConfigMapNotFoundPattern string = "admission webhook \"apps.app-admission-controller-unique.giantswarm.io\" denied the request: app config map not found error"
-	kubeConfigNotFoundPattern   string = "admission webhook \"apps.app-admission-controller-unique.giantswarm.io\" denied the request: kube config not found error"
+	appAdmissionControllerText string = "admission webhook \"apps.app-admission-controller-unique.giantswarm.io\" denied the request: validation error:"
+)
+
+var (
+	appConfigMapPattern     = regexp.MustCompile(`configmap [\d\D]+ in namespace [\d\D]+ not found`)
+	kubeConfigSecretPattern = regexp.MustCompile(`kubeconfig secret [\d\D]+ in namespace [\d\D]+ not found`)
 )
 
 var appConfigMapNotFoundError = &microerror.Error{
@@ -25,12 +28,7 @@ func IsAppConfigMapNotFound(err error) bool {
 
 	c := microerror.Cause(err)
 
-	fmt.Fprintf(os.Stdout, "DEBUG APP CM ERR %#v", err)
-	fmt.Fprintf(os.Stdout, "DEBUG APP CM CAUSE %#v", c)
-	fmt.Fprintf(os.Stdout, "DEBUG APP CM STRING %#q", c.Error())
-	fmt.Fprint(os.Stdout, c.Error())
-
-	if strings.Contains(c.Error(), appConfigMapNotFoundPattern) {
+	if strings.Contains(c.Error(), appAdmissionControllerText) && appConfigMapPattern.MatchString(c.Error()) {
 		return true
 	}
 
@@ -62,16 +60,11 @@ func IsKubeConfigNotFound(err error) bool {
 
 	c := microerror.Cause(err)
 
-	fmt.Fprintf(os.Stdout, "DEBUG KUBECONFIG ERR %#v", err)
-	fmt.Fprintf(os.Stdout, "DEBUG KUBECONFIG CAUSE %#v", c)
-	fmt.Fprintf(os.Stdout, "DEBUG KUBECONFIG STRING %#q", c.Error())
-	fmt.Fprint(os.Stdout, c.Error())
-
-	if strings.Contains(c.Error(), kubeConfigNotFoundPattern) {
+	if strings.Contains(c.Error(), appAdmissionControllerText) && kubeConfigSecretPattern.MatchString(c.Error()) {
 		return true
 	}
 
-	if c == appConfigMapNotFoundError { //nolint:gosimple
+	if c == kubeConfigNotFoundError { //nolint:gosimple
 		return true
 	}
 
