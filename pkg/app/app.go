@@ -6,6 +6,7 @@ import (
 	"io"
 
 	applicationv1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/application/v1alpha1"
+	"github.com/giantswarm/apiextensions/v3/pkg/label"
 	"github.com/giantswarm/microerror"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/yaml"
@@ -16,6 +17,7 @@ type Config struct {
 	AppName             string
 	AppNamespace        string
 	AppVersion          string
+	Annotations         map[string]string
 	DisableForceUpgrade bool
 	Name                string
 	UserConfigMapName   string
@@ -26,12 +28,18 @@ type Config struct {
 //
 // AppCatalog is the name of the app catalog where the app stored.
 func NewCR(c Config) *applicationv1alpha1.App {
-	var annotations map[string]string
+	annotations := c.Annotations
 	{
+		if annotations == nil {
+			annotations = make(map[string]string)
+		}
+
+		forceUpgradeAnnoation := "chart-operator.giantswarm.io/force-helm-upgrade"
+		if _, ok := annotations[forceUpgradeAnnoation]; ok {
+			panic(fmt.Sprintf("Annotation %q should not be set manually. Use Config.DisableForceUpgrade instead.", forceUpgradeAnnoation))
+		}
 		if !c.DisableForceUpgrade {
-			annotations = map[string]string{
-				"chart-operator.giantswarm.io/force-helm-upgrade": "true",
-			}
+			annotations[forceUpgradeAnnoation] = "true"
 		}
 	}
 
@@ -57,9 +65,10 @@ func NewCR(c Config) *applicationv1alpha1.App {
 			Namespace:   "giantswarm",
 			Annotations: annotations,
 			Labels: map[string]string{
-				// Version is set to 0.0.0 for all control plane app CRs so
-				// they are reconciled by app-operator-unique.
-				"app-operator.giantswarm.io/version": "0.0.0",
+				// Version 0.0.0 means this is reconciled by
+				// unique operator.
+				label.AppOperatorVersion:      "0.0.0",
+				label.ConfigControllerVersion: "0.0.0",
 			},
 		},
 		Spec: applicationv1alpha1.AppSpec{
