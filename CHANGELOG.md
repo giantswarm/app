@@ -9,7 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Allow adding custom annotations to created App CRs.
+- Support `ConfigMajorVersion` setting to set
+  "config.giantswarm.io/major-version" annotation.
 - Set "config-controller.giantswarm.io/version" label to "0.0.0" on created App
   CRs.
 

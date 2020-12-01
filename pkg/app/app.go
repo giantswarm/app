@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/giantswarm/apiextensions/v3/pkg/annotation"
 	applicationv1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/application/v1alpha1"
 	"github.com/giantswarm/apiextensions/v3/pkg/label"
 	"github.com/giantswarm/microerror"
@@ -17,7 +18,7 @@ type Config struct {
 	AppName             string
 	AppNamespace        string
 	AppVersion          string
-	Annotations         map[string]string
+	ConfigMajorVersion  int
 	DisableForceUpgrade bool
 	Name                string
 	UserConfigMapName   string
@@ -28,24 +29,18 @@ type Config struct {
 //
 // AppCatalog is the name of the app catalog where the app stored.
 func NewCR(c Config) *applicationv1alpha1.App {
-	annotations := c.Annotations
+	annotations := map[string]string{}
 	{
-		if annotations == nil {
-			annotations = make(map[string]string)
-		}
-
-		forceUpgradeAnnoation := "chart-operator.giantswarm.io/force-helm-upgrade"
-		if _, ok := annotations[forceUpgradeAnnoation]; ok {
-			panic(fmt.Sprintf("Annotation %q should not be set manually. Use Config.DisableForceUpgrade instead.", forceUpgradeAnnoation))
+		if c.ConfigMajorVersion > 0 {
+			annotations[annotation.ConfigMajorVersion] = "true"
 		}
 		if !c.DisableForceUpgrade {
-			annotations[forceUpgradeAnnoation] = "true"
+			annotations["chart-operator.giantswarm.io/force-helm-upgrade"] = "true"
 		}
 	}
 
 	var userConfig applicationv1alpha1.AppSpecUserConfig
 	if c.UserConfigMapName != "" {
-
 		userConfig.ConfigMap = applicationv1alpha1.AppSpecUserConfigConfigMap{
 			Name:      c.UserConfigMapName,
 			Namespace: "giantswarm",
