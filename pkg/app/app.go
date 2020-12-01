@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"strconv"
 
 	"github.com/giantswarm/apiextensions/v3/pkg/annotation"
 	applicationv1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/application/v1alpha1"
@@ -32,7 +33,7 @@ func NewCR(c Config) *applicationv1alpha1.App {
 	annotations := map[string]string{}
 	{
 		if c.ConfigMajorVersion > 0 {
-			annotations[annotation.ConfigMajorVersion] = "true"
+			annotations[annotation.ConfigMajorVersion] = strconv.Itoa(c.ConfigMajorVersion)
 		}
 		if !c.DisableForceUpgrade {
 			annotations["chart-operator.giantswarm.io/force-helm-upgrade"] = "true"
