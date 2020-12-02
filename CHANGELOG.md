@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Validate App CR configmap and secret names if managed by config-controller.
+
 ## [3.6.0] - 2020-12-01
 
 ### Added
@@ -15,7 +19,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   "config.giantswarm.io/major-version" annotation.
 - Set "config-controller.giantswarm.io/version" label to "0.0.0" on created App
   CRs.
-- Validate App CR configmap and secret names if managed by config-controller.
 
 ## [3.5.0] - 2020-11-27
 
