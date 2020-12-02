@@ -467,7 +467,7 @@ func Test_ValidateApp(t *testing.T) {
 						label.AppOperatorVersion: "2.6.0",
 					},
 					Annotations: map[string]string{
-						annotation.ConfigMajorVersion: "1",
+						annotation.ConfigVersion: "1.0.0",
 					},
 				},
 				Spec: v1alpha1.AppSpec{

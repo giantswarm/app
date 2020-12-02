@@ -65,7 +65,7 @@ func (v *Validator) validateCatalog(ctx context.Context, cr v1alpha1.App) error 
 }
 
 func (v *Validator) validateConfig(ctx context.Context, cr v1alpha1.App) error {
-	_, hasManagedConfig := cr.Annotations[annotation.ConfigMajorVersion]
+	_, hasManagedConfig := cr.Annotations[annotation.ConfigVersion]
 	if hasManagedConfig && (key.AppConfigMapName(cr) == "" || key.AppSecretName(cr) == "") {
 		// wait for config-controller setting app CR configmap and secret
 		return microerror.Maskf(appDependencyNotReadyError, "ConfigMap or Secret not set")
