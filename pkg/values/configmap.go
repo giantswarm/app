@@ -5,13 +5,11 @@ import (
 	"fmt"
 
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/application/v1alpha1"
+	"github.com/giantswarm/app/v3/pkg/key"
 	"github.com/giantswarm/microerror"
 	"github.com/imdario/mergo"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"sigs.k8s.io/yaml"
-
-	"github.com/giantswarm/app/v3/pkg/key"
 )
 
 const (
@@ -124,29 +122,4 @@ func (v *Values) getUserConfigMapForApp(ctx context.Context, app v1alpha1.App) (
 	}
 
 	return configMap, nil
-}
-
-func extractData(resourceType, name string, data map[string]string) (map[string]interface{}, error) {
-	var err error
-	var rawMapData map[string]interface{}
-
-	if data == nil {
-		return rawMapData, nil
-	}
-
-	if len(data) != 1 {
-		return nil, microerror.Maskf(parsingError, "expected %#q %s has only one key but got %d", name, resourceType, len(data))
-	}
-
-	var rawData []byte
-	for _, v := range data {
-		rawData = []byte(v)
-	}
-
-	err = yaml.Unmarshal(rawData, &rawMapData)
-	if err != nil {
-		return nil, microerror.Maskf(parsingError, "failed to parse %#q %s, logs: %s", name, resourceType, err.Error())
-	}
-
-	return rawMapData, nil
 }
