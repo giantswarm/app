@@ -2,13 +2,13 @@ package values
 
 import (
 	"context"
-	"sigs.k8s.io/yaml"
 
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/application/v1alpha1"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/imdario/mergo"
 	"k8s.io/client-go/kubernetes"
+	"sigs.k8s.io/yaml"
 )
 
 // Config represents the configuration used to create a new values service.
