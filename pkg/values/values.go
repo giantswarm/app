@@ -4,11 +4,10 @@ import (
 	"context"
 
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/application/v1alpha1"
-	"github.com/giantswarm/helmclient/v3/pkg/helmclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
+	"github.com/imdario/mergo"
 	"k8s.io/client-go/kubernetes"
-	"sigs.k8s.io/yaml"
 )
 
 // Config represents the configuration used to create a new values service.
@@ -56,50 +55,20 @@ func (v *Values) MergeAll(ctx context.Context, app v1alpha1.App, appCatalog v1al
 		return nil, microerror.Mask(err)
 	}
 
-	values, err := helmclient.MergeValues(toByteSliceMap(configMapData), secretData)
+	err = mergo.Merge(&configMapData, secretData, mergo.WithOverride)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
-	return values, nil
-}
-
-// mergeData contains the shared logic that is common to merging configmap and
-// secret data.
-func mergeData(destMap, srcMap map[string][]byte) (map[string][]byte, error) {
-	mergedData, err := helmclient.MergeValues(destMap, srcMap)
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
-
-	bytes, err := yaml.Marshal(mergedData)
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
-
-	// Key name is just for display purposes. The only restriction is the
-	// configmap or secret storing data for the chart CR can only have a single
-	// key with YAML values.
-	result := map[string][]byte{
-		"values": bytes,
-	}
-
-	return result, nil
-}
-
-// toByteSliceMap converts from a string map to a byte slice map.
-func toByteSliceMap(input map[string]string) map[string][]byte {
-	result := map[string][]byte{}
-
-	for k, v := range input {
-		result[k] = []byte(v)
-	}
-
-	return result
+	return configMapData, nil
 }
 
 // toStringMap converts from a byte slice map to a string map.
 func toStringMap(input map[string][]byte) map[string]string {
+	if input == nil {
+		return nil
+	}
+
 	result := map[string]string{}
 
 	for k, v := range input {
