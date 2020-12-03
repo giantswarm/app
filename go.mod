@@ -1,4 +1,4 @@
-module github.com/giantswarm/app/v3
+module github.com/giantswarm/app/v4
 
 go 1.15
 
