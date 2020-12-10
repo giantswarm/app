@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"strconv"
 
 	"github.com/giantswarm/apiextensions/v3/pkg/annotation"
 	applicationv1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/application/v1alpha1"
@@ -18,7 +19,7 @@ type Config struct {
 	AppName             string
 	AppNamespace        string
 	AppVersion          string
-	ConfigVersion       string
+	ConfigMajorVersion  int
 	DisableForceUpgrade bool
 	Name                string
 	UserConfigMapName   string
@@ -31,8 +32,8 @@ type Config struct {
 func NewCR(c Config) *applicationv1alpha1.App {
 	annotations := map[string]string{}
 	{
-		if c.ConfigVersion != "" {
-			annotations[annotation.ConfigVersion] = c.ConfigVersion
+		if c.ConfigMajorVersion > 0 {
+			annotations[annotation.ConfigMajorVersion] = strconv.Itoa(c.ConfigMajorVersion)
 		}
 		if !c.DisableForceUpgrade {
 			annotations["chart-operator.giantswarm.io/force-helm-upgrade"] = "true"
