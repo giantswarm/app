@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Add `PauseReconcilliation` option, responsible for setting `app-operator.giantswarm.io/paused` flag.
+- Add `PauseReconciliation` option, responsible for setting `app-operator.giantswarm.io/paused` flag.
 
 ### Removed
 
