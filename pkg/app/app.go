@@ -14,16 +14,16 @@ import (
 )
 
 type Config struct {
-	AppCatalog           string
-	AppName              string
-	AppNamespace         string
-	AppVersion           string
-	ConfigVersion        string
-	DisableForceUpgrade  bool
-	Name                 string
-	PauseReconcilliation bool
-	UserConfigMapName    string
-	UserSecretName       string
+	AppCatalog          string
+	AppName             string
+	AppNamespace        string
+	AppVersion          string
+	ConfigVersion       string
+	DisableForceUpgrade bool
+	Name                string
+	PauseReconciliation bool
+	UserConfigMapName   string
+	UserSecretName      string
 }
 
 // NewCR returns new application CR.
@@ -38,7 +38,7 @@ func NewCR(c Config) *applicationv1alpha1.App {
 		if !c.DisableForceUpgrade {
 			annotations["chart-operator.giantswarm.io/force-helm-upgrade"] = "true"
 		}
-		if c.PauseReconcilliation {
+		if c.PauseReconciliation {
 			annotations["app-operator.giantswarm.io/paused"] = "true"
 		}
 	}
