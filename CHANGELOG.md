@@ -7,9 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Fixed
+### Added
 
-- Set `config.giantswarm.io/version` using expected value format.
+- Add `PauseReconcilliation` option, responsible for setting `app-operator.giantswarm.io/paused` flag.
 
 ### Removed
 
