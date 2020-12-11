@@ -18,7 +18,7 @@ type Config struct {
 	AppName             string
 	AppNamespace        string
 	AppVersion          string
-	ConfigMajorVersion  int
+	ConfigVersion       string
 	DisableForceUpgrade bool
 	Name                string
 	UserConfigMapName   string
@@ -31,8 +31,8 @@ type Config struct {
 func NewCR(c Config) *applicationv1alpha1.App {
 	annotations := map[string]string{}
 	{
-		if c.ConfigMajorVersion > 0 {
-			annotations[annotation.ConfigVersion] = fmt.Sprintf("%d.x.x", c.ConfigMajorVersion)
+		if c.ConfigVersion != "" {
+			annotations[annotation.ConfigVersion] = c.ConfigVersion
 		}
 		if !c.DisableForceUpgrade {
 			annotations["chart-operator.giantswarm.io/force-helm-upgrade"] = "true"
