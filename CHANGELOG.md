@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
-- Validate App CR configmap and secret names if managed by config-controller.
+- Do not validate App CR configmap and secret names if managed by config-controller.
 
 ## [4.0.0] - 2020-12-03
 
