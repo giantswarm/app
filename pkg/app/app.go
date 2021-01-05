@@ -39,7 +39,7 @@ func NewCR(c Config) *applicationv1alpha1.App {
 			annotations["chart-operator.giantswarm.io/force-helm-upgrade"] = "true"
 		}
 		if c.PauseReconciliation {
-			annotations["app-operator.giantswarm.io/paused"] = "true"
+			annotations[annotation.AppOperatorPaused] = "true"
 		}
 	}
 
