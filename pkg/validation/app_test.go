@@ -484,7 +484,7 @@ func Test_ValidateApp(t *testing.T) {
 				t.Fatalf("error == %#v, want nil", err)
 			}
 
-			_, err = r.ValidateApp(ctx, tc.obj)
+			err = r.ValidateApp(ctx, tc.obj)
 			switch {
 			case err != nil && tc.expectedErr == "":
 				t.Fatalf("error == %#v, want nil", err)
