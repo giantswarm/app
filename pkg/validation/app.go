@@ -19,35 +19,35 @@ const (
 	resourceNotFoundTemplate        = "%s %#q in namespace %#q not found"
 )
 
-func (v *Validator) ValidateApp(ctx context.Context, app v1alpha1.App) (bool, error) {
+func (v *Validator) ValidateApp(ctx context.Context, app v1alpha1.App) error {
 	var err error
 
 	err = v.validateLabels(ctx, app)
 	if err != nil {
-		return false, microerror.Mask(err)
+		return microerror.Mask(err)
 	}
 
 	err = v.validateCatalog(ctx, app)
 	if err != nil {
-		return false, microerror.Mask(err)
+		return microerror.Mask(err)
 	}
 
 	err = v.validateConfig(ctx, app)
 	if err != nil {
-		return false, microerror.Mask(err)
+		return microerror.Mask(err)
 	}
 
 	err = v.validateKubeConfig(ctx, app)
 	if err != nil {
-		return false, microerror.Mask(err)
+		return microerror.Mask(err)
 	}
 
 	err = v.validateUserConfig(ctx, app)
 	if err != nil {
-		return false, microerror.Mask(err)
+		return microerror.Mask(err)
 	}
 
-	return true, nil
+	return nil
 }
 
 func (v *Validator) validateCatalog(ctx context.Context, cr v1alpha1.App) error {

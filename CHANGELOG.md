@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add validation.Interface with well defined returned errors.
+
+### Changed
+
+- validation.Validator.ValidateApp returns only `error` instead of `(bool,
+  error)`.
+
 ### Removed
 
 - Remove unused errors from validation package.
