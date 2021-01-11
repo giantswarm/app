@@ -66,8 +66,7 @@ func NewCR(c Config) *applicationv1alpha1.App {
 			Labels: map[string]string{
 				// Version 0.0.0 means this is reconciled by
 				// unique operator.
-				label.AppOperatorVersion:      "0.0.0",
-				label.ConfigControllerVersion: "0.0.0",
+				label.AppOperatorVersion: "0.0.0",
 			},
 		},
 		Spec: applicationv1alpha1.AppSpec{
