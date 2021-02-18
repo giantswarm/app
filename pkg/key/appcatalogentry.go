@@ -16,6 +16,6 @@ func AppCatalogEntryName(catalogName, appName, appVersion string) string {
 	return fmt.Sprintf("%s-%s-%s", catalogName, appName, appVersion)
 }
 
-func AppCatalogEntryTeam(customResource v1alpha1.App) string {
+func AppCatalogEntryTeam(customResource v1alpha1.AppCatalogEntry) string {
 	return customResource.Annotations[annotation.Team]
 }
