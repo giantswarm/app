@@ -114,35 +114,37 @@ func (v *Validator) validateMetadataConstraint(ctx context.Context, cr v1alpha1.
 		return microerror.Mask(err)
 	}
 
-	if entry.Spec.Restrictions != nil {
-		if entry.Spec.Restrictions.FixedNamespace != "" {
-			if entry.Spec.Restrictions.FixedNamespace != cr.Spec.Namespace {
-				return microerror.Maskf(validationError, "app %#q could be installed in namespace %#q only, not %#q",
-					cr.Spec.Name, entry.Spec.Restrictions.FixedNamespace, cr.Spec.Namespace)
-			}
+	if entry.Spec.Restrictions == nil {
+		// no-op
+		return nil
+	}
+
+	if entry.Spec.Restrictions.FixedNamespace != "" {
+		if entry.Spec.Restrictions.FixedNamespace != cr.Spec.Namespace {
+			return microerror.Maskf(validationError, "app %#q could be installed in namespace %#q only, not %#q",
+				cr.Spec.Name, entry.Spec.Restrictions.FixedNamespace, cr.Spec.Namespace)
 		}
+	}
 
-		var apps *v1alpha1.AppList
-		if entry.Spec.Restrictions.ClusterSingleton {
-			lo := metav1.ListOptions{
-				FieldSelector: fmt.Sprintf("metadata.name!=%s", cr.Name),
-			}
-			apps, err = v.g8sClient.ApplicationV1alpha1().Apps(cr.Namespace).List(ctx, lo)
-			if err != nil {
-				return microerror.Mask(err)
-			}
-
-			for _, app := range apps.Items {
-				if app.Spec.Name == cr.Spec.Name {
-					return microerror.Maskf(validationError, "app %#q could be installed only once in cluster %#q",
-						cr.Spec.Name, key.ClusterID(cr))
-				}
-			}
+	var apps *v1alpha1.AppList
+	if entry.Spec.Restrictions.ClusterSingleton || entry.Spec.Restrictions.NamespaceSingleton {
+		lo := metav1.ListOptions{
+			FieldSelector: fmt.Sprintf("metadata.name!=%s", cr.Name),
 		}
+		apps, err = v.g8sClient.ApplicationV1alpha1().Apps(cr.Namespace).List(ctx, lo)
+		if err != nil {
+			return microerror.Mask(err)
+		}
+	}
 
-		if entry.Spec.Restrictions.NamespaceSingleton {
-			for _, app := range apps.Items {
-				if app.Spec.Name == cr.Spec.Name && app.Spec.Namespace == cr.Spec.Namespace {
+	for _, app := range apps.Items {
+		if app.Spec.Name == cr.Spec.Name {
+			if entry.Spec.Restrictions.ClusterSingleton {
+				return microerror.Maskf(validationError, "app %#q could be installed only once in cluster %#q",
+					cr.Spec.Name, cr.Namespace)
+			}
+			if entry.Spec.Restrictions.NamespaceSingleton {
+				if app.Spec.Namespace == cr.Spec.Namespace {
 					return microerror.Maskf(validationError, "app %#q could be installed only once in namespace %#q",
 						cr.Spec.Name, key.Namespace(cr))
 				}
