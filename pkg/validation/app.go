@@ -132,7 +132,7 @@ func (v *Validator) validateMetadataConstraint(ctx context.Context, cr v1alpha1.
 				return microerror.Mask(err)
 			}
 
-			for _, app:= range apps.Items {
+			for _, app := range apps.Items {
 				if app.Spec.Name == cr.Spec.Name {
 					return microerror.Maskf(validationError, "app %#q could be installed only once in cluster %#q",
 						cr.Spec.Name, key.ClusterID(cr))
@@ -141,7 +141,7 @@ func (v *Validator) validateMetadataConstraint(ctx context.Context, cr v1alpha1.
 		}
 
 		if entry.Spec.Restrictions.NamespaceSingleton {
-			for _, app:= range apps.Items {
+			for _, app := range apps.Items {
 				if app.Spec.Name == cr.Spec.Name && app.Spec.Namespace == cr.Spec.Namespace {
 					return microerror.Maskf(validationError, "app %#q could be installed only once in namespace %#q",
 						cr.Spec.Name, key.Namespace(cr))
