@@ -2,6 +2,7 @@ package validation
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/application/v1alpha1"
 	"github.com/giantswarm/apiextensions/v3/pkg/label"
@@ -43,6 +44,11 @@ func (v *Validator) ValidateApp(ctx context.Context, app v1alpha1.App) (bool, er
 	}
 
 	err = v.validateUserConfig(ctx, app)
+	if err != nil {
+		return false, microerror.Mask(err)
+	}
+
+	err = v.validateMetadataConstraint(ctx, app)
 	if err != nil {
 		return false, microerror.Mask(err)
 	}
@@ -91,6 +97,56 @@ func (v *Validator) validateConfig(ctx context.Context, cr v1alpha1.App) error {
 			return microerror.Maskf(validationError, resourceNotFoundTemplate, "secret", key.AppSecretName(cr), ns)
 		} else if err != nil {
 			return microerror.Mask(err)
+		}
+	}
+
+	return nil
+}
+
+func (v *Validator) validateMetadataConstraint(ctx context.Context, cr v1alpha1.App) error {
+	name := key.AppCatalogEntryName(key.CatalogName(cr), key.AppName(cr), key.Version(cr))
+
+	entry, err := v.g8sClient.ApplicationV1alpha1().AppCatalogEntries(metav1.NamespaceDefault).Get(ctx, name, metav1.GetOptions{})
+	if apierrors.IsNotFound(err) {
+		v.logger.Debugf(ctx, "appCatalogEntry %#q not found, skipping validation", name)
+		return nil
+	} else if err != nil {
+		return microerror.Mask(err)
+	}
+
+	if entry.Spec.Restrictions != nil {
+		if entry.Spec.Restrictions.FixedNamespace != "" {
+			if entry.Spec.Restrictions.FixedNamespace != cr.Spec.Namespace {
+				return microerror.Maskf(validationError, "app %#q could be installed in namespace %#q only, not %#q",
+					cr.Spec.Name, entry.Spec.Restrictions.FixedNamespace, cr.Spec.Namespace)
+			}
+		}
+
+		var apps *v1alpha1.AppList
+		if entry.Spec.Restrictions.ClusterSingleton {
+			lo := metav1.ListOptions{
+				FieldSelector: fmt.Sprintf("metadata.name!=%s", cr.Name),
+			}
+			apps, err = v.g8sClient.ApplicationV1alpha1().Apps(cr.Namespace).List(ctx, lo)
+			if err != nil {
+				return microerror.Mask(err)
+			}
+
+			for _, app:= range apps.Items {
+				if app.Spec.Name == cr.Spec.Name {
+					return microerror.Maskf(validationError, "app %#q could be installed only once in cluster %#q",
+						cr.Spec.Name, key.ClusterID(cr))
+				}
+			}
+		}
+
+		if entry.Spec.Restrictions.NamespaceSingleton {
+			for _, app:= range apps.Items {
+				if app.Spec.Name == cr.Spec.Name && app.Spec.Namespace == cr.Spec.Namespace {
+					return microerror.Maskf(validationError, "app %#q could be installed only once in namespace %#q",
+						cr.Spec.Name, key.Namespace(cr))
+				}
+			}
 		}
 	}
 
