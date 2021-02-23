@@ -154,18 +154,20 @@ func (v *Validator) validateMetadataConstraints(ctx context.Context, cr v1alpha1
 		}
 	}
 
-	var apps *v1alpha1.AppList
+	var apps []v1alpha1.App
 	if entry.Spec.Restrictions.ClusterSingleton || entry.Spec.Restrictions.NamespaceSingleton {
 		lo := metav1.ListOptions{
 			FieldSelector: fmt.Sprintf("metadata.name!=%s", cr.Name),
 		}
-		apps, err = v.g8sClient.ApplicationV1alpha1().Apps(cr.Namespace).List(ctx, lo)
+		appList, err := v.g8sClient.ApplicationV1alpha1().Apps(cr.Namespace).List(ctx, lo)
 		if err != nil {
 			return microerror.Mask(err)
 		}
+
+		apps = appList.Items
 	}
 
-	for _, app := range apps.Items {
+	for _, app := range apps {
 		if app.Spec.Name == cr.Spec.Name {
 			if entry.Spec.Restrictions.ClusterSingleton {
 				return microerror.Maskf(validationError, "app %#q can only be installed only once in cluster %#q",
