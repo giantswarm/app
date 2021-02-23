@@ -607,7 +607,7 @@ func Test_ValidateMetadataConstraints(t *testing.T) {
 					},
 				},
 			},
-			expectedErr: "validation error: app `kiam` can only be installed only once in cluster `eggs2`",
+			expectedErr: "validation error: app `kiam` can only be installed once in cluster `eggs2`",
 		},
 		{
 			name: "case 3: namespace singleton constraint",

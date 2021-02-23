@@ -170,7 +170,7 @@ func (v *Validator) validateMetadataConstraints(ctx context.Context, cr v1alpha1
 	for _, app := range apps {
 		if app.Spec.Name == cr.Spec.Name {
 			if entry.Spec.Restrictions.ClusterSingleton {
-				return microerror.Maskf(validationError, "app %#q can only be installed only once in cluster %#q",
+				return microerror.Maskf(validationError, "app %#q can only be installed once in cluster %#q",
 					cr.Spec.Name, cr.Namespace)
 			}
 			if entry.Spec.Restrictions.NamespaceSingleton {
