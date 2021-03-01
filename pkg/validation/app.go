@@ -149,8 +149,8 @@ func (v *Validator) validateMetadataConstraints(ctx context.Context, cr v1alpha1
 
 	if len(entry.Spec.Restrictions.CompatibleProviders) > 0 {
 		if !contains(entry.Spec.Restrictions.CompatibleProviders, v1alpha1.Provider(v.provider)) {
-			return microerror.Maskf(validationError, "app %#q can only be installed in %#q providers",
-				cr.Spec.Name, entry.Spec.Restrictions.CompatibleProviders)
+			return microerror.Maskf(validationError, "app %#q can only be installed for providers %#q not %#q",
+				cr.Spec.Name, entry.Spec.Restrictions.CompatibleProviders, v.provider)
 		}
 	}
 
