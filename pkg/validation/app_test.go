@@ -689,7 +689,7 @@ func Test_ValidateMetadataConstraints(t *testing.T) {
 					},
 				},
 			},
-			expectedErr: "validation error: app `kiam` can only be installed in [`azure`] provider",
+			expectedErr: "validation error: app `kiam` can only be installed for providers [`azure`] not `aws`",
 		},
 	}
 
