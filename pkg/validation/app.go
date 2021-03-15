@@ -150,7 +150,6 @@ func (v *Validator) validateNamespaceConfig(ctx context.Context, cr v1alpha1.App
 		if targetLabels != nil && labels != nil {
 			for k, v := range targetLabels {
 				originalValue, ok := labels[k]
-
 				if ok && originalValue != v {
 					return microerror.Maskf(validationError, "app %#q is modifying labels %#q in the target namespace %#q to the different value",
 						key.AppName(cr), k, key.AppNamespace(cr))
