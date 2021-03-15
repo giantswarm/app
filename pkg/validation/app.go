@@ -140,8 +140,8 @@ func (v *Validator) validateNamespaceConfig(ctx context.Context, cr v1alpha1.App
 			for k, v := range targetAnnotations {
 				originalValue, ok := annotations[k]
 				if ok && originalValue != v {
-					return microerror.Maskf(validationError, "app %#q is modifying annotation %#q in the target namespace %#q to the different value",
-						key.AppName(cr), k, key.AppNamespace(cr))
+					return microerror.Maskf(validationError, "app %#q is modifying annotation %#q in the target namespace %#q from value %#q to %#q, collide to app %#q",
+						key.AppName(cr), k, key.AppNamespace(cr), originalValue, v, app.Name)
 				}
 			}
 		}
@@ -151,8 +151,8 @@ func (v *Validator) validateNamespaceConfig(ctx context.Context, cr v1alpha1.App
 			for k, v := range targetLabels {
 				originalValue, ok := labels[k]
 				if ok && originalValue != v {
-					return microerror.Maskf(validationError, "app %#q is modifying labels %#q in the target namespace %#q to the different value",
-						key.AppName(cr), k, key.AppNamespace(cr))
+					return microerror.Maskf(validationError, "app %#q is modifying labels %#q in the target namespace %#q from value %#q to %#q, collide to app %#q",
+						key.AppName(cr), k, key.AppNamespace(cr), originalValue, v, app.Name)
 				}
 			}
 		}

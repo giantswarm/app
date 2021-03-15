@@ -821,7 +821,7 @@ func Test_ValidateNamespace(t *testing.T) {
 					},
 				},
 			},
-			expectedErr: "app `kiam` is modifying annotation `linkerd.io/inject` in the target namespace `kube-system` to the different value",
+			expectedErr: "app `kiam` is modifying annotation `linkerd.io/inject` in the target namespace `kube-system` from value `enabled` to `disabled`, collide to app `another-kiam-1`",
 		},
 		{
 			name: "case 2: namespace label collision",
@@ -861,7 +861,7 @@ func Test_ValidateNamespace(t *testing.T) {
 					},
 				},
 			},
-			expectedErr: "app `kiam` is modifying labels `monitoring` in the target namespace `kube-system` to the different value",
+			expectedErr: "app `kiam` is modifying labels `monitoring` in the target namespace `kube-system` from value `enabled` to `disabled`, collide to app `another-kiam-1`",
 		},
 	}
 
