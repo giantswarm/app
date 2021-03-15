@@ -112,52 +112,48 @@ func (v *Validator) validateNamespaceConfig(ctx context.Context, cr v1alpha1.App
 	annotations := key.AppNamespaceAnnotations(cr)
 	labels := key.AppNamespaceLabels(cr)
 
-	if annotations != nil || labels != nil {
-		var apps []v1alpha1.App
-		{
-			lo := metav1.ListOptions{
-				FieldSelector: fmt.Sprintf("metadata.name!=%s", cr.Name),
-			}
-			appList, err := v.g8sClient.ApplicationV1alpha1().Apps(cr.Namespace).List(ctx, lo)
-			if err != nil {
-				return microerror.Mask(err)
-			}
+	if annotations == nil && labels == nil {
+		// no-op
+		return nil
+	}
 
-			apps = appList.Items
+	var apps []v1alpha1.App
+	{
+		lo := metav1.ListOptions{
+			FieldSelector: fmt.Sprintf("metadata.name!=%s", cr.Name),
+		}
+		appList, err := v.g8sClient.ApplicationV1alpha1().Apps(cr.Namespace).List(ctx, lo)
+		if err != nil {
+			return microerror.Mask(err)
 		}
 
-		for _, app := range apps {
-			if key.AppNamespace(cr) != key.AppNamespace(app) {
-				continue
-			}
+		apps = appList.Items
+	}
 
-			targetAnnotations := key.AppNamespaceAnnotations(app)
-			if targetAnnotations != nil && annotations != nil {
-				for k, v := range targetAnnotations {
-					originalValue, ok := annotations[k]
-					if !ok {
-						continue
-					}
+	for _, app := range apps {
+		if key.AppNamespace(cr) != key.AppNamespace(app) {
+			continue
+		}
 
-					if originalValue != v {
-						return microerror.Maskf(validationError, "app %#q is modifying annotation %#q in the target namespace %#q to the different value",
-							key.AppName(cr), k, key.AppNamespace(cr))
-					}
+		targetAnnotations := key.AppNamespaceAnnotations(app)
+		if targetAnnotations != nil && annotations != nil {
+			for k, v := range targetAnnotations {
+				originalValue, ok := annotations[k]
+				if ok && originalValue != v {
+					return microerror.Maskf(validationError, "app %#q is modifying annotation %#q in the target namespace %#q to the different value",
+						key.AppName(cr), k, key.AppNamespace(cr))
 				}
 			}
+		}
 
-			targetLabels := key.AppNamespaceLabels(app)
-			if targetLabels != nil && labels != nil {
-				for k, v := range targetLabels {
-					originalValue, ok := labels[k]
-					if !ok {
-						continue
-					}
+		targetLabels := key.AppNamespaceLabels(app)
+		if targetLabels != nil && labels != nil {
+			for k, v := range targetLabels {
+				originalValue, ok := labels[k]
 
-					if originalValue != v {
-						return microerror.Maskf(validationError, "app %#q is modifying labels %#q in the target namespace %#q to the different value",
-							key.AppName(cr), k, key.AppNamespace(cr))
-					}
+				if ok && originalValue != v {
+					return microerror.Maskf(validationError, "app %#q is modifying labels %#q in the target namespace %#q to the different value",
+						key.AppName(cr), k, key.AppNamespace(cr))
 				}
 			}
 		}
