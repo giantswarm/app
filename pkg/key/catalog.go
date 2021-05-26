@@ -38,7 +38,7 @@ func CatalogType(customResource v1alpha1.Catalog) string {
 	return ""
 }
 
-func CatalogVisibility(customResource v1alpha1.AppCatalog) string {
+func CatalogVisibility(customResource v1alpha1.Catalog) string {
 	if val, ok := customResource.ObjectMeta.Labels[label.CatalogVisibility]; ok {
 		return val
 	}
