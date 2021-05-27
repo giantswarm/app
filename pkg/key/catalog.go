@@ -15,19 +15,43 @@ func CatalogStorageURL(customResource v1alpha1.Catalog) string {
 }
 
 func CatalogConfigMapName(customResource v1alpha1.Catalog) string {
-	return customResource.Spec.Config.ConfigMap.Name
+	config := catalogConfig(customResource)
+
+	if config != nil && config.ConfigMap != nil {
+		return customResource.Spec.Config.ConfigMap.Name
+	}
+
+	return ""
 }
 
 func CatalogConfigMapNamespace(customResource v1alpha1.Catalog) string {
-	return customResource.Spec.Config.ConfigMap.Namespace
+	config := catalogConfig(customResource)
+
+	if config != nil && config.ConfigMap != nil {
+		return customResource.Spec.Config.ConfigMap.Namespace
+	}
+
+	return ""
 }
 
 func CatalogSecretName(customResource v1alpha1.Catalog) string {
-	return customResource.Spec.Config.Secret.Name
+	config := catalogConfig(customResource)
+
+	if config != nil && config.Secret != nil {
+		return customResource.Spec.Config.Secret.Name
+	}
+
+	return ""
 }
 
 func CatalogSecretNamespace(customResource v1alpha1.Catalog) string {
-	return customResource.Spec.Config.Secret.Namespace
+	config := catalogConfig(customResource)
+
+	if config != nil && config.Secret != nil {
+		return customResource.Spec.Config.Secret.Namespace
+	}
+
+	return ""
 }
 
 func CatalogType(customResource v1alpha1.Catalog) string {
@@ -57,4 +81,8 @@ func ToCatalog(v interface{}) (v1alpha1.Catalog, error) {
 	}
 
 	return *customResource, nil
+}
+
+func catalogConfig(customResource v1alpha1.Catalog) *v1alpha1.CatalogSpecConfig {
+	return customResource.Spec.Config
 }
