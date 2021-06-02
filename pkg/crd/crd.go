@@ -102,7 +102,7 @@ func (g CRDGetter) LoadCRD(ctx context.Context, group, kind string) (*apiextensi
 		}
 	}
 
-	return nil, microerror.Maskf(notFoundError, "CRD %s not found", name)
+	return nil, microerror.Maskf(notFoundError, "CRD kind %#q not found in group %#q", kind, group)
 }
 
 func convertCRDV1Beta1(original *apiextensionsv1beta1.CustomResourceDefinition) (*apiextensionsv1.CustomResourceDefinition, error) {
