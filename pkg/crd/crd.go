@@ -77,7 +77,7 @@ func NewCRDGetter(config Config) (*CRDGetter, error) {
 	return crdGetter, nil
 }
 
-func (g CRDGetter) LoadCRD(ctx context.Context, name string) (*apiextensionsv1.CustomResourceDefinition, error) {
+func (g CRDGetter) LoadCRD(ctx context.Context, group, kind string) (*apiextensionsv1.CustomResourceDefinition, error) {
 	var crds []*apiextensionsv1.CustomResourceDefinition
 	charts := []string{
 		"crds-common",
@@ -97,7 +97,7 @@ func (g CRDGetter) LoadCRD(ctx context.Context, name string) (*apiextensionsv1.C
 	}
 
 	for _, crd := range crds {
-		if crd.Name == name {
+		if crd.Spec.Names.Kind == kind && crd.Spec.Group == group {
 			return crd, nil
 		}
 	}
