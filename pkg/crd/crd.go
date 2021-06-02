@@ -7,7 +7,8 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"path/filepath"
+	"net/http"
+	"path"
 
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
@@ -59,10 +60,16 @@ func NewCRDGetter(config Config) (*CRDGetter, error) {
 
 	var githubClient *github.Client
 	{
-		ts := oauth2.StaticTokenSource(
-			&oauth2.Token{AccessToken: config.GitHubToken},
-		)
-		tc := oauth2.NewClient(context.Background(), ts)
+		var tc *http.Client
+		if config.GitHubToken != "" {
+			ts := oauth2.StaticTokenSource(
+				&oauth2.Token{AccessToken: config.GitHubToken},
+			)
+			tc = oauth2.NewClient(context.Background(), ts)
+		} else {
+			tc = http.DefaultClient
+		}
+
 		githubClient = github.NewClient(tc)
 	}
 
@@ -195,7 +202,7 @@ func downloadHelmChartCRDs(ctx context.Context, client *github.Client, helmChart
 		Ref: ref,
 	}
 
-	templatesPath := filepath.Join("helm", helmChart, "templates")
+	templatesPath := path.Join("helm", helmChart, "templates")
 	_, contents, _, err := client.Repositories.GetContents(ctx, "giantswarm", "apiextensions", templatesPath, &getOptions)
 	if err != nil {
 		return nil, err
@@ -203,7 +210,7 @@ func downloadHelmChartCRDs(ctx context.Context, client *github.Client, helmChart
 
 	var allCrds []*apiextensionsv1.CustomResourceDefinition
 	for _, file := range contents {
-		filePath := filepath.Join(templatesPath, *file.Name)
+		filePath := path.Join(templatesPath, *file.Name)
 		contentReader, _, err := client.Repositories.DownloadContents(ctx, "giantswarm", "apiextensions", filePath, &getOptions)
 		if err != nil {
 			return nil, err
