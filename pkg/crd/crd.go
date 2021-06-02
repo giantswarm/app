@@ -77,7 +77,7 @@ func NewCRDGetter(config Config) (*CRDGetter, error) {
 	return crdGetter, nil
 }
 
-func (g CRDGetter) LoadCRD(ctx context.Context, kind, name string) ([]*apiextensionsv1.CustomResourceDefinition, error) {
+func (g CRDGetter) LoadCRD(ctx context.Context, name string) (*apiextensionsv1.CustomResourceDefinition, error) {
 	var crds []*apiextensionsv1.CustomResourceDefinition
 	charts := []string{
 		"crds-common",
@@ -96,7 +96,13 @@ func (g CRDGetter) LoadCRD(ctx context.Context, kind, name string) ([]*apiextens
 		crds = append(crds, chartCRDs...)
 	}
 
-	return crds, nil
+	for _, crd := range crds {
+		if crd.Name == name {
+			return crd, nil
+		}
+	}
+
+	return nil, microerror.Maskf(notFoundError, "CRD %s not found", name)
 }
 
 func convertCRDV1Beta1(original *apiextensionsv1beta1.CustomResourceDefinition) (*apiextensionsv1.CustomResourceDefinition, error) {
