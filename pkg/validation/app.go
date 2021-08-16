@@ -109,7 +109,7 @@ func (v *Validator) validateCatalog(ctx context.Context, cr v1alpha1.App) error 
 		break
 	}
 
-	if catalog == nil {
+	if catalog == nil || catalog.Name == "" {
 		return microerror.Maskf(validationError, catalogNotFoundTemplate, key.CatalogName(cr))
 	}
 

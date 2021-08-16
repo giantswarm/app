@@ -574,6 +574,9 @@ func Test_ValidateApp(t *testing.T) {
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "kiam",
 					Namespace: "eggs2",
+					Labels: map[string]string{
+						label.AppOperatorVersion: "3.0.0",
+					},
 				},
 				Spec: v1alpha1.AppSpec{
 					Catalog:   "missing",
