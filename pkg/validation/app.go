@@ -81,6 +81,8 @@ func (v *Validator) validateCatalog(ctx context.Context, cr v1alpha1.App) error 
 		return nil
 	}
 
+	v.logger.Debugf(ctx, "CATALOG %#q", key.CatalogName(cr))
+
 	var namespaces []string
 	{
 		if key.CatalogNamespace(cr) != "" {
@@ -93,6 +95,8 @@ func (v *Validator) validateCatalog(ctx context.Context, cr v1alpha1.App) error 
 	var catalog *v1alpha1.Catalog
 
 	for _, ns := range namespaces {
+		v.logger.Debugf(ctx, "NS %#q", ns)
+
 		catalog, err = v.g8sClient.ApplicationV1alpha1().Catalogs(ns).Get(ctx, key.CatalogName(cr), metav1.GetOptions{})
 		if apierrors.IsNotFound(err) {
 			// no-op
@@ -100,12 +104,16 @@ func (v *Validator) validateCatalog(ctx context.Context, cr v1alpha1.App) error 
 		} else if err != nil {
 			return microerror.Mask(err)
 		}
+
+		v.logger.Debugf(ctx, "CATALOG %#v", catalog)
 		break
 	}
 
 	if catalog == nil {
 		return microerror.Maskf(validationError, catalogNotFoundTemplate, key.CatalogName(cr))
 	}
+
+	v.logger.Debugf(ctx, "CATALOG %#v", catalog)
 
 	return nil
 }

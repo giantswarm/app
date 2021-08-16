@@ -568,6 +568,28 @@ func Test_ValidateApp(t *testing.T) {
 			},
 			expectedErr: "validation error: label `app-operator.giantswarm.io/version` has invalid value `1.0.0`",
 		},
+		{
+			name: "case 18: missing catalog is rejected",
+			obj: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "kiam",
+					Namespace: "eggs2",
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "missing",
+					Name:      "kiam",
+					Namespace: "kube-system",
+					KubeConfig: v1alpha1.AppSpecKubeConfig{
+						InCluster: true,
+					},
+					Version: "1.4.0",
+				},
+			},
+			catalogs: []*v1alpha1.Catalog{
+				newTestCatalog("giantswarm", "default"),
+			},
+			expectedErr: "validation error: catalog `missing` not found",
+		},
 	}
 
 	for _, tc := range tests {
