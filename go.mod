@@ -23,8 +23,7 @@ replace (
 	github.com/Microsoft/hcsshim v0.8.7 => github.com/Microsoft/hcsshim v0.8.10
 	github.com/bketelsen/crypt => github.com/bketelsen/crypt v0.0.3
 	github.com/dgrijalva/jwt-go => github.com/dgrijalva/jwt-go/v4 v4.0.0-preview1
-	// Use moby v20.10.0-beta1 to fix build issue on darwin.
-	github.com/docker/docker => github.com/moby/moby v20.10.0-beta1+incompatible
+	github.com/docker/docker => github.com/moby/moby v20.10.9+incompatible
 	github.com/gogo/protobuf v1.3.1 => github.com/gogo/protobuf v1.3.2
 	github.com/gorilla/websocket => github.com/gorilla/websocket v1.4.2
 	github.com/opencontainers/runc v0.1.1 => github.com/opencontainers/runc v1.0.0-rc7
