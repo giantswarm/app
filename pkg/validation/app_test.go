@@ -604,6 +604,38 @@ func Test_ValidateApp(t *testing.T) {
 				newTestConfigMap("nginx-ingress-user-values", "eggs2"),
 			},
 		},
+		{
+			name: "case 19: spec.kubeConfig.secret no name specified",
+			obj: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "kiam",
+					Namespace: "eggs2",
+					Labels: map[string]string{
+						label.AppOperatorVersion: "2.6.0",
+					},
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "giantswarm",
+					Name:      "kiam",
+					Namespace: "kube-system",
+					KubeConfig: v1alpha1.AppSpecKubeConfig{
+						Context: v1alpha1.AppSpecKubeConfigContext{
+							Name: "eggs2-kubeconfig",
+						},
+						InCluster: false,
+						Secret: v1alpha1.AppSpecKubeConfigSecret{
+							Name:      "",
+							Namespace: "default",
+						},
+					},
+					Version: "1.4.0",
+				},
+			},
+			catalogs: []*v1alpha1.Catalog{
+				newTestCatalog("giantswarm", "default"),
+			},
+			expectedErr: "validation error: name is not specified for kubeconfig secret",
+		},
 	}
 
 	for _, tc := range tests {
