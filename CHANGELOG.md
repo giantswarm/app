@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.4.0] - 2021-11-09
+
 ### Added
 
 - Validate kubeconfig secret name is set when in cluster is false.
@@ -256,7 +258,8 @@ since there can be a delay creating them on cluster creation.
 
 - First release
 
-[Unreleased]: https://github.com/giantswarm/app/compare/v5.3.0...HEAD
+[Unreleased]: https://github.com/giantswarm/app/compare/v5.4.0...HEAD
+[5.4.0]: https://github.com/giantswarm/app/compare/v5.3.0...v5.4.0
 [5.3.0]: https://github.com/giantswarm/app/compare/v5.2.3...v5.3.0
 [5.2.3]: https://github.com/giantswarm/app/compare/v5.2.2...v5.2.3
 [5.2.2]: https://github.com/giantswarm/app/compare/v5.2.1...v5.2.2
