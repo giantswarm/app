@@ -16,6 +16,7 @@ import (
 const (
 	catalogNotFoundTemplate         = "catalog %#q not found"
 	nameTooLongTemplate             = "name %#q is %d chars and exceeds max length of %d chars"
+	nameNotFoundReasonTemplate      = "name is not specified for %s"
 	namespaceNotFoundReasonTemplate = "namespace is not specified for %s %#q"
 	labelInvalidValueTemplate       = "label %#q has invalid value %#q"
 	labelNotFoundTemplate           = "label %#q not found"
@@ -213,11 +214,16 @@ func (v *Validator) validateKubeConfig(ctx context.Context, cr v1alpha1.App) err
 			return microerror.Maskf(validationError, namespaceNotFoundReasonTemplate, "kubeconfig secret", key.KubeConfigSecretName(cr))
 		}
 
-		_, err := v.k8sClient.CoreV1().Secrets(key.KubeConfigSecretNamespace(cr)).Get(ctx, key.KubeConfigSecretName(cr), metav1.GetOptions{})
+		secretName := key.KubeConfigSecretName(cr)
+		if secretName == "" {
+			return microerror.Maskf(validationError, nameNotFoundReasonTemplate, "kubeconfig secret")
+		}
+
+		_, err := v.k8sClient.CoreV1().Secrets(key.KubeConfigSecretNamespace(cr)).Get(ctx, secretName, metav1.GetOptions{})
 		if apierrors.IsNotFound(err) {
 			// kubeConfigNotFoundError is used rather than a validation error because
 			// during cluster creation there is a short delay while it is generated.
-			return microerror.Maskf(kubeConfigNotFoundError, resourceNotFoundTemplate, "kubeconfig secret", key.KubeConfigSecretName(cr), ns)
+			return microerror.Maskf(kubeConfigNotFoundError, resourceNotFoundTemplate, "kubeconfig secret", secretName, ns)
 		} else if err != nil {
 			return microerror.Mask(err)
 		}

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Validate kubeconfig secret name is set when in cluster is false.
+
 ## [5.3.0] - 2021-09-15
 
 ### Added
