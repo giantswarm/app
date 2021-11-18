@@ -5,14 +5,14 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/giantswarm/apiextensions/v3/pkg/apis/application/v1alpha1"
-	"github.com/giantswarm/apiextensions/v3/pkg/clientset/versioned/fake"
+	"github.com/giantswarm/apiextensions-application/api/v1alpha1"
 	"github.com/giantswarm/k8smetadata/pkg/label"
 	"github.com/giantswarm/micrologger/microloggertest"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgofake "k8s.io/client-go/kubernetes/fake"
+	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 )
 
 func Test_ValidateApp(t *testing.T) {
@@ -654,8 +654,16 @@ func Test_ValidateApp(t *testing.T) {
 				k8sObjs = append(k8sObjs, secret)
 			}
 
+			scheme := runtime.NewScheme()
+			v1alpha1.AddToScheme(scheme)
+
+			fakeCtrlClient := fake.NewClientBuilder().
+				WithRuntimeObjects(g8sObjs...).
+				WithScheme(scheme).
+				Build()
+
 			c := Config{
-				G8sClient: fake.NewSimpleClientset(g8sObjs...),
+				G8sClient: fakeCtrlClient,
 				K8sClient: clientgofake.NewSimpleClientset(k8sObjs...),
 				Logger:    microloggertest.New(),
 
@@ -885,8 +893,16 @@ func Test_ValidateMetadataConstraints(t *testing.T) {
 				g8sObjs = append(g8sObjs, app)
 			}
 
+			scheme := runtime.NewScheme()
+			v1alpha1.AddToScheme(scheme)
+
+			fakeCtrlClient := fake.NewClientBuilder().
+				WithRuntimeObjects(g8sObjs...).
+				WithScheme(scheme).
+				Build()
+
 			c := Config{
-				G8sClient: fake.NewSimpleClientset(g8sObjs...),
+				G8sClient: fakeCtrlClient,
 				K8sClient: clientgofake.NewSimpleClientset(),
 				Logger:    microloggertest.New(),
 
@@ -1053,8 +1069,16 @@ func Test_ValidateNamespace(t *testing.T) {
 				g8sObjs = append(g8sObjs, app)
 			}
 
+			scheme := runtime.NewScheme()
+			v1alpha1.AddToScheme(scheme)
+
+			fakeCtrlClient := fake.NewClientBuilder().
+				WithRuntimeObjects(g8sObjs...).
+				WithScheme(scheme).
+				Build()
+
 			c := Config{
-				G8sClient: fake.NewSimpleClientset(g8sObjs...),
+				G8sClient: fakeCtrlClient,
 				K8sClient: clientgofake.NewSimpleClientset(),
 				Logger:    microloggertest.New(),
 
