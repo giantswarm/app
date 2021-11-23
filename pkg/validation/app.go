@@ -94,7 +94,7 @@ func (v *Validator) validateCatalog(ctx context.Context, cr v1alpha1.App) error 
 		}
 	}
 
-	var catalog *v1alpha1.Catalog
+	var matchedCatalog *v1alpha1.Catalog
 
 	for _, ns := range namespaces {
 		var catalog v1alpha1.Catalog
@@ -108,10 +108,11 @@ func (v *Validator) validateCatalog(ctx context.Context, cr v1alpha1.App) error 
 		} else if err != nil {
 			return microerror.Mask(err)
 		}
+		matchedCatalog = &catalog
 		break
 	}
 
-	if catalog == nil || catalog.Name == "" {
+	if matchedCatalog == nil || matchedCatalog.Name == "" {
 		return microerror.Maskf(validationError, catalogNotFoundTemplate, key.CatalogName(cr))
 	}
 
