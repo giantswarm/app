@@ -655,7 +655,7 @@ func Test_ValidateApp(t *testing.T) {
 			}
 
 			scheme := runtime.NewScheme()
-			v1alpha1.AddToScheme(scheme)
+			_ = v1alpha1.AddToScheme(scheme)
 
 			fakeCtrlClient := fake.NewClientBuilder().
 				WithRuntimeObjects(g8sObjs...).
@@ -894,7 +894,7 @@ func Test_ValidateMetadataConstraints(t *testing.T) {
 			}
 
 			scheme := runtime.NewScheme()
-			v1alpha1.AddToScheme(scheme)
+			_ = v1alpha1.AddToScheme(scheme)
 
 			fakeCtrlClient := fake.NewClientBuilder().
 				WithRuntimeObjects(g8sObjs...).
@@ -1070,7 +1070,7 @@ func Test_ValidateNamespace(t *testing.T) {
 			}
 
 			scheme := runtime.NewScheme()
-			v1alpha1.AddToScheme(scheme)
+			_ = v1alpha1.AddToScheme(scheme)
 
 			fakeCtrlClient := fake.NewClientBuilder().
 				WithRuntimeObjects(g8sObjs...).
