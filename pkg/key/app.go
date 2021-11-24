@@ -157,6 +157,10 @@ func KubeConfigSecretNamespace(customResource v1alpha1.App) string {
 	return customResource.Spec.KubeConfig.Secret.Namespace
 }
 
+func ManagedByLabel(customResource v1alpha1.App) string {
+	return customResource.Labels[label.ManagedBy]
+}
+
 func Namespace(customResource v1alpha1.App) string {
 	return customResource.Spec.Namespace
 }
