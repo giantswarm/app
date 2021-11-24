@@ -929,7 +929,8 @@ func Test_ValidateMetadataConstraints(t *testing.T) {
 				K8sClient: clientgofake.NewSimpleClientset(),
 				Logger:    microloggertest.New(),
 
-				Provider: "aws",
+				ProjectName: "app-admission-controller",
+				Provider:    "aws",
 			}
 			r, err := NewValidator(c)
 			if err != nil {
@@ -1097,7 +1098,8 @@ func Test_ValidateNamespace(t *testing.T) {
 				K8sClient: clientgofake.NewSimpleClientset(),
 				Logger:    microloggertest.New(),
 
-				Provider: "aws",
+				ProjectName: "app-admission-controller",
+				Provider:    "aws",
 			}
 			r, err := NewValidator(c)
 			if err != nil {
