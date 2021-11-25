@@ -636,6 +636,44 @@ func Test_ValidateApp(t *testing.T) {
 			},
 			expectedErr: "validation error: name is not specified for kubeconfig secret",
 		},
+		{
+			name: "case 20: skip validation when giantswarm.io/managed-by label equals flux",
+			obj: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "kiam",
+					Namespace: "eggs2",
+					Labels: map[string]string{
+						label.AppOperatorVersion: "2.6.0",
+						label.ManagedBy:          "flux",
+					},
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "giantswarm",
+					Name:      "kiam",
+					Namespace: "kube-system",
+					KubeConfig: v1alpha1.AppSpecKubeConfig{
+						Context: v1alpha1.AppSpecKubeConfigContext{
+							Name: "eggs2-kubeconfig",
+						},
+						InCluster: false,
+						Secret: v1alpha1.AppSpecKubeConfigSecret{
+							Name:      "",
+							Namespace: "default",
+						},
+					},
+					UserConfig: v1alpha1.AppSpecUserConfig{
+						ConfigMap: v1alpha1.AppSpecUserConfigConfigMap{
+							Name:      "kiam-user-values",
+							Namespace: "eggs2",
+						},
+					},
+					Version: "1.4.0",
+				},
+			},
+			catalogs: []*v1alpha1.Catalog{
+				newTestCatalog("giantswarm", "default"),
+			},
+		},
 	}
 
 	for _, tc := range tests {
@@ -659,7 +697,8 @@ func Test_ValidateApp(t *testing.T) {
 				K8sClient: clientgofake.NewSimpleClientset(k8sObjs...),
 				Logger:    microloggertest.New(),
 
-				Provider: "aws",
+				ProjectName: "app-admission-controller",
+				Provider:    "aws",
 			}
 			r, err := NewValidator(c)
 			if err != nil {
@@ -890,7 +929,8 @@ func Test_ValidateMetadataConstraints(t *testing.T) {
 				K8sClient: clientgofake.NewSimpleClientset(),
 				Logger:    microloggertest.New(),
 
-				Provider: "aws",
+				ProjectName: "app-admission-controller",
+				Provider:    "aws",
 			}
 			r, err := NewValidator(c)
 			if err != nil {
@@ -1058,7 +1098,8 @@ func Test_ValidateNamespace(t *testing.T) {
 				K8sClient: clientgofake.NewSimpleClientset(),
 				Logger:    microloggertest.New(),
 
-				Provider: "aws",
+				ProjectName: "app-admission-controller",
+				Provider:    "aws",
 			}
 			r, err := NewValidator(c)
 			if err != nil {
