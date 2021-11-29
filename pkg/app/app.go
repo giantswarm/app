@@ -20,6 +20,7 @@ type Config struct {
 	AppVersion          string
 	ConfigVersion       string
 	DisableForceUpgrade bool
+	InCluster           bool
 	Name                string
 	Namespace           string
 	UserConfigMapName   string
@@ -73,7 +74,7 @@ func NewCR(c Config) *applicationv1alpha1.App {
 		Spec: applicationv1alpha1.AppSpec{
 			Catalog: c.AppCatalog,
 			KubeConfig: applicationv1alpha1.AppSpecKubeConfig{
-				InCluster: true,
+				InCluster: c.InCluster,
 			},
 			Name:       c.AppName,
 			Namespace:  c.AppNamespace,

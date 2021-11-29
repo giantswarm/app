@@ -120,6 +120,10 @@ func (v *Validator) validateCatalog(ctx context.Context, cr v1alpha1.App) error 
 }
 
 func (v *Validator) validateConfig(ctx context.Context, cr v1alpha1.App) error {
+	if key.IsManagedByFlux(cr, v.projectName) {
+		return nil
+	}
+
 	if key.AppConfigMapName(cr) != "" {
 		ns := key.AppConfigMapNamespace(cr)
 		if ns == "" {
@@ -222,6 +226,10 @@ func (v *Validator) validateNamespaceConfig(ctx context.Context, cr v1alpha1.App
 }
 
 func (v *Validator) validateKubeConfig(ctx context.Context, cr v1alpha1.App) error {
+	if key.IsManagedByFlux(cr, v.projectName) {
+		return nil
+	}
+
 	if !key.InCluster(cr) {
 		ns := key.KubeConfigSecretNamespace(cr)
 		if ns == "" {
@@ -330,6 +338,10 @@ func (v *Validator) validateMetadataConstraints(ctx context.Context, cr v1alpha1
 }
 
 func (v *Validator) validateUserConfig(ctx context.Context, cr v1alpha1.App) error {
+	if key.IsManagedByFlux(cr, v.projectName) {
+		return nil
+	}
+
 	if key.UserConfigMapName(cr) != "" {
 		// NGINX Ingress Controller is no longer a pre-installed app
 		// managed by cluster-operator. So we don't need to restrict
