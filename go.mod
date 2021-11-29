@@ -12,11 +12,11 @@ require (
 	github.com/google/go-github/v39 v39.2.0
 	github.com/imdario/mergo v0.3.12
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8
-	k8s.io/api v0.18.19
-	k8s.io/apiextensions-apiserver v0.18.19
-	k8s.io/apimachinery v0.18.19
-	k8s.io/client-go v0.18.19
-	sigs.k8s.io/yaml v1.2.0
+	k8s.io/api v0.20.13
+	k8s.io/apiextensions-apiserver v0.20.13
+	k8s.io/apimachinery v0.20.13
+	k8s.io/client-go v0.20.13
+	sigs.k8s.io/yaml v1.3.0
 )
 
 replace (
