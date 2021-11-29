@@ -12,7 +12,7 @@ import (
 	"k8s.io/apimachinery/pkg/fields"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/giantswarm/app/v5/pkg/key"
+	"github.com/giantswarm/app/v6/pkg/key"
 )
 
 const (
