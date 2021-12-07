@@ -2,6 +2,7 @@ package key
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/giantswarm/apiextensions-application/api/v1alpha1"
@@ -203,7 +204,7 @@ func UserSecretNamespace(customResource v1alpha1.App) string {
 }
 
 func Version(customResource v1alpha1.App) string {
-	return customResource.Spec.Version
+	return strings.TrimPrefix(customResource.Spec.Version, "v")
 }
 
 func VersionLabel(customResource v1alpha1.App) string {

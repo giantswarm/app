@@ -3,7 +3,6 @@ package validation
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/giantswarm/apiextensions-application/api/v1alpha1"
 	"github.com/giantswarm/k8smetadata/pkg/label"
@@ -267,7 +266,7 @@ func (v *Validator) validateLabels(ctx context.Context, cr v1alpha1.App) error {
 }
 
 func (v *Validator) validateMetadataConstraints(ctx context.Context, cr v1alpha1.App) error {
-	name := key.AppCatalogEntryName(key.CatalogName(cr), key.AppName(cr), strings.TrimPrefix(key.Version(cr), "v"))
+	name := key.AppCatalogEntryName(key.CatalogName(cr), key.AppName(cr), key.Version(cr))
 
 	var entry v1alpha1.AppCatalogEntry
 	err := v.g8sClient.Get(ctx, client.ObjectKey{

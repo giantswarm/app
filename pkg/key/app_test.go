@@ -627,16 +627,27 @@ func Test_UserSecretNamespace(t *testing.T) {
 func Test_Version(t *testing.T) {
 	expectedVersion := "1.2.3"
 
-	obj := v1alpha1.App{
-		Spec: v1alpha1.AppSpec{
-			Name:      "prometheus",
-			Namespace: "monitoring",
-			Version:   "1.2.3",
+	objs := []v1alpha1.App{
+		v1alpha1.App{
+			Spec: v1alpha1.AppSpec{
+				Name:      "prometheus",
+				Namespace: "monitoring",
+				Version:   "1.2.3",
+			},
+		},
+		v1alpha1.App{
+			Spec: v1alpha1.AppSpec{
+				Name:      "prometheus",
+				Namespace: "monitoring",
+				Version:   "v1.2.3",
+			},
 		},
 	}
 
-	if Version(obj) != expectedVersion {
-		t.Fatalf("app version %#q, want %#q", Version(obj), expectedVersion)
+	for _, obj := range objs {
+		if Version(obj) != expectedVersion {
+			t.Fatalf("app version %#q, want %#q", Version(obj), expectedVersion)
+		}
 	}
 }
 
