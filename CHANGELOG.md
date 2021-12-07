@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Support for the `v` prefixed version
+
 ## [6.0.0] - 2021-11-29
 
 - Drop `apiextensions` dependency in favor of `apiextensions-application`.
