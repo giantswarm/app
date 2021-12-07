@@ -821,7 +821,36 @@ func Test_ValidateMetadataConstraints(t *testing.T) {
 			},
 		},
 		{
-			name: "case 1: fixed namespace constraint",
+			name: "case 1: flawless flow with `v` prefixed version",
+			obj: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "kiam",
+					Namespace: "eggs2",
+					Labels: map[string]string{
+						label.AppOperatorVersion: "2.6.0",
+					},
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "giantswarm",
+					Name:      "kiam",
+					Namespace: metav1.NamespaceDefault,
+					Version:   "v1.4.0",
+				},
+			},
+			catalogEntry: &v1alpha1.AppCatalogEntry{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "giantswarm-kiam-1.4.0",
+					Namespace: metav1.NamespaceDefault,
+				},
+				Spec: v1alpha1.AppCatalogEntrySpec{
+					Restrictions: &v1alpha1.AppCatalogEntrySpecRestrictions{
+						FixedNamespace: metav1.NamespaceDefault,
+					},
+				},
+			},
+		},
+		{
+			name: "case 2: fixed namespace constraint",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "kiam",
@@ -848,7 +877,7 @@ func Test_ValidateMetadataConstraints(t *testing.T) {
 			expectedErr: "validation error: app `kiam` can only be installed in namespace `eggs1` only, not `kube-system`",
 		},
 		{
-			name: "case 2: cluster singleton constraint",
+			name: "case 3: cluster singleton constraint",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "kiam",
@@ -889,7 +918,7 @@ func Test_ValidateMetadataConstraints(t *testing.T) {
 			expectedErr: "validation error: app `kiam` can only be installed once in cluster `eggs2`",
 		},
 		{
-			name: "case 3: namespace singleton constraint",
+			name: "case 4: namespace singleton constraint",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "kiam",
@@ -942,7 +971,7 @@ func Test_ValidateMetadataConstraints(t *testing.T) {
 			expectedErr: "validation error: app `kiam` can only be installed only once in namespace `kube-system`",
 		},
 		{
-			name: "case 4: compatible providers constraint",
+			name: "case 5: compatible providers constraint",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "kiam",
@@ -1070,46 +1099,7 @@ func Test_ValidateNamespace(t *testing.T) {
 			},
 		},
 		{
-			name: "case 1: flawless with `v` version prefixed",
-			obj: v1alpha1.App{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "kiam",
-					Namespace: "eggs2",
-				},
-				Spec: v1alpha1.AppSpec{
-					Catalog:   "giantswarm",
-					Name:      "kiam",
-					Namespace: "kube-system",
-					NamespaceConfig: v1alpha1.AppSpecNamespaceConfig{
-						Annotations: map[string]string{
-							"linkerd.io/inject": "enabled",
-						},
-					},
-					Version: "v1.4.0",
-				},
-			},
-			apps: []*v1alpha1.App{
-				{
-					ObjectMeta: metav1.ObjectMeta{
-						Name:      "another-kiam-1",
-						Namespace: "eggs2",
-					},
-					Spec: v1alpha1.AppSpec{
-						Catalog:   "giantswarm",
-						Name:      "kiam",
-						Namespace: "kube-system",
-						NamespaceConfig: v1alpha1.AppSpecNamespaceConfig{
-							Annotations: map[string]string{
-								"linkerd.io/inject": "enabled",
-							},
-						},
-						Version: "1.3.0-rc1",
-					},
-				},
-			},
-		},
-		{
-			name: "case 2: namespace annotation collision",
+			name: "case 1: namespace annotation collision",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "kiam",
@@ -1149,7 +1139,7 @@ func Test_ValidateNamespace(t *testing.T) {
 			expectedErr: "app `kiam` annotation `linkerd.io/inject` for target namespace `kube-system` collides with value `disabled` for app `another-kiam-1`",
 		},
 		{
-			name: "case 3: namespace label collision",
+			name: "case 2: namespace label collision",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "kiam",
