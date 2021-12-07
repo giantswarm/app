@@ -3,7 +3,7 @@ package key
 import (
 	"testing"
 
-	"github.com/giantswarm/apiextensions-application/api/v1alpha1"
+	"github.com/giantswarm/apiextensions/v3/pkg/apis/application/v1alpha1"
 )
 
 func Test_CatalogStorageURL(t *testing.T) {
