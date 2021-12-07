@@ -1,14 +1,14 @@
 package validation
 
 import (
+	"github.com/giantswarm/apiextensions/v3/pkg/clientset/versioned"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"k8s.io/client-go/kubernetes"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 type Config struct {
-	G8sClient client.Client
+	G8sClient versioned.Interface
 	K8sClient kubernetes.Interface
 	Logger    micrologger.Logger
 
@@ -17,7 +17,7 @@ type Config struct {
 }
 
 type Validator struct {
-	g8sClient client.Client
+	g8sClient versioned.Interface
 	k8sClient kubernetes.Interface
 	logger    micrologger.Logger
 

@@ -4,13 +4,11 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/giantswarm/apiextensions-application/api/v1alpha1"
+	"github.com/giantswarm/apiextensions/v3/pkg/apis/application/v1alpha1"
 	"github.com/giantswarm/k8smetadata/pkg/label"
 	"github.com/giantswarm/microerror"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/fields"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/giantswarm/app/v5/pkg/key"
 )
@@ -94,25 +92,20 @@ func (v *Validator) validateCatalog(ctx context.Context, cr v1alpha1.App) error 
 		}
 	}
 
-	var matchedCatalog *v1alpha1.Catalog
+	var catalog *v1alpha1.Catalog
 
 	for _, ns := range namespaces {
-		var catalog v1alpha1.Catalog
-		err = v.g8sClient.Get(ctx, client.ObjectKey{
-			Namespace: ns,
-			Name:      key.CatalogName(cr),
-		}, &catalog)
+		catalog, err = v.g8sClient.ApplicationV1alpha1().Catalogs(ns).Get(ctx, key.CatalogName(cr), metav1.GetOptions{})
 		if apierrors.IsNotFound(err) {
 			// no-op
 			continue
 		} else if err != nil {
 			return microerror.Mask(err)
 		}
-		matchedCatalog = &catalog
 		break
 	}
 
-	if matchedCatalog == nil || matchedCatalog.Name == "" {
+	if catalog == nil || catalog.Name == "" {
 		return microerror.Maskf(validationError, catalogNotFoundTemplate, key.CatalogName(cr))
 	}
 
@@ -176,17 +169,10 @@ func (v *Validator) validateNamespaceConfig(ctx context.Context, cr v1alpha1.App
 
 	var apps []v1alpha1.App
 	{
-		fieldSelector, err := fields.ParseSelector(fmt.Sprintf("metadata.name!=%s", cr.Name))
-		if err != nil {
-			return microerror.Mask(err)
+		lo := metav1.ListOptions{
+			FieldSelector: fmt.Sprintf("metadata.name!=%s", cr.Name),
 		}
-
-		lo := client.ListOptions{
-			Namespace:     cr.Namespace,
-			FieldSelector: fieldSelector,
-		}
-		var appList v1alpha1.AppList
-		err = v.g8sClient.List(ctx, &appList, &lo)
+		appList, err := v.g8sClient.ApplicationV1alpha1().Apps(cr.Namespace).List(ctx, lo)
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -268,11 +254,7 @@ func (v *Validator) validateLabels(ctx context.Context, cr v1alpha1.App) error {
 func (v *Validator) validateMetadataConstraints(ctx context.Context, cr v1alpha1.App) error {
 	name := key.AppCatalogEntryName(key.CatalogName(cr), key.AppName(cr), key.Version(cr))
 
-	var entry v1alpha1.AppCatalogEntry
-	err := v.g8sClient.Get(ctx, client.ObjectKey{
-		Namespace: metav1.NamespaceDefault,
-		Name:      name,
-	}, &entry)
+	entry, err := v.g8sClient.ApplicationV1alpha1().AppCatalogEntries(metav1.NamespaceDefault).Get(ctx, name, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
 		v.logger.Debugf(ctx, "appcatalogentry %#q not found, skipping metadata validation", name)
 		return nil
@@ -301,17 +283,10 @@ func (v *Validator) validateMetadataConstraints(ctx context.Context, cr v1alpha1
 
 	var apps []v1alpha1.App
 	if entry.Spec.Restrictions.ClusterSingleton || entry.Spec.Restrictions.NamespaceSingleton {
-		fieldSelector, err := fields.ParseSelector(fmt.Sprintf("metadata.name!=%s", cr.Name))
-		if err != nil {
-			return microerror.Mask(err)
+		lo := metav1.ListOptions{
+			FieldSelector: fmt.Sprintf("metadata.name!=%s", cr.Name),
 		}
-
-		lo := client.ListOptions{
-			FieldSelector: fieldSelector,
-			Namespace:     cr.Namespace,
-		}
-		var appList v1alpha1.AppList
-		err = v.g8sClient.List(ctx, &appList, &lo)
+		appList, err := v.g8sClient.ApplicationV1alpha1().Apps(cr.Namespace).List(ctx, lo)
 		if err != nil {
 			return microerror.Mask(err)
 		}
