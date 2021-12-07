@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Support for App CRs with a `v` prefixed version. This enabled Flux to automatically update the version based on its image tag. 
+
 ## [5.6.0] - 2021-11-29
 
 ### Changed
