@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Support for the `v` prefixed version. This enables Flux to use `v`-prefixed image tags as Apps version to automatically update them.
+
 ## [5.6.0] - 2021-11-29
 
 ### Changed
