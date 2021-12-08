@@ -204,6 +204,8 @@ func UserSecretNamespace(customResource v1alpha1.App) string {
 }
 
 func Version(customResource v1alpha1.App) string {
+	// This enables Flux to use `v`-prefixed image tags as the App
+	// CR version to automatically update them.
 	return strings.TrimPrefix(customResource.Spec.Version, "v")
 }
 
