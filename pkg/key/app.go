@@ -2,6 +2,7 @@ package key
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/giantswarm/apiextensions-application/api/v1alpha1"
@@ -203,7 +204,9 @@ func UserSecretNamespace(customResource v1alpha1.App) string {
 }
 
 func Version(customResource v1alpha1.App) string {
-	return customResource.Spec.Version
+	// This enables Flux to use `v`-prefixed image tags as the App
+	// CR version to automatically update them.
+	return strings.TrimPrefix(customResource.Spec.Version, "v")
 }
 
 func VersionLabel(customResource v1alpha1.App) string {
