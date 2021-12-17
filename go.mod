@@ -3,10 +3,10 @@ module github.com/giantswarm/app/v6
 go 1.17
 
 require (
-	github.com/giantswarm/apiextensions-application v0.1.0
+	github.com/giantswarm/apiextensions-application v0.2.0
 	github.com/giantswarm/k8smetadata v0.7.1
-	github.com/giantswarm/microerror v0.3.0
-	github.com/giantswarm/micrologger v0.5.0
+	github.com/giantswarm/microerror v0.4.0
+	github.com/giantswarm/micrologger v0.6.0
 	github.com/giantswarm/to v0.4.0
 	github.com/google/go-cmp v0.5.6
 	github.com/google/go-github/v39 v39.2.0
@@ -23,10 +23,10 @@ require (
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/evanphx/json-patch v4.11.0+incompatible // indirect
-	github.com/go-kit/kit v0.10.0 // indirect
-	github.com/go-logfmt/logfmt v0.5.0 // indirect
+	github.com/go-kit/log v0.2.0 // indirect
+	github.com/go-logfmt/logfmt v0.5.1 // indirect
 	github.com/go-logr/logr v0.4.0 // indirect
-	github.com/go-stack/stack v1.8.0 // indirect
+	github.com/go-stack/stack v1.8.1 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
