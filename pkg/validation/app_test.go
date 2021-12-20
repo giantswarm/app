@@ -794,7 +794,7 @@ func Test_ValidateAppUpdate(t *testing.T) {
 					Version:   "1.4.0",
 				},
 			},
-			expectedErr: "validation error: namespace for app `kiam` cannot be changed from `kube-system` to `default`",
+			expectedErr: "validation error: target namespace for app `kiam` cannot be changed from `kube-system` to `default`",
 		},
 	}
 

@@ -348,7 +348,7 @@ func (v *Validator) validateMetadataConstraints(ctx context.Context, cr v1alpha1
 
 func (v *Validator) validateNamespaceUpdate(ctx context.Context, app, currentApp v1alpha1.App) error {
 	if key.Namespace(app) != key.Namespace(currentApp) {
-		return microerror.Maskf(validationError, "namespace for app %#q cannot be changed from %#q to %#q", app.Name,
+		return microerror.Maskf(validationError, "target namespace for app %#q cannot be changed from %#q to %#q", app.Name,
 			key.Namespace(currentApp), key.Namespace(app))
 	}
 
