@@ -78,6 +78,15 @@ func (v *Validator) ValidateApp(ctx context.Context, app v1alpha1.App) (bool, er
 	return true, nil
 }
 
+func (v *Validator) ValidateAppUpdate(ctx context.Context, app, currentApp v1alpha1.App) (bool, error) {
+	err := v.validateNamespaceUpdate(ctx, app, currentApp)
+	if err != nil {
+		return false, microerror.Mask(err)
+	}
+
+	return true, nil
+}
+
 func (v *Validator) validateCatalog(ctx context.Context, cr v1alpha1.App) error {
 	var err error
 
@@ -332,6 +341,15 @@ func (v *Validator) validateMetadataConstraints(ctx context.Context, cr v1alpha1
 				}
 			}
 		}
+	}
+
+	return nil
+}
+
+func (v *Validator) validateNamespaceUpdate(ctx context.Context, app, currentApp v1alpha1.App) error {
+	if key.Namespace(app) != key.Namespace(currentApp) {
+		return microerror.Maskf(validationError, "target namespace for app %#q cannot be changed from %#q to %#q", app.Name,
+			key.Namespace(currentApp), key.Namespace(app))
 	}
 
 	return nil
