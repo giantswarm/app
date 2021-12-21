@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add `ValidateAppUpdate` to ensure `.spec.Namespace` is immutable in App CRs.
+
 ## [6.1.0] - 2021-12-09
 
 ### Added

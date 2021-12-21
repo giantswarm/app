@@ -2,6 +2,7 @@ package validation
 
 import (
 	"context"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -714,6 +715,114 @@ func Test_ValidateApp(t *testing.T) {
 			}
 
 			_, err = r.ValidateApp(ctx, tc.obj)
+			switch {
+			case err != nil && tc.expectedErr == "":
+				t.Fatalf("error == %#v, want nil", err)
+			case err == nil && tc.expectedErr != "":
+				t.Fatalf("error == nil, want non-nil")
+			}
+
+			if err != nil && tc.expectedErr != "" {
+				if !strings.Contains(err.Error(), tc.expectedErr) {
+					t.Fatalf("error == %#v, want %#v ", err.Error(), tc.expectedErr)
+				}
+
+			}
+		})
+	}
+}
+
+func Test_ValidateAppUpdate(t *testing.T) {
+	ctx := context.Background()
+
+	tests := []struct {
+		name        string
+		obj         v1alpha1.App
+		currentApp  v1alpha1.App
+		expectedErr string
+	}{
+		{
+			name: "case 0: flawless",
+			obj: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "kiam",
+					Namespace: "eggs2",
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "giantswarm",
+					Name:      "kiam",
+					Namespace: "kube-system",
+					Version:   "1.4.0",
+				},
+			},
+			currentApp: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "kiam",
+					Namespace: "eggs2",
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "giantswarm",
+					Name:      "kiam",
+					Namespace: "kube-system",
+					Version:   "1.4.0",
+				},
+			},
+		},
+		{
+			name: "case 1: changed namespace is rejected",
+			obj: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "kiam",
+					Namespace: "eggs2",
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "giantswarm",
+					Name:      "kiam",
+					Namespace: "default",
+					Version:   "1.4.0",
+				},
+			},
+			currentApp: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "kiam",
+					Namespace: "eggs2",
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "giantswarm",
+					Name:      "kiam",
+					Namespace: "kube-system",
+					Version:   "1.4.0",
+				},
+			},
+			expectedErr: "validation error: target namespace for app `kiam` cannot be changed from `kube-system` to `default`",
+		},
+	}
+
+	for i, tc := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			t.Log(tc.name)
+
+			scheme := runtime.NewScheme()
+			_ = v1alpha1.AddToScheme(scheme)
+
+			fakeCtrlClient := fake.NewClientBuilder().
+				WithScheme(scheme).
+				Build()
+
+			c := Config{
+				G8sClient: fakeCtrlClient,
+				K8sClient: clientgofake.NewSimpleClientset(),
+				Logger:    microloggertest.New(),
+
+				ProjectName: "app-admission-controller",
+				Provider:    "aws",
+			}
+			r, err := NewValidator(c)
+			if err != nil {
+				t.Fatalf("error == %#v, want nil", err)
+			}
+
+			_, err = r.ValidateAppUpdate(ctx, tc.obj, tc.currentApp)
 			switch {
 			case err != nil && tc.expectedErr == "":
 				t.Fatalf("error == %#v, want nil", err)
