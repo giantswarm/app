@@ -3,6 +3,7 @@ package validation
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/giantswarm/apiextensions-application/api/v1alpha1"
 	"github.com/giantswarm/k8smetadata/pkg/label"
@@ -19,6 +20,7 @@ const (
 	catalogNotFoundTemplate         = "catalog %#q not found"
 	nameTooLongTemplate             = "name %#q is %d chars and exceeds max length of %d chars"
 	nameNotFoundReasonTemplate      = "name is not specified for %s"
+	namespaceNotAllowed             = "namespace %s is not allowed"
 	namespaceNotFoundReasonTemplate = "namespace is not specified for %s %#q"
 	labelInvalidValueTemplate       = "label %#q has invalid value %#q"
 	labelNotFoundTemplate           = "label %#q not found"
@@ -66,6 +68,11 @@ func (v *Validator) ValidateApp(ctx context.Context, app v1alpha1.App) (bool, er
 	}
 
 	err = v.validateNamespaceConfig(ctx, app)
+	if err != nil {
+		return false, microerror.Mask(err)
+	}
+
+	err = v.validateTargetNamespace(ctx, app)
 	if err != nil {
 		return false, microerror.Mask(err)
 	}
@@ -169,6 +176,18 @@ func (v *Validator) validateConfig(ctx context.Context, cr v1alpha1.App) error {
 func (v *Validator) validateName(ctx context.Context, cr v1alpha1.App) error {
 	if len(cr.Name) > nameMaxLength {
 		return microerror.Maskf(validationError, nameTooLongTemplate, cr.Name, len(cr.Name), nameMaxLength)
+	}
+
+	return nil
+}
+
+func (v *Validator) validateTargetNamespace(ctx context.Context, cr v1alpha1.App) error {
+	if key.InCluster(cr) {
+		if strings.HasPrefix(cr.Namespace, "org-") {
+			if !strings.EqualFold(cr.Namespace, cr.Spec.Namespace) {
+				return microerror.Maskf(validationError, namespaceNotAllowed, cr.Spec.Namespace)
+			}
+		}
 	}
 
 	return nil
