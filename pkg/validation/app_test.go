@@ -578,7 +578,7 @@ func Test_ValidateApp(t *testing.T) {
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "kiam",
-					Namespace: "eggs2",
+					Namespace: "giantswarm",
 					Labels: map[string]string{
 						label.AppOperatorVersion: "0.0.0",
 					},
@@ -677,7 +677,7 @@ func Test_ValidateApp(t *testing.T) {
 			},
 		},
 		{
-			name: "application not allowed outside org namespace",
+			name: ".spec.namespace for in-cluster app not allowed outside org namespace",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "kiam",
@@ -699,10 +699,35 @@ func Test_ValidateApp(t *testing.T) {
 			catalogs: []*v1alpha1.Catalog{
 				newTestCatalog("giantswarm", "default"),
 			},
-			expectedErr: "validation error: namespace kube-system is not allowed",
+			expectedErr: "validation error: target namespace kube-system is not allowed",
 		},
 		{
-			name: "application allowed in the org namespace",
+			name: ".spec.namespace for in-cluster app not allowed outside WC namespace",
+			obj: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "kiam",
+					Namespace: "eggs2",
+					Labels: map[string]string{
+						label.AppOperatorVersion: "2.6.0",
+					},
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "giantswarm",
+					Name:      "kiam",
+					Namespace: "kube-system",
+					KubeConfig: v1alpha1.AppSpecKubeConfig{
+						InCluster: true,
+					},
+					Version: "1.4.0",
+				},
+			},
+			catalogs: []*v1alpha1.Catalog{
+				newTestCatalog("giantswarm", "default"),
+			},
+			expectedErr: "validation error: target namespace kube-system is not allowed",
+		},
+		{
+			name: ".spec.namespace for in-cluster app allowed when it matches org namespace",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "kiam",
