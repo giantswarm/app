@@ -3,7 +3,6 @@ package validation
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/giantswarm/apiextensions-application/api/v1alpha1"
 	"github.com/giantswarm/k8smetadata/pkg/label"
@@ -185,8 +184,8 @@ func (v *Validator) validateName(ctx context.Context, cr v1alpha1.App) error {
 // or WC namespaces. Otherwise `.spec.namespace` could be exploited to override permissions.
 func (v *Validator) validateTargetNamespace(ctx context.Context, cr v1alpha1.App) error {
 	if key.InCluster(cr) {
-		if !strings.EqualFold(cr.Namespace, "giantswarm") {
-			if !strings.EqualFold(cr.Namespace, cr.Spec.Namespace) {
+		if cr.Namespace != "giantswarm" {
+			if cr.Namespace != cr.Spec.Namespace {
 				return microerror.Maskf(validationError, targetNamespaceNotAllowed, cr.Spec.Namespace)
 			}
 		}
