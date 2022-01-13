@@ -19,7 +19,7 @@ const (
 	catalogNotFoundTemplate         = "catalog %#q not found"
 	nameTooLongTemplate             = "name %#q is %d chars and exceeds max length of %d chars"
 	nameNotFoundReasonTemplate      = "name is not specified for %s"
-	targetNamespaceNotAllowed       = "target namespace %s is not allowed"
+	targetNamespaceNotAllowed       = "target namespace %s is not allowed for in-cluster apps"
 	namespaceNotFoundReasonTemplate = "namespace is not specified for %s %#q"
 	labelInvalidValueTemplate       = "label %#q has invalid value %#q"
 	labelNotFoundTemplate           = "label %#q not found"
