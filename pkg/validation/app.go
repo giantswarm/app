@@ -19,6 +19,7 @@ const (
 	catalogNotFoundTemplate         = "catalog %#q not found"
 	nameTooLongTemplate             = "name %#q is %d chars and exceeds max length of %d chars"
 	nameNotFoundReasonTemplate      = "name is not specified for %s"
+	targetNamespaceNotAllowed       = "target namespace %s is not allowed for in-cluster apps"
 	namespaceNotFoundReasonTemplate = "namespace is not specified for %s %#q"
 	labelInvalidValueTemplate       = "label %#q has invalid value %#q"
 	labelNotFoundTemplate           = "label %#q not found"
@@ -66,6 +67,11 @@ func (v *Validator) ValidateApp(ctx context.Context, app v1alpha1.App) (bool, er
 	}
 
 	err = v.validateNamespaceConfig(ctx, app)
+	if err != nil {
+		return false, microerror.Mask(err)
+	}
+
+	err = v.validateTargetNamespace(ctx, app)
 	if err != nil {
 		return false, microerror.Mask(err)
 	}
@@ -169,6 +175,20 @@ func (v *Validator) validateConfig(ctx context.Context, cr v1alpha1.App) error {
 func (v *Validator) validateName(ctx context.Context, cr v1alpha1.App) error {
 	if len(cr.Name) > nameMaxLength {
 		return microerror.Maskf(validationError, nameTooLongTemplate, cr.Name, len(cr.Name), nameMaxLength)
+	}
+
+	return nil
+}
+
+// We make sure users cannot create in-cluster Apps outside their organization
+// or WC namespaces. Otherwise `.spec.namespace` could be exploited to override permissions.
+func (v *Validator) validateTargetNamespace(ctx context.Context, cr v1alpha1.App) error {
+	isInCluster := key.InCluster(cr)
+	isNotGs := cr.Namespace != "giantswarm"
+	isOutsideOrg := cr.Namespace != cr.Spec.Namespace
+
+	if isInCluster && isNotGs && isOutsideOrg {
+		return microerror.Maskf(validationError, targetNamespaceNotAllowed, cr.Spec.Namespace)
 	}
 
 	return nil

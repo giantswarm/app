@@ -2,6 +2,7 @@ package validation
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 	"strings"
 	"testing"
@@ -28,7 +29,7 @@ func Test_ValidateApp(t *testing.T) {
 		expectedErr string
 	}{
 		{
-			name: "case 0: flawless flow",
+			name: "flawless flow",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "kiam",
@@ -78,7 +79,7 @@ func Test_ValidateApp(t *testing.T) {
 			},
 		},
 		{
-			name: "case 1: flawless in-cluster",
+			name: "flawless in-cluster",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "dex-app-unique",
@@ -102,7 +103,7 @@ func Test_ValidateApp(t *testing.T) {
 			},
 		},
 		{
-			name: "case 2: missing version label",
+			name: "missing version label",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "dex-app-unique",
@@ -124,7 +125,7 @@ func Test_ValidateApp(t *testing.T) {
 			expectedErr: "validation error: label `app-operator.giantswarm.io/version` not found",
 		},
 		{
-			name: "case 3: spec.catalog not found",
+			name: "spec.catalog not found",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "dex-app-unique",
@@ -149,7 +150,7 @@ func Test_ValidateApp(t *testing.T) {
 			expectedErr: "validation error: catalog `missing` not found",
 		},
 		{
-			name: "case 4: spec.config.configMap not found",
+			name: "spec.config.configMap not found",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "dex-app-unique",
@@ -180,7 +181,7 @@ func Test_ValidateApp(t *testing.T) {
 			expectedErr: "app config map not found error: configmap `dex-app-values` in namespace `giantswarm` not found",
 		},
 		{
-			name: "case 5: spec.config.configMap no namespace specified",
+			name: "spec.config.configMap no namespace specified",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "dex-app-unique",
@@ -211,7 +212,7 @@ func Test_ValidateApp(t *testing.T) {
 			expectedErr: "validation error: namespace is not specified for configmap `dex-app-values`",
 		},
 		{
-			name: "case 6: spec.config.secret not found",
+			name: "spec.config.secret not found",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "dex-app-unique",
@@ -242,7 +243,7 @@ func Test_ValidateApp(t *testing.T) {
 			expectedErr: "validation error: secret `dex-app-secrets` in namespace `giantswarm` not found",
 		},
 		{
-			name: "case 7: spec.config.secret no namespace specified",
+			name: "spec.config.secret no namespace specified",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "dex-app-unique",
@@ -273,7 +274,7 @@ func Test_ValidateApp(t *testing.T) {
 			expectedErr: "validation error: namespace is not specified for secret `dex-app-secrets`",
 		},
 		{
-			name: "case 8: spec.kubeConfig.secret not found",
+			name: "pec.kubeConfig.secret not found",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "kiam",
@@ -305,7 +306,7 @@ func Test_ValidateApp(t *testing.T) {
 			expectedErr: "kube config not found error: kubeconfig secret `eggs2-kubeconfig` in namespace `eggs2` not found",
 		},
 		{
-			name: "case 9: spec.kubeConfig.secret no namespace specified",
+			name: "spec.kubeConfig.secret no namespace specified",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "kiam",
@@ -337,7 +338,7 @@ func Test_ValidateApp(t *testing.T) {
 			expectedErr: "validation error: namespace is not specified for kubeconfig secret `eggs2-kubeconfig`",
 		},
 		{
-			name: "case 10: spec.userConfig.configMap not found",
+			name: "spec.userConfig.configMap not found",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "dex-app-unique",
@@ -368,7 +369,7 @@ func Test_ValidateApp(t *testing.T) {
 			expectedErr: "validation error: configmap `dex-app-user-values` in namespace `giantswarm` not found",
 		},
 		{
-			name: "case 11: spec.userConfig.configMap no namespace specified",
+			name: "spec.userConfig.configMap no namespace specified",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "dex-app-unique",
@@ -399,7 +400,7 @@ func Test_ValidateApp(t *testing.T) {
 			expectedErr: "validation error: namespace is not specified for configmap `dex-app-user-values`",
 		},
 		{
-			name: "case 12: spec.userConfig.secret not found",
+			name: "spec.userConfig.secret not found",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "dex-app-unique",
@@ -430,7 +431,7 @@ func Test_ValidateApp(t *testing.T) {
 			expectedErr: "validation error: secret `dex-app-user-secrets` in namespace `giantswarm` not found",
 		},
 		{
-			name: "case 13: spec.userConfig.secret no namespace specified",
+			name: "spec.userConfig.secret no namespace specified",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "dex-app-unique",
@@ -461,7 +462,7 @@ func Test_ValidateApp(t *testing.T) {
 			expectedErr: "validation error: namespace is not specified for secret `dex-app-user-secrets`",
 		},
 		{
-			name: "case 14: spec.userConfig.configMap.name incorrect for default catalog app",
+			name: "spec.userConfig.configMap.name incorrect for default catalog app",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "kiam",
@@ -492,7 +493,7 @@ func Test_ValidateApp(t *testing.T) {
 			expectedErr: "validation error: user configmap must be named `kiam-user-values` for app in default catalog",
 		},
 		{
-			name: "case 15: spec.userConfig.secret.name incorrect for default catalog app",
+			name: "spec.userConfig.secret.name incorrect for default catalog app",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "kiam",
@@ -523,7 +524,7 @@ func Test_ValidateApp(t *testing.T) {
 			expectedErr: "validation error: user secret must be named `kiam-user-secrets` for app in default catalog",
 		},
 		{
-			name: "case 16: metadata.name exceeds max length",
+			name: "metadata.name exceeds max length",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "cluster-autoscaler-1.2.2-2b060b8bda545a7b6aeff1b8cb13951181ae30d3",
@@ -548,7 +549,7 @@ func Test_ValidateApp(t *testing.T) {
 			expectedErr: "validation error: name `cluster-autoscaler-1.2.2-2b060b8bda545a7b6aeff1b8cb13951181ae30d3` is 65 chars and exceeds max length of 53 chars",
 		},
 		{
-			name: "case 17: legacy version label is rejected",
+			name: "legacy version label is rejected",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "kiam",
@@ -573,11 +574,11 @@ func Test_ValidateApp(t *testing.T) {
 			expectedErr: "validation error: label `app-operator.giantswarm.io/version` has invalid value `1.0.0`",
 		},
 		{
-			name: "case 18: nginx user values configmap name is not restricted",
+			name: "nginx user values configmap name is not restricted",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "kiam",
-					Namespace: "eggs2",
+					Namespace: "giantswarm",
 					Labels: map[string]string{
 						label.AppOperatorVersion: "0.0.0",
 					},
@@ -606,7 +607,7 @@ func Test_ValidateApp(t *testing.T) {
 			},
 		},
 		{
-			name: "case 19: spec.kubeConfig.secret no name specified",
+			name: "spec.kubeConfig.secret no name specified",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "kiam",
@@ -638,7 +639,7 @@ func Test_ValidateApp(t *testing.T) {
 			expectedErr: "validation error: name is not specified for kubeconfig secret",
 		},
 		{
-			name: "case 20: skip validation when giantswarm.io/managed-by label equals flux",
+			name: "skip validation when giantswarm.io/managed-by label equals flux",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "kiam",
@@ -675,10 +676,84 @@ func Test_ValidateApp(t *testing.T) {
 				newTestCatalog("giantswarm", "default"),
 			},
 		},
+		{
+			name: ".spec.namespace for in-cluster app not allowed outside org namespace",
+			obj: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "kiam",
+					Namespace: "org-eggs2",
+					Labels: map[string]string{
+						label.AppOperatorVersion: "2.6.0",
+					},
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "giantswarm",
+					Name:      "kiam",
+					Namespace: "kube-system",
+					KubeConfig: v1alpha1.AppSpecKubeConfig{
+						InCluster: true,
+					},
+					Version: "1.4.0",
+				},
+			},
+			catalogs: []*v1alpha1.Catalog{
+				newTestCatalog("giantswarm", "default"),
+			},
+			expectedErr: "validation error: target namespace kube-system is not allowed",
+		},
+		{
+			name: ".spec.namespace for in-cluster app not allowed outside WC namespace",
+			obj: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "kiam",
+					Namespace: "eggs2",
+					Labels: map[string]string{
+						label.AppOperatorVersion: "2.6.0",
+					},
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "giantswarm",
+					Name:      "kiam",
+					Namespace: "kube-system",
+					KubeConfig: v1alpha1.AppSpecKubeConfig{
+						InCluster: true,
+					},
+					Version: "1.4.0",
+				},
+			},
+			catalogs: []*v1alpha1.Catalog{
+				newTestCatalog("giantswarm", "default"),
+			},
+			expectedErr: "validation error: target namespace kube-system is not allowed",
+		},
+		{
+			name: ".spec.namespace for in-cluster app allowed when it matches org namespace",
+			obj: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "kiam",
+					Namespace: "org-eggs2",
+					Labels: map[string]string{
+						label.AppOperatorVersion: "2.6.0",
+					},
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "giantswarm",
+					Name:      "kiam",
+					Namespace: "org-eggs2",
+					KubeConfig: v1alpha1.AppSpecKubeConfig{
+						InCluster: true,
+					},
+					Version: "1.4.0",
+				},
+			},
+			catalogs: []*v1alpha1.Catalog{
+				newTestCatalog("giantswarm", "default"),
+			},
+		},
 	}
 
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
+	for i, tc := range tests {
+		t.Run(fmt.Sprintf("case %d: %s", i, tc.name), func(t *testing.T) {
 			g8sObjs := make([]runtime.Object, 0)
 			for _, cat := range tc.catalogs {
 				g8sObjs = append(g8sObjs, cat)
