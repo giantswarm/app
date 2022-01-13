@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.3.0] - 2022-01-13
+
 ### Added
 
 - Add `validateTargetNamespace` to ensure users are not allowed to create in-cluster Apps outside org- and WC-related namespaces.
@@ -291,7 +293,8 @@ since there can be a delay creating them on cluster creation.
 
 - First release
 
-[Unreleased]: https://github.com/giantswarm/app/compare/v6.2.0...HEAD
+[Unreleased]: https://github.com/giantswarm/app/compare/v6.3.0...HEAD
+[6.3.0]: https://github.com/giantswarm/app/compare/v6.2.0...v6.3.0
 [6.2.0]: https://github.com/giantswarm/app/compare/v6.1.0...v6.2.0
 [6.1.0]: https://github.com/giantswarm/app/compare/v6.0.0...v6.1.0
 [6.0.0]: https://github.com/giantswarm/app/compare/v5.6.0...v6.0.0
