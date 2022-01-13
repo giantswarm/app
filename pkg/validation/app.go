@@ -183,12 +183,12 @@ func (v *Validator) validateName(ctx context.Context, cr v1alpha1.App) error {
 // We make sure users cannot create in-cluster Apps outside their organization
 // or WC namespaces. Otherwise `.spec.namespace` could be exploited to override permissions.
 func (v *Validator) validateTargetNamespace(ctx context.Context, cr v1alpha1.App) error {
-	if key.InCluster(cr) {
-		if cr.Namespace != "giantswarm" {
-			if cr.Namespace != cr.Spec.Namespace {
-				return microerror.Maskf(validationError, targetNamespaceNotAllowed, cr.Spec.Namespace)
-			}
-		}
+	isInCluster := key.InCluster(cr)
+	isNotGs := cr.Namespace != "giantswarm"
+	isOutsideOrg := cr.Namespace != cr.Spec.Namespace
+
+	if isInCluster && isNotGs && isOutsideOrg {
+		return microerror.Maskf(validationError, targetNamespaceNotAllowed, cr.Spec.Namespace)
 	}
 
 	return nil
