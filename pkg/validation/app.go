@@ -397,7 +397,7 @@ func (v *Validator) validateUserConfig(ctx context.Context, cr v1alpha1.App) err
 		}
 
 		_, err := v.k8sClient.CoreV1().ConfigMaps(ns).Get(ctx, key.UserConfigMapName(cr), metav1.GetOptions{})
-		if key.IsManagedByFlux(cr, "app-admission-controller") {
+		if key.IsManagedByFlux(cr, v.projectName) {
 			v.logger.Debugf(ctx, "skipping validation of app '%s/%s' dependencies due to '%s=%s' label", cr.Namespace, cr.Name, label.ManagedBy, key.ManagedByLabel(cr))
 			return nil
 		} else if apierrors.IsNotFound(err) {
@@ -421,7 +421,7 @@ func (v *Validator) validateUserConfig(ctx context.Context, cr v1alpha1.App) err
 		}
 
 		_, err := v.k8sClient.CoreV1().Secrets(key.UserSecretNamespace(cr)).Get(ctx, key.UserSecretName(cr), metav1.GetOptions{})
-		if key.IsManagedByFlux(cr, "app-admission-controller") {
+		if key.IsManagedByFlux(cr, v.projectName) {
 			v.logger.Debugf(ctx, "skipping validation of app '%s/%s' dependencies due to '%s=%s' label", cr.Namespace, cr.Name, label.ManagedBy, key.ManagedByLabel(cr))
 			return nil
 		} else if apierrors.IsNotFound(err) {
