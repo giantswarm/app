@@ -369,6 +369,37 @@ func Test_ValidateApp(t *testing.T) {
 			expectedErr: "validation error: configmap `dex-app-user-values` in namespace `giantswarm` not found",
 		},
 		{
+			name: "missing spec.userConfig.configMap allowed when managed by Flux",
+			obj: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "dex-app-unique",
+					Namespace: "giantswarm",
+					Labels: map[string]string{
+						label.AppOperatorVersion: "0.0.0",
+						label.ManagedBy:          "flux",
+					},
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "control-plane-catalog",
+					Name:      "dex-app",
+					Namespace: "giantswarm",
+					KubeConfig: v1alpha1.AppSpecKubeConfig{
+						InCluster: true,
+					},
+					UserConfig: v1alpha1.AppSpecUserConfig{
+						ConfigMap: v1alpha1.AppSpecUserConfigConfigMap{
+							Name:      "dex-app-user-values",
+							Namespace: "giantswarm",
+						},
+					},
+					Version: "1.2.2",
+				},
+			},
+			catalogs: []*v1alpha1.Catalog{
+				newTestCatalog("control-plane-catalog", "default"),
+			},
+		},
+		{
 			name: "spec.userConfig.configMap no namespace specified",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
@@ -429,6 +460,37 @@ func Test_ValidateApp(t *testing.T) {
 				newTestCatalog("control-plane-catalog", "giantswarm"),
 			},
 			expectedErr: "validation error: secret `dex-app-user-secrets` in namespace `giantswarm` not found",
+		},
+		{
+			name: "missing spec.userConfig.secret allowed when managed by Flux",
+			obj: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "dex-app-unique",
+					Namespace: "giantswarm",
+					Labels: map[string]string{
+						label.AppOperatorVersion: "0.0.0",
+						label.ManagedBy:          "flux",
+					},
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "control-plane-catalog",
+					Name:      "dex-app",
+					Namespace: "giantswarm",
+					KubeConfig: v1alpha1.AppSpecKubeConfig{
+						InCluster: true,
+					},
+					UserConfig: v1alpha1.AppSpecUserConfig{
+						Secret: v1alpha1.AppSpecUserConfigSecret{
+							Name:      "dex-app-user-secrets",
+							Namespace: "giantswarm",
+						},
+					},
+					Version: "1.2.2",
+				},
+			},
+			catalogs: []*v1alpha1.Catalog{
+				newTestCatalog("control-plane-catalog", "giantswarm"),
+			},
 		},
 		{
 			name: "spec.userConfig.secret no namespace specified",
