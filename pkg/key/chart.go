@@ -2,6 +2,7 @@ package key
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/giantswarm/apiextensions-application/api/v1alpha1"
 	"github.com/giantswarm/k8smetadata/pkg/annotation"
@@ -10,6 +11,19 @@ import (
 
 func ChartConfigMapName(customResource v1alpha1.App) string {
 	return fmt.Sprintf("%s-chart-values", customResource.GetName())
+}
+
+func ChartName(app v1alpha1.App, clusterID string) string {
+	// Chart CR name should match the app CR name when installed in the
+	// same cluster.
+	if InCluster(app) {
+		return app.Name
+	}
+
+	// If the app CR has the cluster ID as a prefix or suffix we remove it
+	// as its redundant in the remote cluster.
+	chartName := strings.TrimPrefix(app.Name, fmt.Sprintf("%s-", clusterID))
+	return strings.TrimSuffix(chartName, fmt.Sprintf("-%s", clusterID))
 }
 
 func ChartSecretName(customResource v1alpha1.App) string {
