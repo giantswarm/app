@@ -26,6 +26,7 @@ func Test_ValidateApp(t *testing.T) {
 		catalogs    []*v1alpha1.Catalog
 		configMaps  []*corev1.ConfigMap
 		secrets     []*corev1.Secret
+		conditional bool
 		expectedErr string
 	}{
 		{
@@ -274,13 +275,79 @@ func Test_ValidateApp(t *testing.T) {
 			expectedErr: "validation error: namespace is not specified for secret `dex-app-secrets`",
 		},
 		{
-			name: "pec.kubeConfig.secret not found",
+			name: "spec.kubeConfig.secret not found",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "kiam",
 					Namespace: "eggs2",
 					Labels: map[string]string{
 						label.AppOperatorVersion: "2.6.0",
+					},
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "giantswarm",
+					Name:      "kiam",
+					Namespace: "kube-system",
+					KubeConfig: v1alpha1.AppSpecKubeConfig{
+						Context: v1alpha1.AppSpecKubeConfigContext{
+							Name: "eggs2-kubeconfig",
+						},
+						InCluster: false,
+						Secret: v1alpha1.AppSpecKubeConfigSecret{
+							Name:      "eggs2-kubeconfig",
+							Namespace: "eggs2",
+						},
+					},
+					Version: "1.4.0",
+				},
+			},
+			catalogs: []*v1alpha1.Catalog{
+				newTestCatalog("giantswarm", "default"),
+			},
+			expectedErr: "kube config not found error: kubeconfig secret `eggs2-kubeconfig` in namespace `eggs2` not found",
+		},
+		{
+			name: "missing spec.kubeConfig.secret allowed when managed by Flux on conditional validation",
+			obj: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "kiam",
+					Namespace: "eggs2",
+					Labels: map[string]string{
+						label.AppOperatorVersion: "2.6.0",
+						label.ManagedBy:          "flux",
+					},
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "giantswarm",
+					Name:      "kiam",
+					Namespace: "kube-system",
+					KubeConfig: v1alpha1.AppSpecKubeConfig{
+						Context: v1alpha1.AppSpecKubeConfigContext{
+							Name: "eggs2-kubeconfig",
+						},
+						InCluster: false,
+						Secret: v1alpha1.AppSpecKubeConfigSecret{
+							Name:      "eggs2-kubeconfig",
+							Namespace: "eggs2",
+						},
+					},
+					Version: "1.4.0",
+				},
+			},
+			catalogs: []*v1alpha1.Catalog{
+				newTestCatalog("giantswarm", "default"),
+			},
+			conditional: true,
+		},
+		{
+			name: "missing spec.kubeConfig.secret not allowed when managed by Flux on uncoditional validation",
+			obj: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "kiam",
+					Namespace: "eggs2",
+					Labels: map[string]string{
+						label.AppOperatorVersion: "2.6.0",
+						label.ManagedBy:          "flux",
 					},
 				},
 				Spec: v1alpha1.AppSpec{
@@ -369,7 +436,7 @@ func Test_ValidateApp(t *testing.T) {
 			expectedErr: "validation error: configmap `dex-app-user-values` in namespace `giantswarm` not found",
 		},
 		{
-			name: "missing spec.userConfig.configMap allowed when managed by Flux",
+			name: "missing spec.userConfig.configMap allowed when managed by Flux on conditional validation",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "dex-app-unique",
@@ -398,6 +465,39 @@ func Test_ValidateApp(t *testing.T) {
 			catalogs: []*v1alpha1.Catalog{
 				newTestCatalog("control-plane-catalog", "default"),
 			},
+			conditional: true,
+		},
+		{
+			name: "missing spec.userConfig.configMap not allowed when managed by Flux on unconditional validation",
+			obj: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "dex-app-unique",
+					Namespace: "giantswarm",
+					Labels: map[string]string{
+						label.AppOperatorVersion: "0.0.0",
+						label.ManagedBy:          "flux",
+					},
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "control-plane-catalog",
+					Name:      "dex-app",
+					Namespace: "giantswarm",
+					KubeConfig: v1alpha1.AppSpecKubeConfig{
+						InCluster: true,
+					},
+					UserConfig: v1alpha1.AppSpecUserConfig{
+						ConfigMap: v1alpha1.AppSpecUserConfigConfigMap{
+							Name:      "dex-app-user-values",
+							Namespace: "giantswarm",
+						},
+					},
+					Version: "1.2.2",
+				},
+			},
+			catalogs: []*v1alpha1.Catalog{
+				newTestCatalog("control-plane-catalog", "default"),
+			},
+			expectedErr: "validation error: configmap `dex-app-user-values` in namespace `giantswarm` not found",
 		},
 		{
 			name: "spec.userConfig.configMap no namespace specified",
@@ -462,7 +562,7 @@ func Test_ValidateApp(t *testing.T) {
 			expectedErr: "validation error: secret `dex-app-user-secrets` in namespace `giantswarm` not found",
 		},
 		{
-			name: "missing spec.userConfig.secret allowed when managed by Flux",
+			name: "missing spec.userConfig.secret allowed when managed by Flux on conditional validation",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "dex-app-unique",
@@ -491,6 +591,39 @@ func Test_ValidateApp(t *testing.T) {
 			catalogs: []*v1alpha1.Catalog{
 				newTestCatalog("control-plane-catalog", "giantswarm"),
 			},
+			conditional: true,
+		},
+		{
+			name: "missing spec.userConfig.secret not allowed when managed by Flux on unconditional validation",
+			obj: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "dex-app-unique",
+					Namespace: "giantswarm",
+					Labels: map[string]string{
+						label.AppOperatorVersion: "0.0.0",
+						label.ManagedBy:          "flux",
+					},
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "control-plane-catalog",
+					Name:      "dex-app",
+					Namespace: "giantswarm",
+					KubeConfig: v1alpha1.AppSpecKubeConfig{
+						InCluster: true,
+					},
+					UserConfig: v1alpha1.AppSpecUserConfig{
+						Secret: v1alpha1.AppSpecUserConfigSecret{
+							Name:      "dex-app-user-secrets",
+							Namespace: "giantswarm",
+						},
+					},
+					Version: "1.2.2",
+				},
+			},
+			catalogs: []*v1alpha1.Catalog{
+				newTestCatalog("control-plane-catalog", "giantswarm"),
+			},
+			expectedErr: "validation error: secret `dex-app-user-secrets` in namespace `giantswarm` not found",
 		},
 		{
 			name: "spec.userConfig.secret no namespace specified",
@@ -701,44 +834,6 @@ func Test_ValidateApp(t *testing.T) {
 			expectedErr: "validation error: name is not specified for kubeconfig secret",
 		},
 		{
-			name: "skip validation when giantswarm.io/managed-by label equals flux",
-			obj: v1alpha1.App{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "kiam",
-					Namespace: "eggs2",
-					Labels: map[string]string{
-						label.AppOperatorVersion: "2.6.0",
-						label.ManagedBy:          "flux",
-					},
-				},
-				Spec: v1alpha1.AppSpec{
-					Catalog:   "giantswarm",
-					Name:      "kiam",
-					Namespace: "kube-system",
-					KubeConfig: v1alpha1.AppSpecKubeConfig{
-						Context: v1alpha1.AppSpecKubeConfigContext{
-							Name: "eggs2-kubeconfig",
-						},
-						InCluster: false,
-						Secret: v1alpha1.AppSpecKubeConfigSecret{
-							Name:      "",
-							Namespace: "default",
-						},
-					},
-					UserConfig: v1alpha1.AppSpecUserConfig{
-						ConfigMap: v1alpha1.AppSpecUserConfigConfigMap{
-							Name:      "kiam-user-values",
-							Namespace: "eggs2",
-						},
-					},
-					Version: "1.4.0",
-				},
-			},
-			catalogs: []*v1alpha1.Catalog{
-				newTestCatalog("giantswarm", "default"),
-			},
-		},
-		{
 			name: ".spec.namespace for in-cluster app not allowed outside org namespace",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
@@ -845,6 +940,7 @@ func Test_ValidateApp(t *testing.T) {
 
 				ProjectName: "app-admission-controller",
 				Provider:    "aws",
+				Conditional: tc.conditional,
 			}
 			r, err := NewValidator(c)
 			if err != nil {

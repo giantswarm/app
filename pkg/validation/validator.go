@@ -14,6 +14,7 @@ type Config struct {
 
 	ProjectName string
 	Provider    string
+	Conditional bool
 }
 
 type Validator struct {
@@ -23,6 +24,7 @@ type Validator struct {
 
 	projectName string
 	provider    string
+	conditional bool
 }
 
 func NewValidator(config Config) (*Validator, error) {
@@ -50,6 +52,7 @@ func NewValidator(config Config) (*Validator, error) {
 
 		projectName: config.ProjectName,
 		provider:    config.Provider,
+		conditional: config.Conditional,
 	}
 
 	return validator, nil
