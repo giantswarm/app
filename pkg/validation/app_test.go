@@ -21,13 +21,13 @@ func Test_ValidateApp(t *testing.T) {
 	ctx := context.Background()
 
 	tests := []struct {
-		name        string
-		obj         v1alpha1.App
-		catalogs    []*v1alpha1.Catalog
-		configMaps  []*corev1.ConfigMap
-		secrets     []*corev1.Secret
-		conditional bool
-		expectedErr string
+		name                   string
+		obj                    v1alpha1.App
+		catalogs               []*v1alpha1.Catalog
+		configMaps             []*corev1.ConfigMap
+		secrets                []*corev1.Secret
+		validateResourcesExist bool
+		expectedErr            string
 	}{
 		{
 			name: "flawless flow",
@@ -337,7 +337,7 @@ func Test_ValidateApp(t *testing.T) {
 			catalogs: []*v1alpha1.Catalog{
 				newTestCatalog("giantswarm", "default"),
 			},
-			conditional: true,
+			validateResourcesExist: true,
 		},
 		{
 			name: "missing spec.kubeConfig.secret not allowed when managed by Flux on uncoditional validation",
@@ -465,7 +465,7 @@ func Test_ValidateApp(t *testing.T) {
 			catalogs: []*v1alpha1.Catalog{
 				newTestCatalog("control-plane-catalog", "default"),
 			},
-			conditional: true,
+			validateResourcesExist: true,
 		},
 		{
 			name: "missing spec.userConfig.configMap not allowed when managed by Flux on unconditional validation",
@@ -591,7 +591,7 @@ func Test_ValidateApp(t *testing.T) {
 			catalogs: []*v1alpha1.Catalog{
 				newTestCatalog("control-plane-catalog", "giantswarm"),
 			},
-			conditional: true,
+			validateResourcesExist: true,
 		},
 		{
 			name: "missing spec.userConfig.secret not allowed when managed by Flux on unconditional validation",
@@ -938,9 +938,9 @@ func Test_ValidateApp(t *testing.T) {
 				K8sClient: clientgofake.NewSimpleClientset(k8sObjs...),
 				Logger:    microloggertest.New(),
 
-				ProjectName: "app-admission-controller",
-				Provider:    "aws",
-				Conditional: tc.conditional,
+				ProjectName:            "app-admission-controller",
+				Provider:               "aws",
+				ValidateResourcesExist: tc.validateResourcesExist,
 			}
 			r, err := NewValidator(c)
 			if err != nil {
