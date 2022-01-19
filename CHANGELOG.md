@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add `validateResourcesExist` flag to Validator for enabling/disabling support for `key.IsManagedByFlux`.
+
+### Changed
+
+- Narrow down the `key.IsManagedByFlux` impact on validation. It now skips only ConfigMap and Secret existence checks.
+
 ## [6.4.0] - 2022-01-18
 
 ### Added

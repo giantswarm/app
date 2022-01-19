@@ -12,8 +12,9 @@ type Config struct {
 	K8sClient kubernetes.Interface
 	Logger    micrologger.Logger
 
-	ProjectName string
-	Provider    string
+	ProjectName            string
+	Provider               string
+	ValidateResourcesExist bool
 }
 
 type Validator struct {
@@ -21,8 +22,9 @@ type Validator struct {
 	k8sClient kubernetes.Interface
 	logger    micrologger.Logger
 
-	projectName string
-	provider    string
+	projectName            string
+	provider               string
+	validateResourcesExist bool
 }
 
 func NewValidator(config Config) (*Validator, error) {
@@ -48,8 +50,9 @@ func NewValidator(config Config) (*Validator, error) {
 		k8sClient: config.K8sClient,
 		logger:    config.Logger,
 
-		projectName: config.ProjectName,
-		provider:    config.Provider,
+		projectName:            config.ProjectName,
+		provider:               config.Provider,
+		validateResourcesExist: config.ValidateResourcesExist,
 	}
 
 	return validator, nil
