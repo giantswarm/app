@@ -8,10 +8,10 @@ require (
 	github.com/giantswarm/microerror v0.4.0
 	github.com/giantswarm/micrologger v0.6.0
 	github.com/giantswarm/to v0.4.0
-	github.com/google/go-cmp v0.5.6
+	github.com/google/go-cmp v0.5.7
 	github.com/google/go-github/v39 v39.2.0
 	github.com/imdario/mergo v0.3.12
-	golang.org/x/oauth2 v0.0.0-20211005180243-6b3c2da341f1
+	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8
 	k8s.io/api v0.21.4
 	k8s.io/apiextensions-apiserver v0.21.4
 	k8s.io/apimachinery v0.21.4
