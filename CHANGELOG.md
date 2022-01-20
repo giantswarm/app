@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.5.1] - 2022-01-20
+
 ### Fixed
 
 - Rename `ValidateResourcesExist` flag to `EnableManagedByLabel`.
@@ -313,7 +315,8 @@ since there can be a delay creating them on cluster creation.
 
 - First release
 
-[Unreleased]: https://github.com/giantswarm/app/compare/v6.5.0...HEAD
+[Unreleased]: https://github.com/giantswarm/app/compare/v6.5.1...HEAD
+[6.5.1]: https://github.com/giantswarm/app/compare/v6.5.0...v6.5.1
 [6.5.0]: https://github.com/giantswarm/app/compare/v6.4.0...v6.5.0
 [6.4.0]: https://github.com/giantswarm/app/compare/v6.3.0...v6.4.0
 [6.3.0]: https://github.com/giantswarm/app/compare/v6.2.0...v6.3.0
