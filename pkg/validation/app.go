@@ -16,14 +16,15 @@ import (
 )
 
 const (
-	catalogNotFoundTemplate         = "catalog %#q not found"
-	nameTooLongTemplate             = "name %#q is %d chars and exceeds max length of %d chars"
-	nameNotFoundReasonTemplate      = "name is not specified for %s"
-	targetNamespaceNotAllowed       = "target namespace %s is not allowed for in-cluster apps"
-	namespaceNotFoundReasonTemplate = "namespace is not specified for %s %#q"
-	labelInvalidValueTemplate       = "label %#q has invalid value %#q"
-	labelNotFoundTemplate           = "label %#q not found"
-	resourceNotFoundTemplate        = "%s %#q in namespace %#q not found"
+	catalogNotFoundTemplate           = "catalog %#q not found"
+	nameTooLongTemplate               = "name %#q is %d chars and exceeds max length of %d chars"
+	nameNotFoundReasonTemplate        = "name is not specified for %s"
+	targetNamespaceNotAllowedTemplate = "target namespace %s is not allowed for in-cluster apps"
+	namespaceNotFoundReasonTemplate   = "namespace is not specified for %s %#q"
+	labelsConflictTemplate            = "label %#q is not allowed with the %#q label"
+	labelInvalidValueTemplate         = "label %#q has invalid value %#q"
+	labelNotFoundTemplate             = "label %#q not found"
+	resourceNotFoundTemplate          = "%s %#q in namespace %#q not found"
 
 	defaultCatalogName            = "default"
 	nginxIngressControllerAppName = "nginx-ingress-controller-app"
@@ -174,7 +175,7 @@ func (v *Validator) validateTargetNamespace(ctx context.Context, cr v1alpha1.App
 	isOutsideOrg := cr.Namespace != cr.Spec.Namespace
 
 	if isInCluster && isNotGs && isOutsideOrg {
-		return microerror.Maskf(validationError, targetNamespaceNotAllowed, cr.Spec.Namespace)
+		return microerror.Maskf(validationError, targetNamespaceNotAllowedTemplate, cr.Spec.Namespace)
 	}
 
 	return nil
@@ -256,11 +257,40 @@ func (v *Validator) validateKubeConfig(ctx context.Context, cr v1alpha1.App) err
 }
 
 func (v *Validator) validateLabels(ctx context.Context, cr v1alpha1.App) error {
+	// This is for migrations towards managing App CRs from the org namespace.
+	// For the transition time being we must retain backward compatibility for the
+	// App CRs in cluster namespaces.
+	isManagedInOrg := !key.InCluster(cr) && key.IsManagedInOrg(cr)
+
+	var validationMethod func(context.Context, v1alpha1.App) error
+	if isManagedInOrg {
+		validationMethod = v.validateLabelsOrgApp
+	} else {
+		validationMethod = v.validateLablesClusterApp
+	}
+
+	return validationMethod(ctx, cr)
+}
+
+func (v *Validator) validateLablesClusterApp(ctx context.Context, cr v1alpha1.App) error {
 	if key.VersionLabel(cr) == "" {
 		return microerror.Maskf(validationError, labelNotFoundTemplate, label.AppOperatorVersion)
 	}
 	if key.VersionLabel(cr) == key.LegacyAppVersionLabel {
 		return microerror.Maskf(validationError, labelInvalidValueTemplate, label.AppOperatorVersion, key.VersionLabel(cr))
+	}
+
+	return nil
+}
+
+func (v *Validator) validateLabelsOrgApp(ctx context.Context, cr v1alpha1.App) error {
+	// For org-namespaced App CR make sure the `giantswarm.io/cluster` is set,
+	// and there is no conflicting `app-operator.giantswarm.io/version` label.
+	if key.ClusterLabel(cr) == "" {
+		return microerror.Maskf(validationError, labelNotFoundTemplate, label.Cluster)
+	}
+	if key.VersionLabel(cr) != "" {
+		return microerror.Maskf(validationError, labelsConflictTemplate, label.AppOperatorVersion, label.Cluster)
 	}
 
 	return nil

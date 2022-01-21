@@ -86,6 +86,14 @@ func ClusterID(customResource v1alpha1.App) string {
 	return customResource.GetLabels()[label.Cluster]
 }
 
+func ClusterLabel(customResource v1alpha1.App) string {
+	if val, ok := customResource.ObjectMeta.Labels[label.Cluster]; ok {
+		return val
+	}
+
+	return ""
+}
+
 func ClusterValuesConfigMapName(customResource v1alpha1.App) string {
 	return fmt.Sprintf("%s-cluster-values", customResource.GetNamespace())
 }
@@ -140,6 +148,10 @@ func IsManagedByFlux(customResource v1alpha1.App, projectName string) bool {
 	}
 
 	return customResource.Labels[label.ManagedBy] == "flux"
+}
+
+func IsManagedInOrg(customResource v1alpha1.App) bool {
+	return strings.HasPrefix(customResource.ObjectMeta.Namespace, "org-")
 }
 
 func KubeConfigContextName(customResource v1alpha1.App) string {

@@ -80,6 +80,56 @@ func Test_ValidateApp(t *testing.T) {
 			},
 		},
 		{
+			name: "flawless org-managed flow",
+			obj: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "kiam",
+					Namespace: "org-eggs2",
+					Labels: map[string]string{
+						label.Cluster: "eggs2",
+					},
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "giantswarm",
+					Name:      "kiam",
+					Namespace: "kube-system",
+					Config: v1alpha1.AppSpecConfig{
+						ConfigMap: v1alpha1.AppSpecConfigConfigMap{
+							Name:      "eggs2-cluster-values",
+							Namespace: "org-eggs2",
+						},
+					},
+					KubeConfig: v1alpha1.AppSpecKubeConfig{
+						Context: v1alpha1.AppSpecKubeConfigContext{
+							Name: "eggs2-kubeconfig",
+						},
+						InCluster: false,
+						Secret: v1alpha1.AppSpecKubeConfigSecret{
+							Name:      "eggs2-kubeconfig",
+							Namespace: "org-eggs2",
+						},
+					},
+					UserConfig: v1alpha1.AppSpecUserConfig{
+						ConfigMap: v1alpha1.AppSpecUserConfigConfigMap{
+							Name:      "kiam-user-values",
+							Namespace: "org-eggs2",
+						},
+					},
+					Version: "1.4.0",
+				},
+			},
+			catalogs: []*v1alpha1.Catalog{
+				newTestCatalog("giantswarm", "default"),
+			},
+			configMaps: []*corev1.ConfigMap{
+				newTestConfigMap("eggs2-cluster-values", "org-eggs2"),
+				newTestConfigMap("kiam-user-values", "org-eggs2"),
+			},
+			secrets: []*corev1.Secret{
+				newTestSecret("eggs2-kubeconfig", "org-eggs2"),
+			},
+		},
+		{
 			name: "flawless in-cluster",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
@@ -124,6 +174,74 @@ func Test_ValidateApp(t *testing.T) {
 				newTestCatalog("control-plane-catalog", "giantswarm"),
 			},
 			expectedErr: "validation error: label `app-operator.giantswarm.io/version` not found",
+		},
+		{
+			name: "missing cluster label",
+			obj: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "kiam",
+					Namespace: "org-eggs2",
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "giantswarm",
+					Name:      "kiam",
+					Namespace: "kube-system",
+					KubeConfig: v1alpha1.AppSpecKubeConfig{
+						Context: v1alpha1.AppSpecKubeConfigContext{
+							Name: "eggs2-kubeconfig",
+						},
+						InCluster: false,
+						Secret: v1alpha1.AppSpecKubeConfigSecret{
+							Name:      "eggs2-kubeconfig",
+							Namespace: "org-eggs2",
+						},
+					},
+					Version: "1.4.0",
+				},
+			},
+			catalogs: []*v1alpha1.Catalog{
+				newTestCatalog("giantswarm", "default"),
+			},
+			secrets: []*corev1.Secret{
+				newTestSecret("eggs2-kubeconfig", "org-eggs2"),
+			},
+			expectedErr: "validation error: label `giantswarm.io/cluster` not found",
+		},
+		{
+			name: "conflicting cluster and version labels",
+			obj: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "kiam",
+					Namespace: "org-eggs2",
+					Labels: map[string]string{
+						label.AppOperatorVersion: "2.6.0",
+						label.Cluster:            "eggs2",
+					},
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "giantswarm",
+					Name:      "kiam",
+					Namespace: "kube-system",
+					KubeConfig: v1alpha1.AppSpecKubeConfig{
+						Context: v1alpha1.AppSpecKubeConfigContext{
+							Name: "eggs2-kubeconfig",
+						},
+						InCluster: false,
+						Secret: v1alpha1.AppSpecKubeConfigSecret{
+							Name:      "eggs2-kubeconfig",
+							Namespace: "org-eggs2",
+						},
+					},
+					Version: "1.4.0",
+				},
+			},
+			catalogs: []*v1alpha1.Catalog{
+				newTestCatalog("giantswarm", "default"),
+			},
+			secrets: []*corev1.Secret{
+				newTestSecret("eggs2-kubeconfig", "org-eggs2"),
+			},
+			expectedErr: "label `app-operator.giantswarm.io/version` is not allowed with the `giantswarm.io/cluster` label",
 		},
 		{
 			name: "spec.catalog not found",
