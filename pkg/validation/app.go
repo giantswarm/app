@@ -261,14 +261,11 @@ func (v *Validator) validateLabels(ctx context.Context, cr v1alpha1.App) error {
 	// App CRs in cluster namespaces.
 	isManagedInOrg := !key.InCluster(cr) && key.IsInOrgNamespace(cr)
 
-	var validationMethod func(context.Context, v1alpha1.App) error
 	if isManagedInOrg {
-		validationMethod = v.validateOrgLabels
-	} else {
-		validationMethod = v.validateClusterLabels
+		return v.validateOrgLabels(ctx, cr)
 	}
 
-	return validationMethod(ctx, cr)
+	return v.validateClusterLabels(ctx, cr)
 }
 
 func (v *Validator) validateClusterLabels(ctx context.Context, cr v1alpha1.App) error {
@@ -283,8 +280,6 @@ func (v *Validator) validateClusterLabels(ctx context.Context, cr v1alpha1.App) 
 }
 
 func (v *Validator) validateOrgLabels(ctx context.Context, cr v1alpha1.App) error {
-	// For org-namespaced App CRs make sure the `giantswarm.io/cluster` is set,
-	// and there is no conflicting `app-operator.giantswarm.io/version` label.
 	if key.ClusterLabel(cr) == "" {
 		return microerror.Maskf(validationError, labelNotFoundTemplate, label.Cluster)
 	}
