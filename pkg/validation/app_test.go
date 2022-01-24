@@ -241,7 +241,6 @@ func Test_ValidateApp(t *testing.T) {
 			secrets: []*corev1.Secret{
 				newTestSecret("eggs2-kubeconfig", "org-eggs2"),
 			},
-			expectedErr: "label `app-operator.giantswarm.io/version` is not allowed with the `giantswarm.io/cluster` label",
 		},
 		{
 			name: "spec.catalog not found",

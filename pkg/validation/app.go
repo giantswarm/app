@@ -21,7 +21,6 @@ const (
 	nameNotFoundReasonTemplate        = "name is not specified for %s"
 	targetNamespaceNotAllowedTemplate = "target namespace %s is not allowed for in-cluster apps"
 	namespaceNotFoundReasonTemplate   = "namespace is not specified for %s %#q"
-	labelsConflictTemplate            = "label %#q is not allowed with the %#q label"
 	labelInvalidValueTemplate         = "label %#q has invalid value %#q"
 	labelNotFoundTemplate             = "label %#q not found"
 	resourceNotFoundTemplate          = "%s %#q in namespace %#q not found"
@@ -288,9 +287,6 @@ func (v *Validator) validateOrgLabels(ctx context.Context, cr v1alpha1.App) erro
 	// and there is no conflicting `app-operator.giantswarm.io/version` label.
 	if key.ClusterLabel(cr) == "" {
 		return microerror.Maskf(validationError, labelNotFoundTemplate, label.Cluster)
-	}
-	if key.VersionLabel(cr) != "" {
-		return microerror.Maskf(validationError, labelsConflictTemplate, label.AppOperatorVersion, label.Cluster)
 	}
 
 	return nil
