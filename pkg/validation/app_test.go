@@ -208,41 +208,6 @@ func Test_ValidateApp(t *testing.T) {
 			expectedErr: "validation error: label `giantswarm.io/cluster` not found",
 		},
 		{
-			name: "conflicting cluster and version labels",
-			obj: v1alpha1.App{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "kiam",
-					Namespace: "org-eggs2",
-					Labels: map[string]string{
-						label.AppOperatorVersion: "2.6.0",
-						label.Cluster:            "eggs2",
-					},
-				},
-				Spec: v1alpha1.AppSpec{
-					Catalog:   "giantswarm",
-					Name:      "kiam",
-					Namespace: "kube-system",
-					KubeConfig: v1alpha1.AppSpecKubeConfig{
-						Context: v1alpha1.AppSpecKubeConfigContext{
-							Name: "eggs2-kubeconfig",
-						},
-						InCluster: false,
-						Secret: v1alpha1.AppSpecKubeConfigSecret{
-							Name:      "eggs2-kubeconfig",
-							Namespace: "org-eggs2",
-						},
-					},
-					Version: "1.4.0",
-				},
-			},
-			catalogs: []*v1alpha1.Catalog{
-				newTestCatalog("giantswarm", "default"),
-			},
-			secrets: []*corev1.Secret{
-				newTestSecret("eggs2-kubeconfig", "org-eggs2"),
-			},
-		},
-		{
 			name: "spec.catalog not found",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
