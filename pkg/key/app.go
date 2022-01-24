@@ -86,6 +86,14 @@ func ClusterID(customResource v1alpha1.App) string {
 	return customResource.GetLabels()[label.Cluster]
 }
 
+func ClusterLabel(customResource v1alpha1.App) string {
+	if val, ok := customResource.ObjectMeta.Labels[label.Cluster]; ok {
+		return val
+	}
+
+	return ""
+}
+
 func ClusterValuesConfigMapName(customResource v1alpha1.App) string {
 	return fmt.Sprintf("%s-cluster-values", customResource.GetNamespace())
 }
@@ -127,6 +135,10 @@ func IsAppCordoned(customResource v1alpha1.App) bool {
 
 func IsDeleted(customResource v1alpha1.App) bool {
 	return customResource.DeletionTimestamp != nil
+}
+
+func IsInOrgNamespace(customResource v1alpha1.App) bool {
+	return strings.HasPrefix(customResource.ObjectMeta.Namespace, "org-")
 }
 
 // IsManagedByFlux returns true if the giantswarm.io/managed-by label is set to
