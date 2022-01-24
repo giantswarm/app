@@ -257,22 +257,22 @@ func (v *Validator) validateKubeConfig(ctx context.Context, cr v1alpha1.App) err
 }
 
 func (v *Validator) validateLabels(ctx context.Context, cr v1alpha1.App) error {
-	// This is for migrations towards managing App CRs from the org namespace.
+	// This is for migration towards managing App CRs in the org namespace.
 	// For the transition time being we must retain backward compatibility for the
 	// App CRs in cluster namespaces.
-	isManagedInOrg := !key.InCluster(cr) && key.IsManagedInOrg(cr)
+	isManagedInOrg := !key.InCluster(cr) && key.IsInOrgNamespace(cr)
 
 	var validationMethod func(context.Context, v1alpha1.App) error
 	if isManagedInOrg {
-		validationMethod = v.validateLabelsOrgApp
+		validationMethod = v.validateOrgLabels
 	} else {
-		validationMethod = v.validateLablesClusterApp
+		validationMethod = v.validateClusterLabels
 	}
 
 	return validationMethod(ctx, cr)
 }
 
-func (v *Validator) validateLablesClusterApp(ctx context.Context, cr v1alpha1.App) error {
+func (v *Validator) validateClusterLabels(ctx context.Context, cr v1alpha1.App) error {
 	if key.VersionLabel(cr) == "" {
 		return microerror.Maskf(validationError, labelNotFoundTemplate, label.AppOperatorVersion)
 	}
@@ -283,8 +283,8 @@ func (v *Validator) validateLablesClusterApp(ctx context.Context, cr v1alpha1.Ap
 	return nil
 }
 
-func (v *Validator) validateLabelsOrgApp(ctx context.Context, cr v1alpha1.App) error {
-	// For org-namespaced App CR make sure the `giantswarm.io/cluster` is set,
+func (v *Validator) validateOrgLabels(ctx context.Context, cr v1alpha1.App) error {
+	// For org-namespaced App CRs make sure the `giantswarm.io/cluster` is set,
 	// and there is no conflicting `app-operator.giantswarm.io/version` label.
 	if key.ClusterLabel(cr) == "" {
 		return microerror.Maskf(validationError, labelNotFoundTemplate, label.Cluster)

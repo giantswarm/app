@@ -137,6 +137,10 @@ func IsDeleted(customResource v1alpha1.App) bool {
 	return customResource.DeletionTimestamp != nil
 }
 
+func IsInOrgNamespace(customResource v1alpha1.App) bool {
+	return strings.HasPrefix(customResource.ObjectMeta.Namespace, "org-")
+}
+
 // IsManagedByFlux returns true if the giantswarm.io/managed-by label is set to
 // flux and is being validated by app-admission-controller. When true we skip
 // validating configmap and secret names. This simplifies managing these
@@ -148,10 +152,6 @@ func IsManagedByFlux(customResource v1alpha1.App, projectName string) bool {
 	}
 
 	return customResource.Labels[label.ManagedBy] == "flux"
-}
-
-func IsManagedInOrg(customResource v1alpha1.App) bool {
-	return strings.HasPrefix(customResource.ObjectMeta.Namespace, "org-")
 }
 
 func KubeConfigContextName(customResource v1alpha1.App) string {
