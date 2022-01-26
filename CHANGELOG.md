@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.6.1] - 2022-01-26
+
 ### Fixed
 
 - Fix key cluster methods to support org-namespaced App CRs.
@@ -326,7 +328,8 @@ since there can be a delay creating them on cluster creation.
 
 - First release
 
-[Unreleased]: https://github.com/giantswarm/app/compare/v6.6.0...HEAD
+[Unreleased]: https://github.com/giantswarm/giantswarm/compare/v6.6.1...HEAD
+[6.6.1]: https://github.com/giantswarm/giantswarm/compare/v6.6.0...v6.6.1
 [6.6.0]: https://github.com/giantswarm/app/compare/v6.5.1...v6.6.0
 [6.5.1]: https://github.com/giantswarm/app/compare/v6.5.0...v6.5.1
 [6.5.0]: https://github.com/giantswarm/app/compare/v6.4.0...v6.5.0
