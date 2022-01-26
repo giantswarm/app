@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix key cluster methods to support org-namespaced App CRs.
+- Fix validation order, so that labels are checked before App CR configs.
+
 ## [6.6.0] - 2022-01-24
 
 ### Added
