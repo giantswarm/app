@@ -41,17 +41,17 @@ func (v *Validator) ValidateApp(ctx context.Context, app v1alpha1.App) (bool, er
 		return false, microerror.Mask(err)
 	}
 
+	err = v.validateLabels(ctx, app)
+	if err != nil {
+		return false, microerror.Mask(err)
+	}
+
 	err = v.validateConfig(ctx, app)
 	if err != nil {
 		return false, microerror.Mask(err)
 	}
 
 	err = v.validateKubeConfig(ctx, app)
-	if err != nil {
-		return false, microerror.Mask(err)
-	}
-
-	err = v.validateLabels(ctx, app)
 	if err != nil {
 		return false, microerror.Mask(err)
 	}
