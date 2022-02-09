@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Make validation of `giantswarm.io/managedby` more general.
+
 ## [6.6.1] - 2022-01-26
 
 ### Fixed
