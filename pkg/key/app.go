@@ -143,7 +143,11 @@ func IsInOrgNamespace(customResource v1alpha1.App) bool {
 
 // IsManagedBy returns true if the giantswarm.io/managed-by label is set on the
 // resource. When true we skip validating configmap and secret names.
-func IsManagedBy(customResource v1alpha1.App) bool {
+func IsManagedBy(customResource v1alpha1.App, projectName string) bool {
+	if projectName != "app-admission-controller" {
+		return false
+	}
+
 	return customResource.Labels[label.ManagedBy] != ""
 }
 

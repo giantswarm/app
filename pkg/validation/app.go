@@ -416,7 +416,7 @@ func (v *Validator) validateConfigMapExists(ctx context.Context, name, namespace
 		return microerror.Maskf(validationError, nameNotFoundReasonTemplate, kind)
 	}
 
-	if v.enableManagedByLabel && key.IsManagedBy(cr) {
+	if v.enableManagedByLabel && key.IsManagedBy(cr, v.projectName) {
 		v.logger.Debugf(ctx, "skipping validation of app '%s/%s' dependencies due to '%s=%s' label", cr.Namespace, cr.Name, label.ManagedBy, key.ManagedByLabel(cr))
 		return nil
 	}
@@ -440,7 +440,7 @@ func (v *Validator) validateSecretExists(ctx context.Context, name, namespace, k
 
 	// Check basic things, like empty name or namespace, but skip
 	// existance validation when managed by Fux.
-	if v.enableManagedByLabel && key.IsManagedBy(cr) {
+	if v.enableManagedByLabel && key.IsManagedBy(cr, v.projectName) {
 		v.logger.Debugf(ctx, "skipping validation of app '%s/%s' dependencies due to '%s=%s' label", cr.Namespace, cr.Name, label.ManagedBy, key.ManagedByLabel(cr))
 		return nil
 	}
