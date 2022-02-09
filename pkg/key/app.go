@@ -141,8 +141,11 @@ func IsInOrgNamespace(customResource v1alpha1.App) bool {
 	return strings.HasPrefix(customResource.ObjectMeta.Namespace, "org-")
 }
 
-// IsManagedBy returns true if the giantswarm.io/managed-by label is set on the
-// resource. When true we skip validating configmap and secret names.
+// IsManagedByFlux returns true if the giantswarm.io/managed-by label is set
+// and is being validated by app-admission-controller. When true we skip
+// validating configmap and secret names. This simplifies managing these
+// resources with Flux. We still perform the validation in app-operator which
+// sets the App CR status.
 func IsManagedBy(customResource v1alpha1.App, projectName string) bool {
 	if projectName != "app-admission-controller" {
 		return false
