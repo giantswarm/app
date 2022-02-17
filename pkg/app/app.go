@@ -14,6 +14,7 @@ import (
 )
 
 type Config struct {
+	Annotations         map[string]string
 	AppCatalog          string
 	AppName             string
 	AppNamespace        string
@@ -21,6 +22,7 @@ type Config struct {
 	ConfigVersion       string
 	DisableForceUpgrade bool
 	InCluster           bool
+	Labels              map[string]string
 	Name                string
 	Namespace           string
 	UserConfigMapName   string
@@ -35,13 +37,21 @@ func NewCR(c Config) *applicationv1alpha1.App {
 		c.Namespace = "giantswarm"
 	}
 
-	annotations := map[string]string{}
+	if c.Labels == nil {
+		c.Labels = map[string]string{}
+	}
+
+	if c.Annotations == nil {
+		c.Annotations = map[string]string{}
+	}
+
 	{
+		c.Labels[label.AppOperatorVersion] = "0.0.0"
 		if c.ConfigVersion != "" {
-			annotations[annotation.ConfigVersion] = c.ConfigVersion
+			c.Annotations[annotation.ConfigVersion] = c.ConfigVersion
 		}
 		if !c.DisableForceUpgrade {
-			annotations["chart-operator.giantswarm.io/force-helm-upgrade"] = "true"
+			c.Annotations["chart-operator.giantswarm.io/force-helm-upgrade"] = "true"
 		}
 	}
 
@@ -64,12 +74,8 @@ func NewCR(c Config) *applicationv1alpha1.App {
 		ObjectMeta: metav1.ObjectMeta{
 			Name:        c.Name,
 			Namespace:   c.Namespace,
-			Annotations: annotations,
-			Labels: map[string]string{
-				// Version 0.0.0 means this is reconciled by
-				// unique operator.
-				label.AppOperatorVersion: "0.0.0",
-			},
+			Annotations: c.Annotations,
+			Labels:      c.Labels,
 		},
 		Spec: applicationv1alpha1.AppSpec{
 			Catalog: c.AppCatalog,
