@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.7.0] - 2022-02-17
+
 ### Added
 
 - Support setting extra labels and annotations when creating new App CR with app package.
@@ -338,7 +340,8 @@ since there can be a delay creating them on cluster creation.
 
 - First release
 
-[Unreleased]: https://github.com/giantswarm/giantswarm/compare/v6.6.2...HEAD
+[Unreleased]: https://github.com/giantswarm/giantswarm/compare/v6.7.0...HEAD
+[6.7.0]: https://github.com/giantswarm/giantswarm/compare/v6.6.2...v6.7.0
 [6.6.2]: https://github.com/giantswarm/giantswarm/compare/v6.6.1...v6.6.2
 [6.6.1]: https://github.com/giantswarm/giantswarm/compare/v6.6.0...v6.6.1
 [6.6.0]: https://github.com/giantswarm/app/compare/v6.5.1...v6.6.0
