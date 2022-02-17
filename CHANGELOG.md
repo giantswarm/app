@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Support setting extra labels and annotations when creating new App CR with app package.
+
 ## [6.6.2] - 2022-02-09
 
 ### Changed
