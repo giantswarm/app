@@ -14,7 +14,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgofake "k8s.io/client-go/kubernetes/fake"
-	"sigs.k8s.io/controller-runtime/pkg/client/fake"
+	"sigs.k8s.io/controller-runtime/pkg/client/fake" //nolint:staticcheck
 )
 
 func Test_ValidateApp(t *testing.T) {
@@ -1010,10 +1010,7 @@ func Test_ValidateApp(t *testing.T) {
 			scheme := runtime.NewScheme()
 			_ = v1alpha1.AddToScheme(scheme)
 
-			fakeCtrlClient := fake.NewClientBuilder().
-				WithRuntimeObjects(g8sObjs...).
-				WithScheme(scheme).
-				Build()
+			fakeCtrlClient := fake.NewFakeClientWithScheme(scheme, g8sObjs...)
 
 			c := Config{
 				G8sClient: fakeCtrlClient,
@@ -1120,9 +1117,7 @@ func Test_ValidateAppUpdate(t *testing.T) {
 			scheme := runtime.NewScheme()
 			_ = v1alpha1.AddToScheme(scheme)
 
-			fakeCtrlClient := fake.NewClientBuilder().
-				WithScheme(scheme).
-				Build()
+			fakeCtrlClient := fake.NewFakeClientWithScheme(scheme)
 
 			c := Config{
 				G8sClient: fakeCtrlClient,
@@ -1359,10 +1354,7 @@ func Test_ValidateMetadataConstraints(t *testing.T) {
 			scheme := runtime.NewScheme()
 			_ = v1alpha1.AddToScheme(scheme)
 
-			fakeCtrlClient := fake.NewClientBuilder().
-				WithRuntimeObjects(g8sObjs...).
-				WithScheme(scheme).
-				Build()
+			fakeCtrlClient := fake.NewFakeClientWithScheme(scheme, g8sObjs...)
 
 			c := Config{
 				G8sClient: fakeCtrlClient,
@@ -1536,10 +1528,7 @@ func Test_ValidateNamespace(t *testing.T) {
 			scheme := runtime.NewScheme()
 			_ = v1alpha1.AddToScheme(scheme)
 
-			fakeCtrlClient := fake.NewClientBuilder().
-				WithRuntimeObjects(g8sObjs...).
-				WithScheme(scheme).
-				Build()
+			fakeCtrlClient := fake.NewFakeClientWithScheme(scheme, g8sObjs...)
 
 			c := Config{
 				G8sClient: fakeCtrlClient,
