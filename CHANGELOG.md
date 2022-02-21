@@ -340,10 +340,10 @@ since there can be a delay creating them on cluster creation.
 
 - First release
 
-[Unreleased]: https://github.com/giantswarm/giantswarm/compare/v6.7.0...HEAD
-[6.7.0]: https://github.com/giantswarm/giantswarm/compare/v6.6.2...v6.7.0
-[6.6.2]: https://github.com/giantswarm/giantswarm/compare/v6.6.1...v6.6.2
-[6.6.1]: https://github.com/giantswarm/giantswarm/compare/v6.6.0...v6.6.1
+[Unreleased]: https://github.com/giantswarm/app/compare/v6.7.0...HEAD
+[6.7.0]: https://github.com/giantswarm/app/compare/v6.6.2...v6.7.0
+[6.6.2]: https://github.com/giantswarm/app/compare/v6.6.1...v6.6.2
+[6.6.1]: https://github.com/giantswarm/app/compare/v6.6.0...v6.6.1
 [6.6.0]: https://github.com/giantswarm/app/compare/v6.5.1...v6.6.0
 [6.5.1]: https://github.com/giantswarm/app/compare/v6.5.0...v6.5.1
 [6.5.0]: https://github.com/giantswarm/app/compare/v6.4.0...v6.5.0
