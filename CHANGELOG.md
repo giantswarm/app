@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.8.0] - 2022-02-21
+
 ### Changed
 
 - Downgrade k8s modules to `< 0.21.0` version and controller-runtime to `< 0.7.0` version.
@@ -344,7 +346,8 @@ since there can be a delay creating them on cluster creation.
 
 - First release
 
-[Unreleased]: https://github.com/giantswarm/app/compare/v6.7.0...HEAD
+[Unreleased]: https://github.com/giantswarm/app/compare/v6.8.0...HEAD
+[6.8.0]: https://github.com/giantswarm/app/compare/v6.7.0...v6.8.0
 [6.7.0]: https://github.com/giantswarm/app/compare/v6.6.2...v6.7.0
 [6.6.2]: https://github.com/giantswarm/app/compare/v6.6.1...v6.6.2
 [6.6.1]: https://github.com/giantswarm/app/compare/v6.6.0...v6.6.1
