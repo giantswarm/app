@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Downgrade k8s modules to `< 0.21.0` version and controller-runtime to `< 0.7.0` version.
+
 ## [6.7.0] - 2022-02-17
 
 ### Added
