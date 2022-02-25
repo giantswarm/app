@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.8.1] - 2022-02-25
+
 ### Fixed
 
 - Remove compatible providers validation for `AppCatalogEntry` as its overly strict.
@@ -350,7 +352,8 @@ since there can be a delay creating them on cluster creation.
 
 - First release
 
-[Unreleased]: https://github.com/giantswarm/app/compare/v6.8.0...HEAD
+[Unreleased]: https://github.com/giantswarm/app/compare/v6.8.1...HEAD
+[6.8.1]: https://github.com/giantswarm/app/compare/v6.8.0...v6.8.1
 [6.8.0]: https://github.com/giantswarm/app/compare/v6.7.0...v6.8.0
 [6.7.0]: https://github.com/giantswarm/app/compare/v6.6.2...v6.7.0
 [6.6.2]: https://github.com/giantswarm/app/compare/v6.6.1...v6.6.2
