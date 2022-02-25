@@ -1331,7 +1331,7 @@ func Test_ValidateMetadataConstraints(t *testing.T) {
 				},
 				Spec: v1alpha1.AppCatalogEntrySpec{
 					Restrictions: &v1alpha1.AppCatalogEntrySpecRestrictions{
-						CompatibleProviders: []v1alpha1.Provider{"azure"},
+						CompatibleProviders: []string{"azure"},
 					},
 				},
 			},
