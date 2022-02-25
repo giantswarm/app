@@ -308,7 +308,7 @@ func (v *Validator) validateMetadataConstraints(ctx context.Context, cr v1alpha1
 	}
 
 	if len(entry.Spec.Restrictions.CompatibleProviders) > 0 {
-		if !contains(entry.Spec.Restrictions.CompatibleProviders, v1alpha1.Provider(v.provider)) {
+		if !contains(entry.Spec.Restrictions.CompatibleProviders, v.provider) {
 			return microerror.Maskf(validationError, "app %#q can only be installed for providers %#q not %#q",
 				cr.Spec.Name, entry.Spec.Restrictions.CompatibleProviders, v.provider)
 		}
@@ -453,7 +453,7 @@ func (v *Validator) validateSecretExists(ctx context.Context, name, namespace, k
 	return nil
 }
 
-func contains(s []v1alpha1.Provider, e v1alpha1.Provider) bool {
+func contains(s []string, e string) bool {
 	for _, a := range s {
 		if a == e {
 			return true
