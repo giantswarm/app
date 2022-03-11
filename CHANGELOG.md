@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.9.0] - 2022-03-11
+
 ### Added
 
 - Add `key.AppCatalogEntryCompatibleProviders`.
@@ -356,7 +358,8 @@ since there can be a delay creating them on cluster creation.
 
 - First release
 
-[Unreleased]: https://github.com/giantswarm/app/compare/v6.8.1...HEAD
+[Unreleased]: https://github.com/giantswarm/app/compare/v6.9.0...HEAD
+[6.9.0]: https://github.com/giantswarm/app/compare/v6.8.1...v6.9.0
 [6.8.1]: https://github.com/giantswarm/app/compare/v6.8.0...v6.8.1
 [6.8.0]: https://github.com/giantswarm/app/compare/v6.7.0...v6.8.0
 [6.7.0]: https://github.com/giantswarm/app/compare/v6.6.2...v6.7.0
