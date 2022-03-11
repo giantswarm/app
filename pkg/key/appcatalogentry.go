@@ -7,6 +7,13 @@ import (
 	"github.com/giantswarm/k8smetadata/pkg/annotation"
 )
 
+func AppCatalogEntryCompatibleProviders(customResource v1alpha1.AppCatalogEntry) []string {
+	if customResource.Spec.Restrictions == nil {
+		return []string{}
+	}
+	return customResource.Spec.Restrictions.CompatibleProviders
+}
+
 func AppCatalogEntryManagedBy(projectName string) string {
 	return fmt.Sprintf("%s-unique", projectName)
 }
