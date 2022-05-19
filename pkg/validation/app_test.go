@@ -1150,6 +1150,324 @@ func Test_ValidateAppUpdate(t *testing.T) {
 	}
 }
 
+func Test_ValidateAppReferences(t *testing.T) {
+	ctx := context.Background()
+
+	tests := []struct {
+		name        string
+		obj         v1alpha1.App
+		expectedErr string
+	}{
+		{
+			name: "flawless flow",
+			obj: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "hello-world",
+					Namespace: "demo0",
+					Labels: map[string]string{
+						label.AppOperatorVersion: "0.0.0",
+					},
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "giantswarm",
+					Name:      "hello-world",
+					Namespace: "demo0",
+					Config: v1alpha1.AppSpecConfig{
+						ConfigMap: v1alpha1.AppSpecConfigConfigMap{
+							Name:      "demo0-cluster-values",
+							Namespace: "demo0",
+						},
+					},
+					KubeConfig: v1alpha1.AppSpecKubeConfig{
+						InCluster: true,
+					},
+					UserConfig: v1alpha1.AppSpecUserConfig{
+						ConfigMap: v1alpha1.AppSpecUserConfigConfigMap{
+							Name:      "hello-world-user-values",
+							Namespace: "demo0",
+						},
+					},
+					Version: "0.3.0",
+				},
+			},
+		},
+		{
+			name: "flawless org namespace flow",
+			obj: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "hello-world",
+					Namespace: "org-acme",
+					Labels: map[string]string{
+						label.AppOperatorVersion: "0.0.0",
+					},
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "giantswarm",
+					Name:      "hello-world",
+					Namespace: "org-acme",
+					Config: v1alpha1.AppSpecConfig{
+						ConfigMap: v1alpha1.AppSpecConfigConfigMap{
+							Name:      "demo0-cluster-values",
+							Namespace: "org-acme",
+						},
+					},
+					KubeConfig: v1alpha1.AppSpecKubeConfig{
+						InCluster: true,
+					},
+					UserConfig: v1alpha1.AppSpecUserConfig{
+						ConfigMap: v1alpha1.AppSpecUserConfigConfigMap{
+							Name:      "hello-world-user-values",
+							Namespace: "org-acme",
+						},
+					},
+					Version: "0.3.0",
+				},
+			},
+		},
+		{
+			name: "referencing `giantswarm` namespaces in config ConfigMap",
+			obj: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "hello-world",
+					Namespace: "demo0",
+					Labels: map[string]string{
+						label.AppOperatorVersion: "0.0.0",
+					},
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "giantswarm",
+					Name:      "hello-world",
+					Namespace: "demo0",
+					Config: v1alpha1.AppSpecConfig{
+						ConfigMap: v1alpha1.AppSpecConfigConfigMap{
+							Name:      "vault-configuration",
+							Namespace: "giantswarm",
+						},
+					},
+					KubeConfig: v1alpha1.AppSpecKubeConfig{
+						InCluster: true,
+					},
+					UserConfig: v1alpha1.AppSpecUserConfig{
+						ConfigMap: v1alpha1.AppSpecUserConfigConfigMap{
+							Name:      "hello-world-user-values",
+							Namespace: "demo0",
+						},
+					},
+					Version: "0.3.0",
+				},
+			},
+			expectedErr: "validation error: references to giantswarm namespace not allowed for `0.0.0` labeld apps",
+		},
+		{
+			name: "referencing `giantswarm` namespaces in config Secret",
+			obj: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "hello-world",
+					Namespace: "demo0",
+					Labels: map[string]string{
+						label.AppOperatorVersion: "0.0.0",
+					},
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "giantswarm",
+					Name:      "hello-world",
+					Namespace: "demo0",
+					Config: v1alpha1.AppSpecConfig{
+						Secret: v1alpha1.AppSpecConfigSecret{
+							Name:      "vault-secret",
+							Namespace: "giantswarm",
+						},
+					},
+					KubeConfig: v1alpha1.AppSpecKubeConfig{
+						InCluster: true,
+					},
+					UserConfig: v1alpha1.AppSpecUserConfig{
+						ConfigMap: v1alpha1.AppSpecUserConfigConfigMap{
+							Name:      "hello-world-user-values",
+							Namespace: "demo0",
+						},
+					},
+					Version: "0.3.0",
+				},
+			},
+			expectedErr: "validation error: references to giantswarm namespace not allowed for `0.0.0` labeld apps",
+		},
+		{
+			name: "referencing `giantswarm` namespaces in user config ConfigMap",
+			obj: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "hello-world",
+					Namespace: "demo0",
+					Labels: map[string]string{
+						label.AppOperatorVersion: "0.0.0",
+					},
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "giantswarm",
+					Name:      "hello-world",
+					Namespace: "demo0",
+					Config: v1alpha1.AppSpecConfig{
+						ConfigMap: v1alpha1.AppSpecConfigConfigMap{
+							Name:      "hello-world-user-values",
+							Namespace: "demo0",
+						},
+					},
+					KubeConfig: v1alpha1.AppSpecKubeConfig{
+						InCluster: true,
+					},
+					UserConfig: v1alpha1.AppSpecUserConfig{
+						ConfigMap: v1alpha1.AppSpecUserConfigConfigMap{
+							Name:      "vault-configuration",
+							Namespace: "giantswarm",
+						},
+					},
+					Version: "0.3.0",
+				},
+			},
+			expectedErr: "validation error: references to giantswarm namespace not allowed for `0.0.0` labeld apps",
+		},
+		{
+			name: "referencing `giantswarm` namespaces in user config Secret",
+			obj: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "hello-world",
+					Namespace: "demo0",
+					Labels: map[string]string{
+						label.AppOperatorVersion: "0.0.0",
+					},
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "giantswarm",
+					Name:      "hello-world",
+					Namespace: "demo0",
+					Config: v1alpha1.AppSpecConfig{
+						ConfigMap: v1alpha1.AppSpecConfigConfigMap{
+							Name:      "hello-world-user-values",
+							Namespace: "demo0",
+						},
+					},
+					KubeConfig: v1alpha1.AppSpecKubeConfig{
+						InCluster: true,
+					},
+					UserConfig: v1alpha1.AppSpecUserConfig{
+						Secret: v1alpha1.AppSpecUserConfigSecret{
+							Name:      "vault-configuration",
+							Namespace: "giantswarm",
+						},
+					},
+					Version: "0.3.0",
+				},
+			},
+			expectedErr: "validation error: references to giantswarm namespace not allowed for `0.0.0` labeld apps",
+		},
+		{
+			name: "referencing `giantswarm` namespaces for remote cluster",
+			obj: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "hello-world",
+					Namespace: "demo0",
+					Labels: map[string]string{
+						label.AppOperatorVersion: "0.0.0",
+					},
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "giantswarm",
+					Name:      "hello-world",
+					Namespace: "demo0",
+					Config: v1alpha1.AppSpecConfig{
+						ConfigMap: v1alpha1.AppSpecConfigConfigMap{
+							Name:      "hello-world-user-values",
+							Namespace: "demo0",
+						},
+					},
+					KubeConfig: v1alpha1.AppSpecKubeConfig{
+						InCluster: false,
+					},
+					UserConfig: v1alpha1.AppSpecUserConfig{
+						ConfigMap: v1alpha1.AppSpecUserConfigConfigMap{
+							Name:      "vault-configuration",
+							Namespace: "giantswarm",
+						},
+					},
+					Version: "0.3.0",
+				},
+			},
+			expectedErr: "validation error: references to giantswarm namespace not allowed for `0.0.0` labeld apps",
+		},
+		{
+			name: "referencing `*-prometheus` dynamic namespace in config",
+			obj: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "hello-world",
+					Namespace: "demo0",
+					Labels: map[string]string{
+						label.AppOperatorVersion: "0.0.0",
+					},
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "giantswarm",
+					Name:      "hello-world",
+					Namespace: "demo0",
+					Config: v1alpha1.AppSpecConfig{
+						ConfigMap: v1alpha1.AppSpecConfigConfigMap{
+							Name:      "hello-world-user-values",
+							Namespace: "demo0",
+						},
+					},
+					KubeConfig: v1alpha1.AppSpecKubeConfig{
+						InCluster: false,
+					},
+					UserConfig: v1alpha1.AppSpecUserConfig{
+						Secret: v1alpha1.AppSpecUserConfigSecret{
+							Name:      "prometheus-secret",
+							Namespace: "demo0-prometheus",
+						},
+					},
+					Version: "0.3.0",
+				},
+			},
+			expectedErr: "validation error: references to demo0-prometheus namespace not allowed for `0.0.0` labeld apps",
+		},
+	}
+
+	for i, tc := range tests {
+		t.Run(fmt.Sprintf("case %d: %s", i, tc.name), func(t *testing.T) {
+			scheme := runtime.NewScheme()
+			_ = v1alpha1.AddToScheme(scheme)
+
+			fakeCtrlClient := fake.NewFakeClientWithScheme(scheme)
+
+			c := Config{
+				G8sClient: fakeCtrlClient,
+				K8sClient: clientgofake.NewSimpleClientset(),
+				Logger:    microloggertest.New(),
+
+				ProjectName: "app-admission-controller",
+				Provider:    "aws",
+			}
+			r, err := NewValidator(c)
+			if err != nil {
+				t.Fatalf("error == %#v, want nil", err)
+			}
+
+			_, err = r.ValidateAppReferences(ctx, tc.obj)
+			switch {
+			case err != nil && tc.expectedErr == "":
+				t.Fatalf("error == %#v, want nil", err)
+			case err == nil && tc.expectedErr != "":
+				t.Fatalf("error == nil, want non-nil")
+			}
+
+			if err != nil && tc.expectedErr != "" {
+				if !strings.Contains(err.Error(), tc.expectedErr) {
+					t.Fatalf("error == %#v, want %#v ", err.Error(), tc.expectedErr)
+				}
+
+			}
+		})
+	}
+}
+
 func Test_ValidateMetadataConstraints(t *testing.T) {
 	ctx := context.Background()
 

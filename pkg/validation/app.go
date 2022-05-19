@@ -3,6 +3,7 @@ package validation
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/giantswarm/apiextensions-application/api/v1alpha1"
 	"github.com/giantswarm/k8smetadata/pkg/label"
@@ -23,6 +24,8 @@ const (
 	namespaceNotFoundReasonTemplate   = "namespace is not specified for %s %#q"
 	labelInvalidValueTemplate         = "label %#q has invalid value %#q"
 	labelNotFoundTemplate             = "label %#q not found"
+	referencesNotAllowedTemplate      = "references to %s namespace not allowed for `0.0.0` labeld apps"
+	remoteForUniqueNotAllowedTemplate = "apps labeled `0.0.0` must be created in-cluster"
 	resourceNotFoundTemplate          = "%s %#q in namespace %#q not found"
 
 	defaultCatalogName            = "default"
@@ -31,6 +34,19 @@ const (
 	// nameMaxLength is 53 characters as this is the maximum allowed for Helm
 	// release names.
 	nameMaxLength = 53
+)
+
+var (
+	fixedProtectedNamespaces = map[string]bool{
+		"flux-giantswarm": true,
+		"giantswarm":      true,
+		"kube-system":     true,
+		"monitoring":      true,
+	}
+
+	dynamicProtectedNamespace = []string{
+		"-prometheus",
+	}
 )
 
 func (v *Validator) ValidateApp(ctx context.Context, app v1alpha1.App) (bool, error) {
@@ -77,6 +93,32 @@ func (v *Validator) ValidateApp(ctx context.Context, app v1alpha1.App) (bool, er
 	}
 
 	err = v.validateUserConfig(ctx, app)
+	if err != nil {
+		return false, microerror.Mask(err)
+	}
+
+	return true, nil
+}
+
+func (v *Validator) ValidateAppReferences(ctx context.Context, app v1alpha1.App) (bool, error) {
+	var err error
+
+	// Extra precaution, to make ure we always skip this validation for
+	// `giantswarm`-namespaced apps
+	if _, ok := fixedProtectedNamespaces[app.ObjectMeta.Namespace]; ok {
+		return true, nil
+	}
+
+	// Check user tries to install App outside the Management Cluster with
+	// unique App Operator, and disallow it in such case.
+	/*err = v.validateTargetCluster(ctx, app)
+	if err != nil {
+		return false, microerror.Mask(err)
+	}*/
+
+	// Check user tries to reference protected configuration when submitting
+	// App CR for unique App Operator, and disallow it in such case.
+	err = v.validateConfigReferences(ctx, app)
 	if err != nil {
 		return false, microerror.Mask(err)
 	}
@@ -158,9 +200,49 @@ func (v *Validator) validateConfig(ctx context.Context, cr v1alpha1.App) error {
 	return nil
 }
 
+// We make sure users cannot reference configuration from protected namespaces
+// when configuring their unique App CRs, see:
+// https://github.com/giantswarm/giantswarm/issues/21953
+func (v *Validator) validateConfigReferences(ctx context.Context, cr v1alpha1.App) error {
+	referencedNamespaces := []string{
+		key.AppConfigMapNamespace(cr),
+		key.AppSecretNamespace(cr),
+		key.UserConfigMapNamespace(cr),
+		key.UserSecretNamespace(cr),
+	}
+
+	for _, ns := range referencedNamespaces {
+		if _, ok := fixedProtectedNamespaces[ns]; ok {
+			return microerror.Maskf(validationError, referencesNotAllowedTemplate, ns)
+		}
+	}
+
+	for _, rns := range referencedNamespaces {
+		for _, pns := range dynamicProtectedNamespace {
+			if strings.HasSuffix(rns, pns) {
+				return microerror.Maskf(validationError, referencesNotAllowedTemplate, rns)
+			}
+		}
+	}
+
+	return nil
+}
+
 func (v *Validator) validateName(ctx context.Context, cr v1alpha1.App) error {
 	if len(cr.Name) > nameMaxLength {
 		return microerror.Maskf(validationError, nameTooLongTemplate, cr.Name, len(cr.Name), nameMaxLength)
+	}
+
+	return nil
+}
+
+// We make sure users cannot install Apps on remote clusters with unique
+// App Operatorator. This is to mitigate:
+// https://github.com/giantswarm/giantswarm/issues/21953
+func (v *Validator) validateTargetCluster(ctx context.Context, cr v1alpha1.App) error {
+	isUnique := key.VersionLabel(cr) == key.UniqueAppVersionLabel
+	if isUnique && !key.InCluster(cr) {
+		return microerror.Maskf(validationError, remoteForUniqueNotAllowedTemplate)
 	}
 
 	return nil
