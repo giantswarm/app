@@ -25,8 +25,8 @@ const (
 	labelInvalidValueTemplate         = "label %#q has invalid value %#q"
 	labelNotFoundTemplate             = "label %#q not found"
 	referencesNotAllowedTemplate      = "references to %s namespace not allowed for `0.0.0` labeld apps"
-	remoteForUniqueNotAllowedTemplate = "apps labeled `0.0.0` must be created in-cluster"
-	resourceNotFoundTemplate          = "%s %#q in namespace %#q not found"
+	//remoteForUniqueNotAllowedTemplate = "apps labeled `0.0.0` must be created in-cluster"
+	resourceNotFoundTemplate = "%s %#q in namespace %#q not found"
 
 	defaultCatalogName            = "default"
 	nginxIngressControllerAppName = "nginx-ingress-controller-app"
@@ -239,14 +239,14 @@ func (v *Validator) validateName(ctx context.Context, cr v1alpha1.App) error {
 // We make sure users cannot install Apps on remote clusters with unique
 // App Operatorator. This is to mitigate:
 // https://github.com/giantswarm/giantswarm/issues/21953
-func (v *Validator) validateTargetCluster(ctx context.Context, cr v1alpha1.App) error {
+/*func (v *Validator) validateTargetCluster(ctx context.Context, cr v1alpha1.App) error {
 	isUnique := key.VersionLabel(cr) == key.UniqueAppVersionLabel
 	if isUnique && !key.InCluster(cr) {
 		return microerror.Maskf(validationError, remoteForUniqueNotAllowedTemplate)
 	}
 
 	return nil
-}
+}*/
 
 // We make sure users cannot create in-cluster Apps outside their organization
 // or WC namespaces. Otherwise `.spec.namespace` could be exploited to override permissions.
