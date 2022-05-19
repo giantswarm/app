@@ -34,6 +34,10 @@ func AppNamespace(customResource v1alpha1.App) string {
 	return customResource.Spec.Namespace
 }
 
+func AppNamespaceAnnotation(customResource v1alpha1.App) string {
+	return customResource.GetAnnotations()[annotation.AppNamespace]
+}
+
 func AppKubernetesNameLabel(customResource v1alpha1.App) string {
 	if val, ok := customResource.ObjectMeta.Labels[label.AppKubernetesName]; ok {
 		return val

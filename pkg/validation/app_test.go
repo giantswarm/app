@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/giantswarm/apiextensions-application/api/v1alpha1"
+	"github.com/giantswarm/k8smetadata/pkg/annotation"
 	"github.com/giantswarm/k8smetadata/pkg/label"
 	"github.com/giantswarm/micrologger/microloggertest"
 	corev1 "k8s.io/api/core/v1"
@@ -1150,7 +1151,7 @@ func Test_ValidateAppUpdate(t *testing.T) {
 	}
 }
 
-func Test_ValidateAppReferences(t *testing.T) {
+func Test_ValidateAppForRegularUser(t *testing.T) {
 	ctx := context.Background()
 
 	tests := []struct {
@@ -1256,7 +1257,7 @@ func Test_ValidateAppReferences(t *testing.T) {
 					Version: "0.3.0",
 				},
 			},
-			expectedErr: "validation error: references to giantswarm namespace not allowed for `0.0.0` labeld apps",
+			expectedErr: "validation error: references to `giantswarm` namespace not allowed",
 		},
 		{
 			name: "referencing `giantswarm` namespaces in config Secret",
@@ -1290,7 +1291,7 @@ func Test_ValidateAppReferences(t *testing.T) {
 					Version: "0.3.0",
 				},
 			},
-			expectedErr: "validation error: references to giantswarm namespace not allowed for `0.0.0` labeld apps",
+			expectedErr: "validation error: references to `giantswarm` namespace not allowed",
 		},
 		{
 			name: "referencing `giantswarm` namespaces in user config ConfigMap",
@@ -1324,7 +1325,7 @@ func Test_ValidateAppReferences(t *testing.T) {
 					Version: "0.3.0",
 				},
 			},
-			expectedErr: "validation error: references to giantswarm namespace not allowed for `0.0.0` labeld apps",
+			expectedErr: "validation error: references to `giantswarm` namespace not allowed",
 		},
 		{
 			name: "referencing `giantswarm` namespaces in user config Secret",
@@ -1358,7 +1359,7 @@ func Test_ValidateAppReferences(t *testing.T) {
 					Version: "0.3.0",
 				},
 			},
-			expectedErr: "validation error: references to giantswarm namespace not allowed for `0.0.0` labeld apps",
+			expectedErr: "validation error: references to `giantswarm` namespace not allowed",
 		},
 		{
 			name: "referencing `giantswarm` namespaces for remote cluster",
@@ -1392,7 +1393,7 @@ func Test_ValidateAppReferences(t *testing.T) {
 					Version: "0.3.0",
 				},
 			},
-			expectedErr: "validation error: references to giantswarm namespace not allowed for `0.0.0` labeld apps",
+			expectedErr: "validation error: references to `giantswarm` namespace not allowed",
 		},
 		{
 			name: "referencing `*-prometheus` dynamic namespace in config",
@@ -1426,7 +1427,76 @@ func Test_ValidateAppReferences(t *testing.T) {
 					Version: "0.3.0",
 				},
 			},
-			expectedErr: "validation error: references to demo0-prometheus namespace not allowed for `0.0.0` labeld apps",
+			expectedErr: "validation error: references to `demo0-prometheus` namespace not allowed",
+		},
+		{
+			name: "mismatch in annotation namespace is not allowed",
+			obj: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "hello-world",
+					Namespace: "demo0",
+					Annotations: map[string]string{
+						annotation.AppNamespace: "giantswarm",
+					},
+					Labels: map[string]string{
+						label.AppOperatorVersion: "0.0.0",
+					},
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "giantswarm",
+					Name:      "hello-world",
+					Namespace: "demo0",
+					KubeConfig: v1alpha1.AppSpecKubeConfig{
+						InCluster: true,
+					},
+					Version: "0.3.0",
+				},
+			},
+			expectedErr: "validation error: wrong `giantswarm` namespace for the `chart-operator.giantswarm.io/app-namespace` annotation",
+		},
+		{
+			name: "installing app-operator is not allowed from production catalog",
+			obj: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "app-operator",
+					Namespace: "demo0",
+					Labels: map[string]string{
+						label.AppOperatorVersion: "0.0.0",
+					},
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "control-plane-catalog",
+					Name:      "app-operator",
+					Namespace: "demo0",
+					KubeConfig: v1alpha1.AppSpecKubeConfig{
+						InCluster: true,
+					},
+					Version: "5.8.0",
+				},
+			},
+			expectedErr: "validation error: installing `app-operator` from `control-plane-catalog` catalog is not allowed",
+		},
+		{
+			name: "installing app-operator is not allowed from test catalog",
+			obj: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "app-operator",
+					Namespace: "demo0",
+					Labels: map[string]string{
+						label.AppOperatorVersion: "0.0.0",
+					},
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "control-plane-test-catalog",
+					Name:      "app-operator",
+					Namespace: "demo0",
+					KubeConfig: v1alpha1.AppSpecKubeConfig{
+						InCluster: true,
+					},
+					Version: "5.8.0",
+				},
+			},
+			expectedErr: "validation error: installing `app-operator` from `control-plane-test-catalog` catalog is not allowed",
 		},
 	}
 
@@ -1450,7 +1520,7 @@ func Test_ValidateAppReferences(t *testing.T) {
 				t.Fatalf("error == %#v, want nil", err)
 			}
 
-			_, err = r.ValidateAppReferences(ctx, tc.obj)
+			_, err = r.ValidateAppForRegularUser(ctx, tc.obj)
 			switch {
 			case err != nil && tc.expectedErr == "":
 				t.Fatalf("error == %#v, want nil", err)
