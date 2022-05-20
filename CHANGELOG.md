@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add additional validation logic for submitting the `0.0.0`-labeld App CRs by a non privileged users.
+
 ## [6.9.0] - 2022-03-11
 
 ### Added
