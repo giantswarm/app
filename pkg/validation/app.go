@@ -120,7 +120,7 @@ func (v *Validator) ValidateAppForRegularUser(ctx context.Context, app v1alpha1.
 	}
 
 	// Don't let user trick chart-operator to use elevated client
-	// for installint his app
+	// for installing his app
 	err = v.validateAnnotations(ctx, app)
 	if err != nil {
 		return false, microerror.Mask(err)
