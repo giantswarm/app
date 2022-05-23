@@ -39,6 +39,7 @@ const (
 
 var (
 	fixedProtectedNamespaces = map[string]bool{
+		"draughtsman":     true,
 		"flux-giantswarm": true,
 		"giantswarm":      true,
 		"kube-system":     true,
@@ -113,14 +114,14 @@ func (v *Validator) ValidateApp(ctx context.Context, app v1alpha1.App) (bool, er
 func (v *Validator) ValidateAppForRegularUser(ctx context.Context, app v1alpha1.App) (bool, error) {
 	var err error
 
-	// Extra precaution, to make ure we always skip this validation for
+	// Extra precaution, to make sure we always skip this validation for
 	// `giantswarm`-namespaced apps
 	if _, ok := fixedProtectedNamespaces[app.ObjectMeta.Namespace]; ok {
 		return true, nil
 	}
 
 	// Don't let user trick chart-operator to use elevated client
-	// for installing his app
+	// for installint his app
 	err = v.validateAnnotations(ctx, app)
 	if err != nil {
 		return false, microerror.Mask(err)
