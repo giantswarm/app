@@ -990,6 +990,31 @@ func Test_ValidateApp(t *testing.T) {
 				newTestCatalog("giantswarm", "default"),
 			},
 		},
+		{
+			name: "mismatch in annotation namespace is not allowed",
+			obj: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "hello-world",
+					Namespace: "demo0",
+					Annotations: map[string]string{
+						annotation.AppNamespace: "giantswarm",
+					},
+					Labels: map[string]string{
+						label.AppOperatorVersion: "0.0.0",
+					},
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "giantswarm",
+					Name:      "hello-world",
+					Namespace: "demo0",
+					KubeConfig: v1alpha1.AppSpecKubeConfig{
+						InCluster: true,
+					},
+					Version: "0.3.0",
+				},
+			},
+			expectedErr: "validation error: wrong `giantswarm` namespace for the `chart-operator.giantswarm.io/app-namespace` annotation",
+		},
 	}
 
 	for i, tc := range tests {
@@ -1428,31 +1453,6 @@ func Test_ValidateAppForRegularUser(t *testing.T) {
 				},
 			},
 			expectedErr: "validation error: references to `demo0-prometheus` namespace not allowed",
-		},
-		{
-			name: "mismatch in annotation namespace is not allowed",
-			obj: v1alpha1.App{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "hello-world",
-					Namespace: "demo0",
-					Annotations: map[string]string{
-						annotation.AppNamespace: "giantswarm",
-					},
-					Labels: map[string]string{
-						label.AppOperatorVersion: "0.0.0",
-					},
-				},
-				Spec: v1alpha1.AppSpec{
-					Catalog:   "giantswarm",
-					Name:      "hello-world",
-					Namespace: "demo0",
-					KubeConfig: v1alpha1.AppSpecKubeConfig{
-						InCluster: true,
-					},
-					Version: "0.3.0",
-				},
-			},
-			expectedErr: "validation error: wrong `giantswarm` namespace for the `chart-operator.giantswarm.io/app-namespace` annotation",
 		},
 		{
 			name: "installing app-operator is not allowed from production catalog",

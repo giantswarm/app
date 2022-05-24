@@ -3,7 +3,6 @@ package validation
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/giantswarm/apiextensions-application/api/v1alpha1"
 	"github.com/giantswarm/k8smetadata/pkg/label"
@@ -17,7 +16,6 @@ import (
 )
 
 const (
-	appOperatorNotAllowedTemplate     = "installing `app-operator` from %#q catalog is not allowed"
 	catalogNotFoundTemplate           = "catalog %#q not found"
 	nameTooLongTemplate               = "name %#q is %d chars and exceeds max length of %d chars"
 	nameNotFoundReasonTemplate        = "name is not specified for %s"
@@ -26,7 +24,6 @@ const (
 	namespaceNotFoundReasonTemplate   = "namespace is not specified for %s %#q"
 	labelInvalidValueTemplate         = "label %#q has invalid value %#q"
 	labelNotFoundTemplate             = "label %#q not found"
-	referencesNotAllowedTemplate      = "references to %#q namespace not allowed"
 	resourceNotFoundTemplate          = "%s %#q in namespace %#q not found"
 
 	defaultCatalogName            = "default"
@@ -37,31 +34,13 @@ const (
 	nameMaxLength = 53
 )
 
-var (
-	fixedProtectedNamespaces = map[string]bool{
-		"draughtsman":     true,
-		"flux-giantswarm": true,
-		"giantswarm":      true,
-		"kube-system":     true,
-		"monitoring":      true,
-	}
-
-	dynamicProtectedNamespace = []string{
-		"-prometheus",
-	}
-
-	prohibitedApps = map[string]bool{
-		"app-operator": true,
-	}
-
-	prohibitedAppsCatalogs = map[string]bool{
-		"control-plane-catalog":      true,
-		"control-plane-test-catalog": true,
-	}
-)
-
 func (v *Validator) ValidateApp(ctx context.Context, app v1alpha1.App) (bool, error) {
 	var err error
+
+	err = v.validateAnnotations(ctx, app)
+	if err != nil {
+		return false, microerror.Mask(err)
+	}
 
 	err = v.validateCatalog(ctx, app)
 	if err != nil {
@@ -111,39 +90,6 @@ func (v *Validator) ValidateApp(ctx context.Context, app v1alpha1.App) (bool, er
 	return true, nil
 }
 
-func (v *Validator) ValidateAppForRegularUser(ctx context.Context, app v1alpha1.App) (bool, error) {
-	var err error
-
-	// Extra precaution, to make sure we always skip this validation for
-	// `giantswarm`-namespaced apps
-	if _, ok := fixedProtectedNamespaces[app.ObjectMeta.Namespace]; ok {
-		return true, nil
-	}
-
-	// Don't let user trick chart-operator to use elevated client
-	// for installint his app
-	err = v.validateAnnotations(ctx, app)
-	if err != nil {
-		return false, microerror.Mask(err)
-	}
-
-	// Don't let user install app-operator at all, not by editing
-	// existing App CRs, nor by installing it separately
-	err = v.validateAppOperator(ctx, app)
-	if err != nil {
-		return false, microerror.Mask(err)
-	}
-
-	// Check user tries to reference protected configuration when submitting
-	// App CR for unique App Operator, and disallow it in such case.
-	err = v.validateConfigReferences(ctx, app)
-	if err != nil {
-		return false, microerror.Mask(err)
-	}
-
-	return true, nil
-}
-
 func (v *Validator) ValidateAppUpdate(ctx context.Context, app, currentApp v1alpha1.App) (bool, error) {
 	err := v.validateNamespaceUpdate(ctx, app, currentApp)
 	if err != nil {
@@ -161,23 +107,6 @@ func (v *Validator) validateAnnotations(ctx context.Context, cr v1alpha1.App) er
 	namespaceAnnotation := key.AppNamespaceAnnotation(cr)
 	if namespaceAnnotation != "" && namespaceAnnotation != cr.ObjectMeta.Namespace {
 		return microerror.Maskf(validationError, namespaceMismatchTemplate, namespaceAnnotation)
-	}
-
-	return nil
-}
-
-// This is for preventing user to install another instance of app-operator,
-// especially older versions, see explanation:
-// https://github.com/giantswarm/giantswarm/issues/21953
-func (v *Validator) validateAppOperator(ctx context.Context, cr v1alpha1.App) error {
-	appName := key.AppName(cr)
-	appCatalog := key.CatalogName(cr)
-
-	_, isAppProhibited := prohibitedApps[appName]
-	_, isAppCatalogProhibited := prohibitedAppsCatalogs[appCatalog]
-
-	if isAppProhibited && isAppCatalogProhibited {
-		return microerror.Maskf(validationError, appOperatorNotAllowedTemplate, appCatalog)
 	}
 
 	return nil
@@ -242,34 +171,6 @@ func (v *Validator) validateConfig(ctx context.Context, cr v1alpha1.App) error {
 			return microerror.Maskf(validationError, resourceNotFoundTemplate, "secret", key.AppSecretName(cr), key.AppSecretNamespace(cr))
 		} else if err != nil {
 			return microerror.Mask(err)
-		}
-	}
-
-	return nil
-}
-
-// We make sure users cannot reference configuration from protected namespaces
-// when configuring their unique App CRs, see:
-// https://github.com/giantswarm/giantswarm/issues/21953
-func (v *Validator) validateConfigReferences(ctx context.Context, cr v1alpha1.App) error {
-	referencedNamespaces := []string{
-		key.AppConfigMapNamespace(cr),
-		key.AppSecretNamespace(cr),
-		key.UserConfigMapNamespace(cr),
-		key.UserSecretNamespace(cr),
-	}
-
-	for _, ns := range referencedNamespaces {
-		if _, ok := fixedProtectedNamespaces[ns]; ok {
-			return microerror.Maskf(validationError, referencesNotAllowedTemplate, ns)
-		}
-	}
-
-	for _, rns := range referencedNamespaces {
-		for _, pns := range dynamicProtectedNamespace {
-			if strings.HasSuffix(rns, pns) {
-				return microerror.Maskf(validationError, referencesNotAllowedTemplate, rns)
-			}
 		}
 	}
 
