@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Add additional validation logic for submitting the `0.0.0`-labeld App CRs by a non privileged users.
+- Add additional validation logic for the `chart-operator.giantswarm.io/app-namespace` annotation.
 
 ## [6.9.0] - 2022-03-11
 
