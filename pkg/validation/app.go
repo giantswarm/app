@@ -20,6 +20,7 @@ const (
 	nameTooLongTemplate               = "name %#q is %d chars and exceeds max length of %d chars"
 	nameNotFoundReasonTemplate        = "name is not specified for %s"
 	targetNamespaceNotAllowedTemplate = "target namespace %s is not allowed for in-cluster apps"
+	namespaceMismatchTemplate         = "wrong %#q namespace for the `chart-operator.giantswarm.io/app-namespace` annotation"
 	namespaceNotFoundReasonTemplate   = "namespace is not specified for %s %#q"
 	labelInvalidValueTemplate         = "label %#q has invalid value %#q"
 	labelNotFoundTemplate             = "label %#q not found"
@@ -35,6 +36,11 @@ const (
 
 func (v *Validator) ValidateApp(ctx context.Context, app v1alpha1.App) (bool, error) {
 	var err error
+
+	err = v.validateAnnotations(ctx, app)
+	if err != nil {
+		return false, microerror.Mask(err)
+	}
 
 	err = v.validateCatalog(ctx, app)
 	if err != nil {
@@ -91,6 +97,19 @@ func (v *Validator) ValidateAppUpdate(ctx context.Context, app, currentApp v1alp
 	}
 
 	return true, nil
+}
+
+// This is for preventing chart-operator to select elevated
+// client for a given app, by making an impression it comes from
+// a different namespace, see explanation:
+// https://github.com/giantswarm/giantswarm/issues/22100#issuecomment-1131723221
+func (v *Validator) validateAnnotations(ctx context.Context, cr v1alpha1.App) error {
+	namespaceAnnotation := key.AppNamespaceAnnotation(cr)
+	if namespaceAnnotation != "" && namespaceAnnotation != cr.ObjectMeta.Namespace {
+		return microerror.Maskf(validationError, namespaceMismatchTemplate, namespaceAnnotation)
+	}
+
+	return nil
 }
 
 func (v *Validator) validateCatalog(ctx context.Context, cr v1alpha1.App) error {

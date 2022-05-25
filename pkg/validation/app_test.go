@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/giantswarm/apiextensions-application/api/v1alpha1"
+	"github.com/giantswarm/k8smetadata/pkg/annotation"
 	"github.com/giantswarm/k8smetadata/pkg/label"
 	"github.com/giantswarm/micrologger/microloggertest"
 	corev1 "k8s.io/api/core/v1"
@@ -988,6 +989,31 @@ func Test_ValidateApp(t *testing.T) {
 			catalogs: []*v1alpha1.Catalog{
 				newTestCatalog("giantswarm", "default"),
 			},
+		},
+		{
+			name: "mismatch in annotation namespace is not allowed",
+			obj: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "hello-world",
+					Namespace: "demo0",
+					Annotations: map[string]string{
+						annotation.AppNamespace: "giantswarm",
+					},
+					Labels: map[string]string{
+						label.AppOperatorVersion: "0.0.0",
+					},
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "giantswarm",
+					Name:      "hello-world",
+					Namespace: "demo0",
+					KubeConfig: v1alpha1.AppSpecKubeConfig{
+						InCluster: true,
+					},
+					Version: "0.3.0",
+				},
+			},
+			expectedErr: "validation error: wrong `giantswarm` namespace for the `chart-operator.giantswarm.io/app-namespace` annotation",
 		},
 	}
 
