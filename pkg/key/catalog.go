@@ -10,10 +10,6 @@ func CatalogTitle(customResource v1alpha1.Catalog) string {
 	return customResource.Spec.Title
 }
 
-func CatalogStorageURL(customResource v1alpha1.Catalog) string {
-	return customResource.Spec.Storage.URL
-}
-
 func CatalogConfigMapName(customResource v1alpha1.Catalog) string {
 	config := catalogConfig(customResource)
 

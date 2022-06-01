@@ -6,25 +6,6 @@ import (
 	"github.com/giantswarm/apiextensions-application/api/v1alpha1"
 )
 
-func Test_CatalogStorageURL(t *testing.T) {
-	expectedURL := "http://giantswarm.io/sample-catalog/"
-
-	obj := v1alpha1.Catalog{
-		Spec: v1alpha1.CatalogSpec{
-			Title:       "giant-swarm-title",
-			Description: "giant-swarm app catalog sample",
-			Storage: v1alpha1.CatalogSpecStorage{
-				Type: "helm",
-				URL:  "http://giantswarm.io/sample-catalog/",
-			},
-		},
-	}
-
-	if CatalogStorageURL(obj) != expectedURL {
-		t.Fatalf("app catalog storage url %s, want %s", CatalogStorageURL(obj), expectedURL)
-	}
-}
-
 func Test_CatalogTitle(t *testing.T) {
 	expectedName := "giant-swarm-title"
 
