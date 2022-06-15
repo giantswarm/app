@@ -27,19 +27,17 @@ import (
 type Config struct {
 	Logger micrologger.Logger
 
-	ApiextensionsReference            string
-	ApiextensionsApplicationReference string
-	GitHubToken                       string
-	Provider                          string
+	ApiextensionsReference string
+	GitHubToken            string
+	Provider               string
 }
 
 type CRDGetter struct {
 	logger micrologger.Logger
 
-	apiextensionsReference            string
-	apiextensionsApplicationReference string
-	githubClient                      *github.Client
-	provider                          string
+	apiextensionsReference string
+	githubClient           *github.Client
+	provider               string
 }
 
 var (
@@ -78,10 +76,9 @@ func NewCRDGetter(config Config) (*CRDGetter, error) {
 	crdGetter := &CRDGetter{
 		logger: config.Logger,
 
-		apiextensionsReference:            config.ApiextensionsReference,
-		apiextensionsApplicationReference: config.ApiextensionsApplicationReference,
-		githubClient:                      githubClient,
-		provider:                          config.Provider,
+		apiextensionsReference: config.ApiextensionsReference,
+		githubClient:           githubClient,
+		provider:               config.Provider,
 	}
 
 	return crdGetter, nil
@@ -89,67 +86,24 @@ func NewCRDGetter(config Config) (*CRDGetter, error) {
 
 func (g CRDGetter) LoadCRDs(ctx context.Context) ([]*apiextensionsv1.CustomResourceDefinition, error) {
 	var crds []*apiextensionsv1.CustomResourceDefinition
-
-	{
-		// github.com/giantswarm/apiextensions
-		charts := []string{
-			"crds-common",
-		}
-		if g.provider != "" {
-			charts = append(charts, fmt.Sprintf("crds-%s", g.provider))
-		}
-		for _, chart := range charts {
-			chartCRDs, err := downloadGithubCRDManifests(
-				ctx,
-				g.githubClient,
-				"apiextensions",
-				path.Join("helm", chart, "templates"),
-				g.apiextensionsReference,
-			)
-			if err != nil {
-				return nil, microerror.Mask(err)
-			}
-
-			crds = append(crds, chartCRDs...)
-		}
+	charts := []string{
+		"crds-common",
 	}
 
-	{
-		// github.com/giantswarm/apiextensions-application
-		chartCRDs, err := downloadGithubCRDManifests(
-			ctx,
-			g.githubClient,
-			"apiextensions-application",
-			path.Join("config", "crd"),
-			g.apiextensionsApplicationReference,
-		)
+	if g.provider != "" {
+		charts = append(charts, fmt.Sprintf("crds-%s", g.provider))
+	}
+
+	for _, chart := range charts {
+		chartCRDs, err := downloadHelmChartCRDs(ctx, g.githubClient, chart, g.apiextensionsReference)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
-		// Remove CRDs found in apiextensions which are redefined in apiextensions-application
-		crds = filterCRDs(crds, chartCRDs)
-		// Add apiextensions-application CRDs to the list
+
 		crds = append(crds, chartCRDs...)
 	}
 
 	return crds, nil
-}
-
-// filterCRDs removes CRDs found in "toFilter" array from "crds" array.
-func filterCRDs(crds, toFilter []*apiextensionsv1.CustomResourceDefinition) []*apiextensionsv1.CustomResourceDefinition {
-	output := []*apiextensionsv1.CustomResourceDefinition{}
-	filterNames := map[string]bool{}
-	for _, crd := range toFilter {
-		filterNames[crd.GetName()] = true
-	}
-
-	for _, crd := range crds {
-		if _, ok := filterNames[crd.GetName()]; !ok {
-			output = append(output, crd)
-		}
-	}
-
-	return output
 }
 
 func (g CRDGetter) LoadCRD(ctx context.Context, group, kind string) (*apiextensionsv1.CustomResourceDefinition, error) {
@@ -252,12 +206,13 @@ func decodeCRDs(readCloser io.ReadCloser) ([]*apiextensionsv1.CustomResourceDefi
 	return crds, nil
 }
 
-func downloadGithubCRDManifests(ctx context.Context, client *github.Client, repository, templatesPath, ref string) ([]*apiextensionsv1.CustomResourceDefinition, error) {
+func downloadHelmChartCRDs(ctx context.Context, client *github.Client, helmChart string, ref string) ([]*apiextensionsv1.CustomResourceDefinition, error) {
 	getOptions := github.RepositoryContentGetOptions{
 		Ref: ref,
 	}
 
-	_, contents, _, err := client.Repositories.GetContents(ctx, "giantswarm", repository, templatesPath, &getOptions)
+	templatesPath := path.Join("helm", helmChart, "templates")
+	_, contents, _, err := client.Repositories.GetContents(ctx, "giantswarm", "apiextensions", templatesPath, &getOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -265,7 +220,7 @@ func downloadGithubCRDManifests(ctx context.Context, client *github.Client, repo
 	var allCrds []*apiextensionsv1.CustomResourceDefinition
 	for _, file := range contents {
 		filePath := path.Join(templatesPath, *file.Name)
-		contentReader, _, err := client.Repositories.DownloadContents(ctx, "giantswarm", repository, filePath, &getOptions)
+		contentReader, _, err := client.Repositories.DownloadContents(ctx, "giantswarm", "apiextensions", filePath, &getOptions)
 		if err != nil {
 			return nil, err
 		}

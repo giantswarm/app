@@ -13,8 +13,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Use `application.giantswarm.io` CRDs from `apiextensions-application` instead of `apiextensions`.
 
-## [6.10.0] - 2022-05-25
-
 ### Added
 
 - Add additional validation logic for the `chart-operator.giantswarm.io/app-namespace` annotation.
