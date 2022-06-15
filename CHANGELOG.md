@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.11.1] - 2022-06-15
+
+### Removed
+
+- Revert changes made in v6.11.0
+
 ## [6.11.0] - 2022-06-14
 
 ### Changed
@@ -368,7 +374,8 @@ since there can be a delay creating them on cluster creation.
 
 - First release
 
-[Unreleased]: https://github.com/giantswarm/app/compare/v6.11.0...HEAD
+[Unreleased]: https://github.com/giantswarm/app/compare/v6.11.1...HEAD
+[6.11.1]: https://github.com/giantswarm/app/compare/v6.11.0...v6.11.1
 [6.11.0]: https://github.com/giantswarm/app/compare/v6.10.0...v6.11.0
 [6.10.0]: https://github.com/giantswarm/app/compare/v6.9.0...v6.10.0
 [6.9.0]: https://github.com/giantswarm/app/compare/v6.8.1...v6.9.0
