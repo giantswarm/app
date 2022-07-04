@@ -130,6 +130,10 @@ github.com/ghodss/yaml v0.0.0-20150909031657-73d445a93680/go.mod h1:4dBDuWmgqj2H
 github.com/ghodss/yaml v1.0.0/go.mod h1:4dBDuWmgqj2HViK6kFavaiC9ZROes6MMH2rRYeMEF04=
 github.com/giantswarm/apiextensions-application v0.5.0 h1:xWL2YP1ckAH+XkLqehGOsb4R525HxYdWH9u9GQl3220=
 github.com/giantswarm/apiextensions-application v0.5.0/go.mod h1:O6mg+EdXC9CyTLgi0d3rf6QTXrQX/79iw4kjMJRinig=
+github.com/giantswarm/apiextensions-application v0.5.1-0.20220704091713-f8a531556d90 h1:fTdPosk7MVPDJofDnTKkDHSYx0b2kECRR8BC1nnZhKQ=
+github.com/giantswarm/apiextensions-application v0.5.1-0.20220704091713-f8a531556d90/go.mod h1:O6mg+EdXC9CyTLgi0d3rf6QTXrQX/79iw4kjMJRinig=
+github.com/giantswarm/apiextensions-application v0.5.1-0.20220704095320-547adb0ff0b6 h1:wzHoLc1udHG3pEv/taFSVfIlOEbfXlDSSVIpH+Xtaek=
+github.com/giantswarm/apiextensions-application v0.5.1-0.20220704095320-547adb0ff0b6/go.mod h1:O6mg+EdXC9CyTLgi0d3rf6QTXrQX/79iw4kjMJRinig=
 github.com/giantswarm/k8smetadata v0.6.0/go.mod h1:k3DYCMdspxhk7efLkQdX1b8UZ71ijOCG3ZoIU8+5xgw=
 github.com/giantswarm/k8smetadata v0.9.2 h1:10lbS5DRJNES4iytNxc/5+3lsZfx+t+RvP1qZF2ymvc=
 github.com/giantswarm/k8smetadata v0.9.2/go.mod h1:k3DYCMdspxhk7efLkQdX1b8UZ71ijOCG3ZoIU8+5xgw=
