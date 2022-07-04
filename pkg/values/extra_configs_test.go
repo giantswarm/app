@@ -22,7 +22,7 @@ func Test_GetExtraConfigs(t *testing.T) {
 			[]v1alpha1.AppExtraConfig{},
 		},
 		{
-			"List of a single config map and a single secret",
+			"Get config map from a list of a single config map and a single secret",
 			[]v1alpha1.AppExtraConfig{
 				{Name: "test-config-map-1", Namespace: "default"},
 				{Kind: "secret", Name: "test-secret-1", Namespace: "default"},
@@ -30,6 +30,17 @@ func Test_GetExtraConfigs(t *testing.T) {
 			getPreClusterExtraConfigMapEntries,
 			[]v1alpha1.AppExtraConfig{
 				{Name: "test-config-map-1", Namespace: "default"},
+			},
+		},
+		{
+			"Get secret from a list of a single config map and a single secret",
+			[]v1alpha1.AppExtraConfig{
+				{Name: "test-config-map-1", Namespace: "default"},
+				{Kind: "secret", Name: "test-secret-1", Namespace: "default"},
+			},
+			getPreClusterExtraSecretEntries,
+			[]v1alpha1.AppExtraConfig{
+				{Kind: "secret", Name: "test-secret-1", Namespace: "default"},
 			},
 		},
 		{
@@ -73,6 +84,27 @@ func Test_GetExtraConfigs(t *testing.T) {
 			},
 		},
 		{
+			"List of a multiple secrets, post-cluster / pre-user level",
+			[]v1alpha1.AppExtraConfig{
+				{Name: "test-config-map-1", Namespace: "default"},
+				{Kind: "secret", Name: "test-secret-1", Priority: v1alpha1.ConfigPriorityCluster},
+				{Kind: "secret", Name: "test-secret-2", Priority: v1alpha1.ConfigPriorityCluster + 1},
+				{Name: "test-config-map-2", Namespace: "default", Priority: v1alpha1.ConfigPriorityCluster},
+				{Kind: "secret", Name: "test-secret-4", Priority: v1alpha1.ConfigPriorityUser},
+				{Name: "test-config-map-6", Namespace: "default", Priority: v1alpha1.ConfigPriorityCluster + 1},
+				{Kind: "secret", Name: "test-secret-5", Namespace: "default", Priority: v1alpha1.ConfigPriorityCluster + v1alpha1.ConfigPriorityDistance/2},
+				{Kind: "secret", Name: "test-secret-6", Priority: v1alpha1.ConfigPriorityUser - 1},
+				{Kind: "secret", Name: "test-secret-7", Priority: v1alpha1.ConfigPriorityUser + 1},
+			},
+			getPostClusterPreUserExtraSecretEntries,
+			[]v1alpha1.AppExtraConfig{
+				{Kind: "secret", Name: "test-secret-2", Priority: v1alpha1.ConfigPriorityCluster + 1},
+				{Kind: "secret", Name: "test-secret-4", Priority: v1alpha1.ConfigPriorityUser},
+				{Kind: "secret", Name: "test-secret-5", Namespace: "default", Priority: v1alpha1.ConfigPriorityCluster + v1alpha1.ConfigPriorityDistance/2},
+				{Kind: "secret", Name: "test-secret-6", Priority: v1alpha1.ConfigPriorityUser - 1},
+			},
+		},
+		{
 			"List of a multiple config maps, post-user level",
 			[]v1alpha1.AppExtraConfig{
 				{Name: "test-config-map-1", Namespace: "default", Priority: v1alpha1.ConfigPriorityUser},
@@ -89,6 +121,26 @@ func Test_GetExtraConfigs(t *testing.T) {
 				{Name: "test-config-map-3", Namespace: "default", Priority: v1alpha1.ConfigPriorityUser + v1alpha1.ConfigPriorityDistance/2},
 				{Name: "test-config-map-4", Namespace: "default", Priority: v1alpha1.ConfigPriorityMaximum},
 				{Name: "test-config-map-6", Namespace: "default", Priority: v1alpha1.ConfigPriorityUser + 1},
+			},
+		},
+		{
+			"List of a multiple config maps, post-user level",
+			[]v1alpha1.AppExtraConfig{
+				{Kind: "secret", Name: "test-secret-1", Namespace: "default", Priority: v1alpha1.ConfigPriorityUser},
+				{Name: "test-config-map-2", Namespace: "default"},
+				{Kind: "secret", Name: "test-secret-2", Namespace: "default"},
+				{Kind: "secret", Name: "test-secret-3", Namespace: "default", Priority: v1alpha1.ConfigPriorityUser + v1alpha1.ConfigPriorityDistance/2},
+				{Name: "test-config-map-4", Namespace: "default", Priority: v1alpha1.ConfigPriorityMaximum},
+				{Kind: "secret", Name: "test-secret-4", Namespace: "default", Priority: v1alpha1.ConfigPriorityMaximum},
+				{Kind: "secret", Name: "test-secret-5", Namespace: "default", Priority: v1alpha1.ConfigPriorityMaximum + 1},
+				{Kind: "secret", Name: "test-secret-6", Namespace: "default", Priority: v1alpha1.ConfigPriorityUser - 1},
+				{Kind: "secret", Name: "test-secret-7", Namespace: "default", Priority: v1alpha1.ConfigPriorityUser + 1},
+			},
+			getPostUserExtraSecretEntries,
+			[]v1alpha1.AppExtraConfig{
+				{Kind: "secret", Name: "test-secret-3", Namespace: "default", Priority: v1alpha1.ConfigPriorityUser + v1alpha1.ConfigPriorityDistance/2},
+				{Kind: "secret", Name: "test-secret-4", Namespace: "default", Priority: v1alpha1.ConfigPriorityMaximum},
+				{Kind: "secret", Name: "test-secret-7", Namespace: "default", Priority: v1alpha1.ConfigPriorityUser + 1},
 			},
 		},
 	}
