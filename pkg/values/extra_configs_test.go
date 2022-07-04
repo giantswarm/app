@@ -1,10 +1,11 @@
 package values
 
 import (
-	"github.com/giantswarm/apiextensions-application/api/v1alpha1"
-	"github.com/google/go-cmp/cmp"
 	"reflect"
 	"testing"
+
+	"github.com/giantswarm/apiextensions-application/api/v1alpha1"
+	"github.com/google/go-cmp/cmp"
 )
 
 func Test_GetExtraConfigs(t *testing.T) {
