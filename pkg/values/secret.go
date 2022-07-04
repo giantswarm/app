@@ -20,6 +20,8 @@ func (v *Values) MergeSecretData(ctx context.Context, app v1alpha1.App, catalog 
 	catalogSecretName := key.CatalogSecretName(catalog)
 	userSecretName := key.UserSecretName(app)
 
+	extraConfigs := key.ExtraConfigs(app)
+
 	if appSecretName == "" && catalogSecretName == "" && userSecretName == "" {
 		// Return early as there is no secret.
 		return nil, nil
@@ -34,6 +36,12 @@ func (v *Values) MergeSecretData(ctx context.Context, app v1alpha1.App, catalog 
 	catalogData, err := extractData(secret, "catalog", toStringMap(rawCatalogData))
 	if err != nil {
 		return nil, microerror.Mask(err)
+	}
+
+	// Pre cluster extra secrets
+	err, done := v.fetchAndMergeExtraConfigs(ctx, getPreClusterExtraSecretEntries(extraConfigs), v.getSecretAsString, catalogData)
+	if done {
+		return catalogData, err
 	}
 
 	// We get the app level secrets if configured.
@@ -52,6 +60,12 @@ func (v *Values) MergeSecretData(ctx context.Context, app v1alpha1.App, catalog 
 	err = mergo.Merge(&catalogData, appData, mergo.WithOverride)
 	if err != nil {
 		return nil, microerror.Mask(err)
+	}
+
+	// Post cluster / pre user extra secrets
+	err, done = v.fetchAndMergeExtraConfigs(ctx, getPostClusterPreUserExtraSecretEntries(extraConfigs), v.getSecretAsString, catalogData)
+	if done {
+		return catalogData, err
 	}
 
 	// We get the user level values if configured and merge them.
@@ -74,7 +88,23 @@ func (v *Values) MergeSecretData(ctx context.Context, app v1alpha1.App, catalog 
 		}
 	}
 
+	// Post user extra secrets
+	err, done = v.fetchAndMergeExtraConfigs(ctx, getPostUserExtraSecretEntries(extraConfigs), v.getSecretAsString, catalogData)
+	if done {
+		return catalogData, err
+	}
+
 	return catalogData, nil
+}
+
+func (v *Values) getSecretAsString(ctx context.Context, secretName, secretNamespace string) (map[string]string, error) {
+	data, err := v.getSecret(ctx, secretName, secretNamespace)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return toStringMap(data), nil
 }
 
 func (v *Values) getSecret(ctx context.Context, secretName, secretNamespace string) (map[string][]byte, error) {

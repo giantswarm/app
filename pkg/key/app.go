@@ -207,6 +207,16 @@ func UserConfigMapName(customResource v1alpha1.App) string {
 	return customResource.Spec.UserConfig.ConfigMap.Name
 }
 
+func ExtraConfigs(customResource v1alpha1.App) []v1alpha1.AppExtraConfig {
+	var extraConfigs []v1alpha1.AppExtraConfig
+	if customResource.Spec.ExtraConfigs != nil {
+		extraConfigs = customResource.Spec.ExtraConfigs
+	} else {
+		extraConfigs = []v1alpha1.AppExtraConfig{}
+	}
+	return extraConfigs
+}
+
 func UserConfigMapNamespace(customResource v1alpha1.App) string {
 	return customResource.Spec.UserConfig.ConfigMap.Namespace
 }

@@ -110,6 +110,31 @@ func extractNonNestedData(data map[string]string) (map[string]interface{}, error
 	return rawMapData, nil
 }
 
+func (v *Values) fetchAndMergeExtraConfigs(
+	ctx context.Context,
+	extraConfigs []v1alpha1.AppExtraConfig,
+	dataFetcherMethod func(ctx context.Context, configMapName, configMapNamespace string) (map[string]string, error),
+	destinationData map[string]interface{},
+) (error, bool) {
+	for _, entry := range extraConfigs {
+		rawData, err := dataFetcherMethod(ctx, entry.Name, entry.Namespace)
+		if err != nil {
+			return microerror.Mask(err), true
+		}
+
+		data, err := extractNonNestedData(rawData)
+		if err != nil {
+			return microerror.Maskf(parsingError, "failed to parse %#q config map in %#q, logs: %s", entry.Name, entry.Namespace, err.Error()), true
+		}
+
+		err = mergo.Merge(&destinationData, data, mergo.WithOverride)
+		if err != nil {
+			return microerror.Mask(err), true
+		}
+	}
+	return nil, false
+}
+
 // toStringMap converts from a byte slice map to a string map.
 func toStringMap(input map[string][]byte) map[string]string {
 	if input == nil {

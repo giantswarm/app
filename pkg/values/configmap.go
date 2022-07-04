@@ -25,12 +25,7 @@ func (v *Values) MergeConfigMapData(ctx context.Context, app v1alpha1.App, catal
 	catalogConfigMapName := key.CatalogConfigMapName(catalog)
 	userConfigMapName := key.UserConfigMapName(app)
 
-	var extraConfigs []v1alpha1.AppExtraConfig
-	if app.Spec.ExtraConfigs != nil {
-		extraConfigs = app.Spec.ExtraConfigs
-	} else {
-		extraConfigs = []v1alpha1.AppExtraConfig{}
-	}
+	extraConfigs := key.ExtraConfigs(app)
 
 	if appConfigMapName == "" && catalogConfigMapName == "" && userConfigMapName == "" {
 		// Return early as there is no config.
@@ -49,7 +44,7 @@ func (v *Values) MergeConfigMapData(ctx context.Context, app v1alpha1.App, catal
 	}
 
 	// Pre cluster extra config maps
-	err, done := v.fetchAndMergeExtraConfigs(ctx, getPreClusterExtraConfigMapEntries(extraConfigs), catalogData)
+	err, done := v.fetchAndMergeExtraConfigs(ctx, getPreClusterExtraConfigMapEntries(extraConfigs), v.getConfigMap, catalogData)
 	if done {
 		return catalogData, err
 	}
@@ -71,7 +66,7 @@ func (v *Values) MergeConfigMapData(ctx context.Context, app v1alpha1.App, catal
 	}
 
 	// Post cluster / pre user extra config maps
-	err, done = v.fetchAndMergeExtraConfigs(ctx, getPostClusterPreUserExtraConfigMapEntries(extraConfigs), catalogData)
+	err, done = v.fetchAndMergeExtraConfigs(ctx, getPostClusterPreUserExtraConfigMapEntries(extraConfigs), v.getConfigMap, catalogData)
 	if done {
 		return catalogData, err
 	}
@@ -95,32 +90,12 @@ func (v *Values) MergeConfigMapData(ctx context.Context, app v1alpha1.App, catal
 	}
 
 	// Post user extra config maps
-	err, done = v.fetchAndMergeExtraConfigs(ctx, getPostUserExtraConfigMapEntries(extraConfigs), catalogData)
+	err, done = v.fetchAndMergeExtraConfigs(ctx, getPostUserExtraConfigMapEntries(extraConfigs), v.getConfigMap, catalogData)
 	if done {
 		return catalogData, err
 	}
 
 	return catalogData, nil
-}
-
-func (v *Values) fetchAndMergeExtraConfigs(ctx context.Context, extraConfigs []v1alpha1.AppExtraConfig, destinationData map[string]interface{}) (error, bool) {
-	for _, entry := range extraConfigs {
-		rawData, err := v.getConfigMap(ctx, entry.Name, entry.Namespace)
-		if err != nil {
-			return microerror.Mask(err), true
-		}
-
-		data, err := extractNonNestedData(rawData)
-		if err != nil {
-			return microerror.Maskf(parsingError, "failed to parse %#q config map in %#q, logs: %s", entry.Name, entry.Namespace, err.Error()), true
-		}
-
-		err = mergo.Merge(&destinationData, data, mergo.WithOverride)
-		if err != nil {
-			return microerror.Mask(err), true
-		}
-	}
-	return nil, false
 }
 
 func (v *Values) getConfigMap(ctx context.Context, configMapName, configMapNamespace string) (map[string]string, error) {
