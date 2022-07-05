@@ -3,7 +3,6 @@ package values
 import (
 	"context"
 	"reflect"
-	"strconv"
 	"testing"
 
 	"github.com/giantswarm/apiextensions-application/api/v1alpha1"
@@ -69,15 +68,9 @@ func Test_MergeConfigMapData(t *testing.T) {
 				},
 			},
 			configMaps: []*corev1.ConfigMap{
-				{
-					Data: map[string]string{
-						"values": "cluster: yaml\n",
-					},
-					ObjectMeta: metav1.ObjectMeta{
-						Name:      "test-cluster-values",
-						Namespace: "giantswarm",
-					},
-				},
+				getConfigMapDefinition("test-cluster-values", "giantswarm", map[string]string{
+					"values": "cluster: yaml\n",
+				}),
 			},
 			expectedData: map[string]interface{}{
 				"cluster": "yaml",
@@ -96,30 +89,11 @@ func Test_MergeConfigMapData(t *testing.T) {
 					Namespace: "giantswarm",
 				},
 			},
-			catalog: v1alpha1.Catalog{
-				ObjectMeta: metav1.ObjectMeta{
-					Name: "test-catalog",
-				},
-				Spec: v1alpha1.CatalogSpec{
-					Title: "test-catalog",
-					Config: &v1alpha1.CatalogSpecConfig{
-						ConfigMap: &v1alpha1.CatalogSpecConfigConfigMap{
-							Name:      "test-catalog-values",
-							Namespace: "giantswarm",
-						},
-					},
-				},
-			},
+			catalog: getSimpleTestCatalogDefinition(),
 			configMaps: []*corev1.ConfigMap{
-				{
-					Data: map[string]string{
-						"values": "catalog: yaml\n",
-					},
-					ObjectMeta: metav1.ObjectMeta{
-						Name:      "test-catalog-values",
-						Namespace: "giantswarm",
-					},
-				},
+				getTestCatalogConfigMapDefinition(map[string]string{
+					"values": "catalog: yaml\n",
+				}),
 			},
 			expectedData: map[string]interface{}{
 				"catalog": "yaml",
@@ -144,39 +118,14 @@ func Test_MergeConfigMapData(t *testing.T) {
 					},
 				},
 			},
-			catalog: v1alpha1.Catalog{
-				ObjectMeta: metav1.ObjectMeta{
-					Name: "test-catalog",
-				},
-				Spec: v1alpha1.CatalogSpec{
-					Title: "test-catalog",
-					Config: &v1alpha1.CatalogSpecConfig{
-						ConfigMap: &v1alpha1.CatalogSpecConfigConfigMap{
-							Name:      "test-catalog-values",
-							Namespace: "giantswarm",
-						},
-					},
-				},
-			},
+			catalog: getSimpleTestCatalogDefinition(),
 			configMaps: []*corev1.ConfigMap{
-				{
-					Data: map[string]string{
-						"values": "catalog: yaml\n",
-					},
-					ObjectMeta: metav1.ObjectMeta{
-						Name:      "test-catalog-values",
-						Namespace: "giantswarm",
-					},
-				},
-				{
-					Data: map[string]string{
-						"values": "cluster: yaml\n",
-					},
-					ObjectMeta: metav1.ObjectMeta{
-						Name:      "test-cluster-values",
-						Namespace: "giantswarm",
-					},
-				},
+				getTestCatalogConfigMapDefinition(map[string]string{
+					"values": "catalog: yaml\n",
+				}),
+				getConfigMapDefinition("test-cluster-values", "giantswarm", map[string]string{
+					"values": "cluster: yaml\n",
+				}),
 			},
 			expectedData: map[string]interface{}{
 				"catalog": "yaml",
@@ -202,39 +151,14 @@ func Test_MergeConfigMapData(t *testing.T) {
 					},
 				},
 			},
-			catalog: v1alpha1.Catalog{
-				ObjectMeta: metav1.ObjectMeta{
-					Name: "test-catalog",
-				},
-				Spec: v1alpha1.CatalogSpec{
-					Title: "test-catalog",
-					Config: &v1alpha1.CatalogSpecConfig{
-						ConfigMap: &v1alpha1.CatalogSpecConfigConfigMap{
-							Name:      "test-catalog-values",
-							Namespace: "giantswarm",
-						},
-					},
-				},
-			},
+			catalog: getSimpleTestCatalogDefinition(),
 			configMaps: []*corev1.ConfigMap{
-				{
-					Data: map[string]string{
-						"values": "test: catalog\n",
-					},
-					ObjectMeta: metav1.ObjectMeta{
-						Name:      "test-catalog-values",
-						Namespace: "giantswarm",
-					},
-				},
-				{
-					Data: map[string]string{
-						"values": "test: app\n",
-					},
-					ObjectMeta: metav1.ObjectMeta{
-						Name:      "test-cluster-values",
-						Namespace: "giantswarm",
-					},
-				},
+				getTestCatalogConfigMapDefinition(map[string]string{
+					"values": "test: catalog\n",
+				}),
+				getConfigMapDefinition("test-cluster-values", "giantswarm", map[string]string{
+					"values": "test: app\n",
+				}),
 			},
 			expectedData: map[string]interface{}{
 				"test": "app",
@@ -265,48 +189,17 @@ func Test_MergeConfigMapData(t *testing.T) {
 					},
 				},
 			},
-			catalog: v1alpha1.Catalog{
-				ObjectMeta: metav1.ObjectMeta{
-					Name: "test-catalog",
-				},
-				Spec: v1alpha1.CatalogSpec{
-					Title: "test-catalog",
-					Config: &v1alpha1.CatalogSpecConfig{
-						ConfigMap: &v1alpha1.CatalogSpecConfigConfigMap{
-							Name:      "test-catalog-values",
-							Namespace: "giantswarm",
-						},
-					},
-				},
-			},
+			catalog: getSimpleTestCatalogDefinition(),
 			configMaps: []*corev1.ConfigMap{
-				{
-					Data: map[string]string{
-						"values": "catalog: test\ntest: catalog\n",
-					},
-					ObjectMeta: metav1.ObjectMeta{
-						Name:      "test-catalog-values",
-						Namespace: "giantswarm",
-					},
-				},
-				{
-					Data: map[string]string{
-						"values": "cluster: test\ntest: app\n",
-					},
-					ObjectMeta: metav1.ObjectMeta{
-						Name:      "test-cluster-values",
-						Namespace: "giantswarm",
-					},
-				},
-				{
-					Data: map[string]string{
-						"values": "user: test\ntest: user\n",
-					},
-					ObjectMeta: metav1.ObjectMeta{
-						Name:      "test-user-values",
-						Namespace: "giantswarm",
-					},
-				},
+				getTestCatalogConfigMapDefinition(map[string]string{
+					"values": "catalog: test\ntest: catalog\n",
+				}),
+				getConfigMapDefinition("test-cluster-values", "giantswarm", map[string]string{
+					"values": "cluster: test\ntest: app\n",
+				}),
+				getConfigMapDefinition("test-user-values", "giantswarm", map[string]string{
+					"values": "user: test\ntest: user\n",
+				}),
 			},
 			expectedData: map[string]interface{}{
 				"catalog": "test",
@@ -334,39 +227,14 @@ func Test_MergeConfigMapData(t *testing.T) {
 					},
 				},
 			},
-			catalog: v1alpha1.Catalog{
-				ObjectMeta: metav1.ObjectMeta{
-					Name: "test-catalog",
-				},
-				Spec: v1alpha1.CatalogSpec{
-					Title: "test-catalog",
-					Config: &v1alpha1.CatalogSpecConfig{
-						ConfigMap: &v1alpha1.CatalogSpecConfigConfigMap{
-							Name:      "test-catalog-values",
-							Namespace: "giantswarm",
-						},
-					},
-				},
-			},
+			catalog: getSimpleTestCatalogDefinition(),
 			configMaps: []*corev1.ConfigMap{
-				{
-					Data: map[string]string{
-						"values": `values: val`,
-					},
-					ObjectMeta: metav1.ObjectMeta{
-						Name:      "test-catalog-values",
-						Namespace: "giantswarm",
-					},
-				},
-				{
-					Data: map[string]string{
-						"values": `values: -`,
-					},
-					ObjectMeta: metav1.ObjectMeta{
-						Name:      "user-values",
-						Namespace: "giantswarm",
-					},
-				},
+				getTestCatalogConfigMapDefinition(map[string]string{
+					"values": `values: val`,
+				}),
+				getConfigMapDefinition("user-values", "giantswarm", map[string]string{
+					"values": `values: -`,
+				}),
 			},
 			errorMatcher: IsParsingError,
 		},
@@ -374,8 +242,8 @@ func Test_MergeConfigMapData(t *testing.T) {
 
 	ctx := context.Background()
 
-	for i, tc := range tests {
-		t.Run(strconv.Itoa(i), func(t *testing.T) {
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
 			objs := make([]runtime.Object, 0)
 			for _, cm := range tc.configMaps {
 				objs = append(objs, cm)
@@ -413,5 +281,36 @@ func Test_MergeConfigMapData(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func getSimpleTestCatalogDefinition() v1alpha1.Catalog {
+	return v1alpha1.Catalog{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "test-catalog",
+		},
+		Spec: v1alpha1.CatalogSpec{
+			Title: "test-catalog",
+			Config: &v1alpha1.CatalogSpecConfig{
+				ConfigMap: &v1alpha1.CatalogSpecConfigConfigMap{
+					Name:      "test-catalog-values",
+					Namespace: "giantswarm",
+				},
+			},
+		},
+	}
+}
+
+func getTestCatalogConfigMapDefinition(data map[string]string) *corev1.ConfigMap {
+	return getConfigMapDefinition("test-catalog-values", "giantswarm", data)
+}
+
+func getConfigMapDefinition(name, namespace string, data map[string]string) *corev1.ConfigMap {
+	return &corev1.ConfigMap{
+		Data: data,
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      name,
+			Namespace: namespace,
+		},
 	}
 }
