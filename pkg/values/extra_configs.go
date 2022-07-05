@@ -1,8 +1,9 @@
 package values
 
 import (
-	"github.com/giantswarm/apiextensions-application/api/v1alpha1"
 	"sort"
+
+	"github.com/giantswarm/apiextensions-application/api/v1alpha1"
 )
 
 // Generic
