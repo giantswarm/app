@@ -290,13 +290,13 @@ func Test_MergeConfigMapData(t *testing.T) {
 					},
 					ExtraConfigs: []v1alpha1.AppExtraConfig{
 						{
-							Name:      "pre-cluster-overrides",
-							Namespace: "giantswarm",
-						},
-						{
 							Name:      "post-cluster-overrides",
 							Namespace: "giantswarm",
 							Priority:  v1alpha1.ConfigPriorityCluster + 1,
+						},
+						{
+							Name:      "pre-cluster-overrides",
+							Namespace: "giantswarm",
 						},
 					},
 				},
@@ -349,8 +349,9 @@ func Test_MergeConfigMapData(t *testing.T) {
 					},
 					ExtraConfigs: []v1alpha1.AppExtraConfig{
 						{
-							Name:      "pre-cluster-overrides",
+							Name:      "post-user-overrides-2",
 							Namespace: "giantswarm",
+							Priority:  v1alpha1.ConfigPriorityMaximum,
 						},
 						{
 							Name:      "post-cluster-overrides",
@@ -358,14 +359,13 @@ func Test_MergeConfigMapData(t *testing.T) {
 							Priority:  v1alpha1.ConfigPriorityCluster + 1,
 						},
 						{
+							Name:      "pre-cluster-overrides",
+							Namespace: "giantswarm",
+						},
+						{
 							Name:      "post-user-overrides-1",
 							Namespace: "giantswarm",
 							Priority:  v1alpha1.ConfigPriorityUser + 1,
-						},
-						{
-							Name:      "post-user-overrides-2",
-							Namespace: "giantswarm",
-							Priority:  v1alpha1.ConfigPriorityMaximum,
 						},
 					},
 				},

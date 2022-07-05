@@ -1,6 +1,9 @@
 package values
 
-import "github.com/giantswarm/apiextensions-application/api/v1alpha1"
+import (
+	"github.com/giantswarm/apiextensions-application/api/v1alpha1"
+	"sort"
+)
 
 // Generic
 
@@ -21,19 +24,29 @@ func getExtraConfigs(appExtraConfigs []v1alpha1.AppExtraConfig, kind string, pri
 			extraConfigKind = "configMap"
 		}
 
-		var extraConfigPriority int
-		if extraConfig.Priority != 0 {
-			extraConfigPriority = extraConfig.Priority
-		} else {
-			extraConfigPriority = v1alpha1.ConfigPriorityDefault
-		}
+		var extraConfigPriority = considerDefaultPriority(extraConfig.Priority)
 
 		if extraConfigKind == kind && priorityCondition(extraConfigPriority) {
 			extraConfigs = append(extraConfigs, extraConfig)
 		}
 	}
 
+	// Sort from based on priority, keep original order on equal elements
+	sort.SliceStable(extraConfigs, func(i, j int) bool {
+		left := considerDefaultPriority(extraConfigs[i].Priority)
+		right := considerDefaultPriority(extraConfigs[j].Priority)
+
+		return left < right
+	})
+
 	return extraConfigs
+}
+func considerDefaultPriority(value int) int {
+	if value != 0 {
+		return value
+	} else {
+		return v1alpha1.ConfigPriorityDefault
+	}
 }
 
 // Pre Cluster

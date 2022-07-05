@@ -243,6 +243,62 @@ func Test_MergeSecretData(t *testing.T) {
 			},
 			errorMatcher: IsParsingError,
 		},
+		{
+			name: "case multi layer 1: pre cluster overrides",
+			app: v1alpha1.App{
+				Spec: v1alpha1.AppSpec{
+					Catalog: "test-catalog",
+					Config: v1alpha1.AppSpecConfig{
+						Secret: v1alpha1.AppSpecConfigSecret{
+							Name:      "test-cluster-secrets",
+							Namespace: "giantswarm",
+						},
+					},
+					ExtraConfigs: []v1alpha1.AppExtraConfig{
+						{
+							Kind:      "secret",
+							Name:      "pre-cluster-secret-override-1",
+							Namespace: "giantswarm",
+							Priority:  v1alpha1.ConfigPriorityCluster - 1,
+						},
+						{
+							Name:      "pre-cluster-config-map-override",
+							Namespace: "giantswarm",
+						},
+						{
+							Kind:      "secret",
+							Name:      "pre-cluster-secret-override-2",
+							Namespace: "giantswarm",
+						},
+					},
+					Name:      "test-app",
+					Namespace: "giantswarm",
+				},
+			},
+			catalog: getSimpleTestCatalogDefinitionWithSecret(),
+			secrets: []*corev1.Secret{
+				getTestCatalogSecretDefinition(map[string][]byte{
+					"values": []byte("catalog: test\nfoo: bar\n"),
+				}),
+				getSecretDefinition("test-cluster-secrets", "giantswarm", map[string][]byte{
+					"values": []byte("foo: cluster\ncluster: fallthrough\n"),
+				}),
+				getSecretDefinition("pre-cluster-secret-override-1", "giantswarm", map[string][]byte{
+					"values": []byte("color: red\nfoo: hello\napple: pear\n"),
+				}),
+				getSecretDefinition("pre-cluster-secret-override-2", "giantswarm", map[string][]byte{
+					"values": []byte("color: green\nfoo: baz\ntop: nope\n"),
+				}),
+			},
+			expectedData: map[string]interface{}{
+				"catalog": "test",
+				"foo":     "cluster",
+				"color":   "red",
+				"apple":   "pear",
+				"top":     "nope",
+				"cluster": "fallthrough",
+			},
+		},
 	}
 	ctx := context.Background()
 

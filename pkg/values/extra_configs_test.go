@@ -56,10 +56,10 @@ func Test_GetExtraConfigs(t *testing.T) {
 			},
 			getPreClusterExtraConfigMapEntries,
 			[]v1alpha1.AppExtraConfig{
-				{Name: "test-config-map-1", Namespace: "default", Priority: v1alpha1.ConfigPriorityCluster},
-				{Name: "test-config-map-2", Namespace: "default", Priority: v1alpha1.ConfigPriorityCluster - 1},
 				{Name: "test-config-map-4", Namespace: "default", Priority: v1alpha1.ConfigPriorityDefault},
 				{Name: "test-config-map-7", Namespace: "default"},
+				{Name: "test-config-map-2", Namespace: "default", Priority: v1alpha1.ConfigPriorityCluster - 1},
+				{Name: "test-config-map-1", Namespace: "default", Priority: v1alpha1.ConfigPriorityCluster},
 			},
 		},
 		{
@@ -79,8 +79,8 @@ func Test_GetExtraConfigs(t *testing.T) {
 			[]v1alpha1.AppExtraConfig{
 				{Name: "test-config-map-3", Namespace: "default", Priority: v1alpha1.ConfigPriorityCluster + 1},
 				{Name: "test-config-map-4", Namespace: "default", Priority: v1alpha1.ConfigPriorityCluster + v1alpha1.ConfigPriorityDistance/2},
-				{Name: "test-config-map-5", Namespace: "default", Priority: v1alpha1.ConfigPriorityUser},
 				{Name: "test-config-map-7", Namespace: "default", Priority: v1alpha1.ConfigPriorityUser - 1},
+				{Name: "test-config-map-5", Namespace: "default", Priority: v1alpha1.ConfigPriorityUser},
 			},
 		},
 		{
@@ -99,9 +99,9 @@ func Test_GetExtraConfigs(t *testing.T) {
 			getPostClusterPreUserExtraSecretEntries,
 			[]v1alpha1.AppExtraConfig{
 				{Kind: "secret", Name: "test-secret-2", Priority: v1alpha1.ConfigPriorityCluster + 1},
-				{Kind: "secret", Name: "test-secret-4", Priority: v1alpha1.ConfigPriorityUser},
 				{Kind: "secret", Name: "test-secret-5", Namespace: "default", Priority: v1alpha1.ConfigPriorityCluster + v1alpha1.ConfigPriorityDistance/2},
 				{Kind: "secret", Name: "test-secret-6", Priority: v1alpha1.ConfigPriorityUser - 1},
+				{Kind: "secret", Name: "test-secret-4", Priority: v1alpha1.ConfigPriorityUser},
 			},
 		},
 		{
@@ -118,9 +118,9 @@ func Test_GetExtraConfigs(t *testing.T) {
 			},
 			getPostUserExtraConfigMapEntries,
 			[]v1alpha1.AppExtraConfig{
+				{Name: "test-config-map-6", Namespace: "default", Priority: v1alpha1.ConfigPriorityUser + 1},
 				{Name: "test-config-map-3", Namespace: "default", Priority: v1alpha1.ConfigPriorityUser + v1alpha1.ConfigPriorityDistance/2},
 				{Name: "test-config-map-4", Namespace: "default", Priority: v1alpha1.ConfigPriorityMaximum},
-				{Name: "test-config-map-6", Namespace: "default", Priority: v1alpha1.ConfigPriorityUser + 1},
 			},
 		},
 		{
@@ -138,9 +138,9 @@ func Test_GetExtraConfigs(t *testing.T) {
 			},
 			getPostUserExtraSecretEntries,
 			[]v1alpha1.AppExtraConfig{
+				{Kind: "secret", Name: "test-secret-7", Namespace: "default", Priority: v1alpha1.ConfigPriorityUser + 1},
 				{Kind: "secret", Name: "test-secret-3", Namespace: "default", Priority: v1alpha1.ConfigPriorityUser + v1alpha1.ConfigPriorityDistance/2},
 				{Kind: "secret", Name: "test-secret-4", Namespace: "default", Priority: v1alpha1.ConfigPriorityMaximum},
-				{Kind: "secret", Name: "test-secret-7", Namespace: "default", Priority: v1alpha1.ConfigPriorityUser + 1},
 			},
 		},
 	}
