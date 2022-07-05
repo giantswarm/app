@@ -89,7 +89,7 @@ func Test_MergeConfigMapData(t *testing.T) {
 					Namespace: "giantswarm",
 				},
 			},
-			catalog: getSimpleTestCatalogDefinition(),
+			catalog: getSimpleTestCatalogDefinitionWithConfigMap(),
 			configMaps: []*corev1.ConfigMap{
 				getTestCatalogConfigMapDefinition(map[string]string{
 					"values": "catalog: yaml\n",
@@ -118,7 +118,7 @@ func Test_MergeConfigMapData(t *testing.T) {
 					},
 				},
 			},
-			catalog: getSimpleTestCatalogDefinition(),
+			catalog: getSimpleTestCatalogDefinitionWithConfigMap(),
 			configMaps: []*corev1.ConfigMap{
 				getTestCatalogConfigMapDefinition(map[string]string{
 					"values": "catalog: yaml\n",
@@ -151,7 +151,7 @@ func Test_MergeConfigMapData(t *testing.T) {
 					},
 				},
 			},
-			catalog: getSimpleTestCatalogDefinition(),
+			catalog: getSimpleTestCatalogDefinitionWithConfigMap(),
 			configMaps: []*corev1.ConfigMap{
 				getTestCatalogConfigMapDefinition(map[string]string{
 					"values": "test: catalog\n",
@@ -189,7 +189,7 @@ func Test_MergeConfigMapData(t *testing.T) {
 					},
 				},
 			},
-			catalog: getSimpleTestCatalogDefinition(),
+			catalog: getSimpleTestCatalogDefinitionWithConfigMap(),
 			configMaps: []*corev1.ConfigMap{
 				getTestCatalogConfigMapDefinition(map[string]string{
 					"values": "catalog: test\ntest: catalog\n",
@@ -227,7 +227,7 @@ func Test_MergeConfigMapData(t *testing.T) {
 					},
 				},
 			},
-			catalog: getSimpleTestCatalogDefinition(),
+			catalog: getSimpleTestCatalogDefinitionWithConfigMap(),
 			configMaps: []*corev1.ConfigMap{
 				getTestCatalogConfigMapDefinition(map[string]string{
 					"values": `values: val`,
@@ -257,7 +257,7 @@ func Test_MergeConfigMapData(t *testing.T) {
 					},
 				},
 			},
-			catalog: getSimpleTestCatalogDefinition(),
+			catalog: getSimpleTestCatalogDefinitionWithConfigMap(),
 			configMaps: []*corev1.ConfigMap{
 				getTestCatalogConfigMapDefinition(map[string]string{
 					"values": "foo: bar\ntest: catalog\n",
@@ -301,7 +301,7 @@ func Test_MergeConfigMapData(t *testing.T) {
 					},
 				},
 			},
-			catalog: getSimpleTestCatalogDefinition(),
+			catalog: getSimpleTestCatalogDefinitionWithConfigMap(),
 			configMaps: []*corev1.ConfigMap{
 				getTestCatalogConfigMapDefinition(map[string]string{
 					"values": "foo: bar\ntest: catalog\n",
@@ -370,7 +370,7 @@ func Test_MergeConfigMapData(t *testing.T) {
 					},
 				},
 			},
-			catalog: getSimpleTestCatalogDefinition(),
+			catalog: getSimpleTestCatalogDefinitionWithConfigMap(),
 			configMaps: []*corev1.ConfigMap{
 				getTestCatalogConfigMapDefinition(map[string]string{
 					"values": "foo: bar\ntest: catalog\n",
@@ -452,7 +452,7 @@ func Test_MergeConfigMapData(t *testing.T) {
 	}
 }
 
-func getSimpleTestCatalogDefinition() v1alpha1.Catalog {
+func getSimpleTestCatalogDefinitionWithConfigMap() v1alpha1.Catalog {
 	return v1alpha1.Catalog{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: "test-catalog",
