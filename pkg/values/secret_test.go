@@ -469,6 +469,43 @@ func Test_MergeSecretData(t *testing.T) {
 			},
 			errorMatcher: IsNotFound,
 		},
+		{
+			name: "case multi layer 5: data should be nil when multi layer secret is invalid yaml",
+			app: v1alpha1.App{
+				Spec: v1alpha1.AppSpec{
+					Catalog: "test-catalog",
+					ExtraConfigs: []v1alpha1.AppExtraConfig{
+						{
+							Kind:      "secret",
+							Name:      "post-user-secret-overrides",
+							Namespace: "giantswarm",
+							Priority:  v1alpha1.ConfigPriorityMaximum,
+						},
+					},
+					Name:      "test-app",
+					Namespace: "giantswarm",
+					UserConfig: v1alpha1.AppSpecUserConfig{
+						Secret: v1alpha1.AppSpecUserConfigSecret{
+							Name:      "test-cluster-user-secrets",
+							Namespace: "giantswarm",
+						},
+					},
+				},
+			},
+			catalog: getSimpleTestCatalogDefinitionWithSecret(),
+			secrets: []*corev1.Secret{
+				getTestCatalogSecretDefinition(map[string][]byte{
+					"values": []byte("catalog: test\nfoo: bar\n"),
+				}),
+				getSecretDefinition("test-cluster-user-secrets", "giantswarm", map[string][]byte{
+					"values": []byte("user: test\ntop: nope\nfoo: user\n"),
+				}),
+				getSecretDefinition("post-user-secret-overrides", "giantswarm", map[string][]byte{
+					"values": []byte("this-will-not-end-well"),
+				}),
+			},
+			errorMatcher: IsParsingError,
+		},
 	}
 	ctx := context.Background()
 
