@@ -104,7 +104,7 @@ func extractNonNestedData(data map[string]string) (map[string]interface{}, error
 
 	err = yaml.Unmarshal(rawData, &rawMapData)
 	if err != nil {
-		return rawMapData, nil
+		return nil, err
 	}
 
 	return rawMapData, nil

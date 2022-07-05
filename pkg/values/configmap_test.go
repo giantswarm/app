@@ -406,6 +406,66 @@ func Test_MergeConfigMapData(t *testing.T) {
 				"top":          "max",
 			},
 		},
+		{
+			name: "case multi layer 4: data should be nil when multi layer config map not found",
+			app: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "my-test-app",
+					Namespace: "giantswarm",
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "test-catalog",
+					Name:      "test-app",
+					Namespace: "giantswarm",
+					ExtraConfigs: []v1alpha1.AppExtraConfig{
+						{
+							Name:      "post-user-overrides",
+							Namespace: "giantswarm",
+							Priority:  v1alpha1.ConfigPriorityMaximum,
+						},
+					},
+				},
+			},
+			catalog: getSimpleTestCatalogDefinitionWithConfigMap(),
+			configMaps: []*corev1.ConfigMap{
+				getTestCatalogConfigMapDefinition(map[string]string{
+					"values": "foo: bar\ntest: catalog\n",
+				}),
+			},
+			expectedData: nil,
+			errorMatcher: IsNotFound,
+		},
+		{
+			name: "case multi layer 5: data should be nil when multi layer config map contains invalid yaml",
+			app: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "my-test-app",
+					Namespace: "giantswarm",
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "test-catalog",
+					Name:      "test-app",
+					Namespace: "giantswarm",
+					ExtraConfigs: []v1alpha1.AppExtraConfig{
+						{
+							Name:      "pre-cluster-overrides",
+							Namespace: "giantswarm",
+						},
+					},
+				},
+			},
+			catalog: getSimpleTestCatalogDefinitionWithConfigMap(),
+			configMaps: []*corev1.ConfigMap{
+				getTestCatalogConfigMapDefinition(map[string]string{
+					"values": "foo: bar\ntest: catalog\n",
+				}),
+				getConfigMapDefinition("pre-cluster-overrides", "giantswarm", map[string]string{
+					"values": "this-is-wrong",
+				}),
+			},
+			expectedData: nil,
+			errorMatcher: IsParsingError,
+		},
 	}
 
 	ctx := context.Background()
