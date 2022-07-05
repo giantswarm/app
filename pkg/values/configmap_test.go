@@ -271,6 +271,141 @@ func Test_MergeConfigMapData(t *testing.T) {
 				"test": "catalog",
 			},
 		},
+		{
+			name: "case multi layer 2: post cluster overrides pre cluster",
+			app: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "my-test-app",
+					Namespace: "giantswarm",
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "test-catalog",
+					Name:      "test-app",
+					Namespace: "giantswarm",
+					Config: v1alpha1.AppSpecConfig{
+						ConfigMap: v1alpha1.AppSpecConfigConfigMap{
+							Name:      "cluster-overrides",
+							Namespace: "giantswarm",
+						},
+					},
+					ExtraConfigs: []v1alpha1.AppExtraConfig{
+						{
+							Name:      "pre-cluster-overrides",
+							Namespace: "giantswarm",
+						},
+						{
+							Name:      "post-cluster-overrides",
+							Namespace: "giantswarm",
+							Priority:  v1alpha1.ConfigPriorityCluster + 1,
+						},
+					},
+				},
+			},
+			catalog: getSimpleTestCatalogDefinition(),
+			configMaps: []*corev1.ConfigMap{
+				getTestCatalogConfigMapDefinition(map[string]string{
+					"values": "foo: bar\ntest: catalog\n",
+				}),
+				getConfigMapDefinition("pre-cluster-overrides", "giantswarm", map[string]string{
+					"values": "foo: baz\npre-cluster: test",
+				}),
+				getConfigMapDefinition("cluster-overrides", "giantswarm", map[string]string{
+					"values": "cluster: something",
+				}),
+				getConfigMapDefinition("post-cluster-overrides", "giantswarm", map[string]string{
+					"values": "foo: hello\npost-cluster: world",
+				}),
+			},
+			expectedData: map[string]interface{}{
+				"foo":          "hello",
+				"test":         "catalog",
+				"cluster":      "something",
+				"pre-cluster":  "test",
+				"post-cluster": "world",
+			},
+		},
+		{
+			name: "case multi layer 3: post user overrides all",
+			app: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "my-test-app",
+					Namespace: "giantswarm",
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "test-catalog",
+					Name:      "test-app",
+					Namespace: "giantswarm",
+					Config: v1alpha1.AppSpecConfig{
+						ConfigMap: v1alpha1.AppSpecConfigConfigMap{
+							Name:      "cluster-overrides",
+							Namespace: "giantswarm",
+						},
+					},
+					UserConfig: v1alpha1.AppSpecUserConfig{
+						ConfigMap: v1alpha1.AppSpecUserConfigConfigMap{
+							Name:      "user-overrides",
+							Namespace: "giantswarm",
+						},
+					},
+					ExtraConfigs: []v1alpha1.AppExtraConfig{
+						{
+							Name:      "pre-cluster-overrides",
+							Namespace: "giantswarm",
+						},
+						{
+							Name:      "post-cluster-overrides",
+							Namespace: "giantswarm",
+							Priority:  v1alpha1.ConfigPriorityCluster + 1,
+						},
+						{
+							Name:      "post-user-overrides-1",
+							Namespace: "giantswarm",
+							Priority:  v1alpha1.ConfigPriorityUser + 1,
+						},
+						{
+							Name:      "post-user-overrides-2",
+							Namespace: "giantswarm",
+							Priority:  v1alpha1.ConfigPriorityMaximum,
+						},
+					},
+				},
+			},
+			catalog: getSimpleTestCatalogDefinition(),
+			configMaps: []*corev1.ConfigMap{
+				getTestCatalogConfigMapDefinition(map[string]string{
+					"values": "foo: bar\ntest: catalog\n",
+				}),
+				getConfigMapDefinition("pre-cluster-overrides", "giantswarm", map[string]string{
+					"values": "foo: baz\npre-cluster: test",
+				}),
+				getConfigMapDefinition("cluster-overrides", "giantswarm", map[string]string{
+					"values": "cluster: something",
+				}),
+				getConfigMapDefinition("post-cluster-overrides", "giantswarm", map[string]string{
+					"values": "foo: hello\npost-cluster: world",
+				}),
+				getConfigMapDefinition("user-overrides", "giantswarm", map[string]string{
+					"values": "ping: pong\napple: pear",
+				}),
+				getConfigMapDefinition("post-user-overrides-1", "giantswarm", map[string]string{
+					"values": "foo: post-user\napple: banana\ncolor: blue",
+				}),
+				getConfigMapDefinition("post-user-overrides-2", "giantswarm", map[string]string{
+					"values": "cluster: max-priority\ncolor: yellow\ntop: max",
+				}),
+			},
+			expectedData: map[string]interface{}{
+				"foo":          "post-user",
+				"test":         "catalog",
+				"cluster":      "max-priority",
+				"pre-cluster":  "test",
+				"post-cluster": "world",
+				"ping":         "pong",
+				"apple":        "banana",
+				"color":        "yellow",
+				"top":          "max",
+			},
+		},
 	}
 
 	ctx := context.Background()
