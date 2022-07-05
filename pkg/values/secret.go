@@ -41,7 +41,7 @@ func (v *Values) MergeSecretData(ctx context.Context, app v1alpha1.App, catalog 
 	// Pre cluster extra secrets
 	err, done := v.fetchAndMergeExtraConfigs(ctx, getPreClusterExtraSecretEntries(extraConfigs), v.getSecretAsString, catalogData)
 	if done {
-		return catalogData, err
+		return nil, err
 	}
 
 	// We get the app level secrets if configured.
@@ -65,7 +65,7 @@ func (v *Values) MergeSecretData(ctx context.Context, app v1alpha1.App, catalog 
 	// Post cluster / pre user extra secrets
 	err, done = v.fetchAndMergeExtraConfigs(ctx, getPostClusterPreUserExtraSecretEntries(extraConfigs), v.getSecretAsString, catalogData)
 	if done {
-		return catalogData, err
+		return nil, err
 	}
 
 	// We get the user level values if configured and merge them.
@@ -91,7 +91,7 @@ func (v *Values) MergeSecretData(ctx context.Context, app v1alpha1.App, catalog 
 	// Post user extra secrets
 	err, done = v.fetchAndMergeExtraConfigs(ctx, getPostUserExtraSecretEntries(extraConfigs), v.getSecretAsString, catalogData)
 	if done {
-		return catalogData, err
+		return nil, err
 	}
 
 	return catalogData, nil

@@ -313,7 +313,7 @@ func Test_MergeSecretData(t *testing.T) {
 					ExtraConfigs: []v1alpha1.AppExtraConfig{
 						{
 							Kind:      "secret",
-							Name:      "post-cluster-secret-override-1",
+							Name:      "post-cluster-secret-overrides-1",
 							Namespace: "giantswarm",
 							Priority:  v1alpha1.ConfigPriorityUser,
 						},
@@ -325,7 +325,7 @@ func Test_MergeSecretData(t *testing.T) {
 						},
 						{
 							Kind:      "secret",
-							Name:      "post-cluster-secret-override-2",
+							Name:      "post-cluster-secret-overrides-2",
 							Namespace: "giantswarm",
 							Priority:  v1alpha1.ConfigPriorityCluster + v1alpha1.ConfigPriorityDistance/2,
 						},
@@ -351,10 +351,10 @@ func Test_MergeSecretData(t *testing.T) {
 				getSecretDefinition("test-cluster-secrets", "giantswarm", map[string][]byte{
 					"values": []byte("foo: cluster\ncluster: fallthrough\n"),
 				}),
-				getSecretDefinition("post-cluster-secret-override-1", "giantswarm", map[string][]byte{
+				getSecretDefinition("post-cluster-secret-overrides-1", "giantswarm", map[string][]byte{
 					"values": []byte("color: red\nfoo: hello\napple: pear\n"),
 				}),
-				getSecretDefinition("post-cluster-secret-override-2", "giantswarm", map[string][]byte{
+				getSecretDefinition("post-cluster-secret-overrides-2", "giantswarm", map[string][]byte{
 					"values": []byte("color: green\nfoo: baz\ntop: nope\n"),
 				}),
 				getSecretDefinition("test-cluster-user-secrets", "giantswarm", map[string][]byte{
@@ -371,6 +371,103 @@ func Test_MergeSecretData(t *testing.T) {
 				"cluster":     "fallthrough",
 				"user":        "test",
 			},
+		},
+		{
+			name: "case multi layer 3: post user overrides",
+			app: v1alpha1.App{
+				Spec: v1alpha1.AppSpec{
+					Catalog: "test-catalog",
+					ExtraConfigs: []v1alpha1.AppExtraConfig{
+						{
+							Kind:      "secret",
+							Name:      "post-user-secret-overrides-1",
+							Namespace: "giantswarm",
+							Priority:  v1alpha1.ConfigPriorityMaximum,
+						},
+						{
+							Kind:      "secret",
+							Name:      "pre-user-secret-overrides",
+							Namespace: "giantswarm",
+							Priority:  v1alpha1.ConfigPriorityUser,
+						},
+						{
+							Kind:      "secret",
+							Name:      "post-user-secret-overrides-2",
+							Namespace: "giantswarm",
+							Priority:  v1alpha1.ConfigPriorityUser + 1,
+						},
+					},
+					Name:      "test-app",
+					Namespace: "giantswarm",
+					UserConfig: v1alpha1.AppSpecUserConfig{
+						Secret: v1alpha1.AppSpecUserConfigSecret{
+							Name:      "test-cluster-user-secrets",
+							Namespace: "giantswarm",
+						},
+					},
+				},
+			},
+			catalog: getSimpleTestCatalogDefinitionWithSecret(),
+			secrets: []*corev1.Secret{
+				getTestCatalogSecretDefinition(map[string][]byte{
+					"values": []byte("catalog: test\nfoo: bar\n"),
+				}),
+				getSecretDefinition("pre-user-secret-overrides", "giantswarm", map[string][]byte{
+					"values": []byte("pre-cluster: giantswarm\nuser: nope"),
+				}),
+				getSecretDefinition("test-cluster-user-secrets", "giantswarm", map[string][]byte{
+					"values": []byte("user: test\ntop: nope\nfoo: user\n"),
+				}),
+				getSecretDefinition("post-user-secret-overrides-2", "giantswarm", map[string][]byte{
+					"values": []byte("color: green\nfoo: baz\ntop: almost\n"),
+				}),
+				getSecretDefinition("post-user-secret-overrides-1", "giantswarm", map[string][]byte{
+					"values": []byte("color: red\nfoo: hello\napple: pear\n"),
+				}),
+			},
+			expectedData: map[string]interface{}{
+				"catalog":     "test",
+				"pre-cluster": "giantswarm",
+				"foo":         "hello",
+				"color":       "red",
+				"apple":       "pear",
+				"top":         "almost",
+				"user":        "test",
+			},
+		},
+		{
+			name: "case multi layer 4: data should be nil when multi layer secret not found",
+			app: v1alpha1.App{
+				Spec: v1alpha1.AppSpec{
+					Catalog: "test-catalog",
+					ExtraConfigs: []v1alpha1.AppExtraConfig{
+						{
+							Kind:      "secret",
+							Name:      "pre-user-secret-overrides",
+							Namespace: "giantswarm",
+							Priority:  v1alpha1.ConfigPriorityUser,
+						},
+					},
+					Name:      "test-app",
+					Namespace: "giantswarm",
+					UserConfig: v1alpha1.AppSpecUserConfig{
+						Secret: v1alpha1.AppSpecUserConfigSecret{
+							Name:      "test-cluster-user-secrets",
+							Namespace: "giantswarm",
+						},
+					},
+				},
+			},
+			catalog: getSimpleTestCatalogDefinitionWithSecret(),
+			secrets: []*corev1.Secret{
+				getTestCatalogSecretDefinition(map[string][]byte{
+					"values": []byte("catalog: test\nfoo: bar\n"),
+				}),
+				getSecretDefinition("test-cluster-user-secrets", "giantswarm", map[string][]byte{
+					"values": []byte("user: test\ntop: nope\nfoo: user\n"),
+				}),
+			},
+			errorMatcher: IsNotFound,
 		},
 	}
 	ctx := context.Background()
