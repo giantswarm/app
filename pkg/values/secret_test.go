@@ -257,17 +257,17 @@ func Test_MergeSecretData(t *testing.T) {
 					ExtraConfigs: []v1alpha1.AppExtraConfig{
 						{
 							Kind:      "secret",
-							Name:      "pre-cluster-secret-override-1",
+							Name:      "pre-cluster-secret-overrides-1",
 							Namespace: "giantswarm",
 							Priority:  v1alpha1.ConfigPriorityCluster - 1,
 						},
 						{
-							Name:      "pre-cluster-config-map-override",
+							Name:      "pre-cluster-config-map-overrides",
 							Namespace: "giantswarm",
 						},
 						{
 							Kind:      "secret",
-							Name:      "pre-cluster-secret-override-2",
+							Name:      "pre-cluster-secret-overrides-2",
 							Namespace: "giantswarm",
 						},
 					},
@@ -283,10 +283,10 @@ func Test_MergeSecretData(t *testing.T) {
 				getSecretDefinition("test-cluster-secrets", "giantswarm", map[string][]byte{
 					"values": []byte("foo: cluster\ncluster: fallthrough\n"),
 				}),
-				getSecretDefinition("pre-cluster-secret-override-1", "giantswarm", map[string][]byte{
+				getSecretDefinition("pre-cluster-secret-overrides-1", "giantswarm", map[string][]byte{
 					"values": []byte("color: red\nfoo: hello\napple: pear\n"),
 				}),
-				getSecretDefinition("pre-cluster-secret-override-2", "giantswarm", map[string][]byte{
+				getSecretDefinition("pre-cluster-secret-overrides-2", "giantswarm", map[string][]byte{
 					"values": []byte("color: green\nfoo: baz\ntop: nope\n"),
 				}),
 			},
@@ -297,6 +297,79 @@ func Test_MergeSecretData(t *testing.T) {
 				"apple":   "pear",
 				"top":     "nope",
 				"cluster": "fallthrough",
+			},
+		},
+		{
+			name: "case multi layer 2: post cluster overrides",
+			app: v1alpha1.App{
+				Spec: v1alpha1.AppSpec{
+					Catalog: "test-catalog",
+					Config: v1alpha1.AppSpecConfig{
+						Secret: v1alpha1.AppSpecConfigSecret{
+							Name:      "test-cluster-secrets",
+							Namespace: "giantswarm",
+						},
+					},
+					ExtraConfigs: []v1alpha1.AppExtraConfig{
+						{
+							Kind:      "secret",
+							Name:      "post-cluster-secret-override-1",
+							Namespace: "giantswarm",
+							Priority:  v1alpha1.ConfigPriorityUser,
+						},
+						{
+							Kind:      "secret",
+							Name:      "pre-cluster-secret-overrides",
+							Namespace: "giantswarm",
+							Priority:  v1alpha1.ConfigPriorityCluster - 1,
+						},
+						{
+							Kind:      "secret",
+							Name:      "post-cluster-secret-override-2",
+							Namespace: "giantswarm",
+							Priority:  v1alpha1.ConfigPriorityCluster + v1alpha1.ConfigPriorityDistance/2,
+						},
+					},
+					Name:      "test-app",
+					Namespace: "giantswarm",
+					UserConfig: v1alpha1.AppSpecUserConfig{
+						Secret: v1alpha1.AppSpecUserConfigSecret{
+							Name:      "test-cluster-user-secrets",
+							Namespace: "giantswarm",
+						},
+					},
+				},
+			},
+			catalog: getSimpleTestCatalogDefinitionWithSecret(),
+			secrets: []*corev1.Secret{
+				getTestCatalogSecretDefinition(map[string][]byte{
+					"values": []byte("catalog: test\nfoo: bar\n"),
+				}),
+				getSecretDefinition("pre-cluster-secret-overrides", "giantswarm", map[string][]byte{
+					"values": []byte("pre-cluster: giantswarm\ncluster: nope"),
+				}),
+				getSecretDefinition("test-cluster-secrets", "giantswarm", map[string][]byte{
+					"values": []byte("foo: cluster\ncluster: fallthrough\n"),
+				}),
+				getSecretDefinition("post-cluster-secret-override-1", "giantswarm", map[string][]byte{
+					"values": []byte("color: red\nfoo: hello\napple: pear\n"),
+				}),
+				getSecretDefinition("post-cluster-secret-override-2", "giantswarm", map[string][]byte{
+					"values": []byte("color: green\nfoo: baz\ntop: nope\n"),
+				}),
+				getSecretDefinition("test-cluster-user-secrets", "giantswarm", map[string][]byte{
+					"values": []byte("user: test\ntop: max\nfoo: user\n"),
+				}),
+			},
+			expectedData: map[string]interface{}{
+				"catalog":     "test",
+				"pre-cluster": "giantswarm",
+				"foo":         "user",
+				"color":       "red",
+				"apple":       "pear",
+				"top":         "max",
+				"cluster":     "fallthrough",
+				"user":        "test",
 			},
 		},
 	}
