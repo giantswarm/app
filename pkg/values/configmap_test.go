@@ -238,6 +238,39 @@ func Test_MergeConfigMapData(t *testing.T) {
 			},
 			errorMatcher: IsParsingError,
 		},
+		{
+			name: "case multi layer 1: pre cluster overrides catalog",
+			app: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "my-test-app",
+					Namespace: "giantswarm",
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "test-catalog",
+					Name:      "test-app",
+					Namespace: "giantswarm",
+					ExtraConfigs: []v1alpha1.AppExtraConfig{
+						{
+							Name:      "pre-cluster-overrides",
+							Namespace: "giantswarm",
+						},
+					},
+				},
+			},
+			catalog: getSimpleTestCatalogDefinition(),
+			configMaps: []*corev1.ConfigMap{
+				getTestCatalogConfigMapDefinition(map[string]string{
+					"values": "foo: bar\ntest: catalog\n",
+				}),
+				getConfigMapDefinition("pre-cluster-overrides", "giantswarm", map[string]string{
+					"values": "foo: baz\n",
+				}),
+			},
+			expectedData: map[string]interface{}{
+				"foo":  "baz",
+				"test": "catalog",
+			},
+		},
 	}
 
 	ctx := context.Background()
