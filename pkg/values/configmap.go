@@ -46,7 +46,7 @@ func (v *Values) MergeConfigMapData(ctx context.Context, app v1alpha1.App, catal
 	// Pre cluster extra config maps
 	err, done := v.fetchAndMergeExtraConfigs(ctx, getPreClusterExtraConfigMapEntries(extraConfigs), v.getConfigMap, catalogData)
 	if done {
-		return catalogData, err
+		return nil, err
 	}
 
 	// We get the app level values if configured.
@@ -68,7 +68,7 @@ func (v *Values) MergeConfigMapData(ctx context.Context, app v1alpha1.App, catal
 	// Post cluster / pre user extra config maps
 	err, done = v.fetchAndMergeExtraConfigs(ctx, getPostClusterPreUserExtraConfigMapEntries(extraConfigs), v.getConfigMap, catalogData)
 	if done {
-		return catalogData, err
+		return nil, err
 	}
 
 	// We get the user level values if configured and merge them.
@@ -92,7 +92,7 @@ func (v *Values) MergeConfigMapData(ctx context.Context, app v1alpha1.App, catal
 	// Post user extra config maps
 	err, done = v.fetchAndMergeExtraConfigs(ctx, getPostUserExtraConfigMapEntries(extraConfigs), v.getConfigMap, catalogData)
 	if done {
-		return catalogData, err
+		return nil, err
 	}
 
 	return catalogData, nil
