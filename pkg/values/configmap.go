@@ -27,7 +27,7 @@ func (v *Values) MergeConfigMapData(ctx context.Context, app v1alpha1.App, catal
 
 	extraConfigs := key.ExtraConfigs(app)
 
-	if appConfigMapName == "" && catalogConfigMapName == "" && userConfigMapName == "" {
+	if appConfigMapName == "" && catalogConfigMapName == "" && userConfigMapName == "" && len(extraConfigs) == 0 {
 		// Return early as there is no config.
 		return nil, nil
 	}
@@ -41,6 +41,12 @@ func (v *Values) MergeConfigMapData(ctx context.Context, app v1alpha1.App, catal
 	catalogData, err := extractData(configmap, "catalog", rawCatalogData)
 	if err != nil {
 		return nil, microerror.Mask(err)
+	}
+
+	if catalogData == nil {
+		// If there is no catalog data then treat it as an empty map otherwise `mergo.Merge` will silently
+		// fail to merge the first layers: `dst = nil; mergo.Merge(dst, MAP_OF_DATA)` and `dst` is still nil
+		catalogData = map[string]interface{}{}
 	}
 
 	v.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("State of merge at catalog: %#q", catalogData))

@@ -22,7 +22,7 @@ func (v *Values) MergeSecretData(ctx context.Context, app v1alpha1.App, catalog 
 
 	extraConfigs := key.ExtraConfigs(app)
 
-	if appSecretName == "" && catalogSecretName == "" && userSecretName == "" {
+	if appSecretName == "" && catalogSecretName == "" && userSecretName == "" && len(extraConfigs) == 0 {
 		// Return early as there is no secret.
 		return nil, nil
 	}
@@ -36,6 +36,12 @@ func (v *Values) MergeSecretData(ctx context.Context, app v1alpha1.App, catalog 
 	catalogData, err := extractData(secret, "catalog", toStringMap(rawCatalogData))
 	if err != nil {
 		return nil, microerror.Mask(err)
+	}
+
+	if catalogData == nil {
+		// If there is no catalog data then treat it as an empty map otherwise `mergo.Merge` will silently
+		// fail to merge the first layers: `dst = nil; mergo.Merge(dst, MAP_OF_DATA)` and `dst` is still nil
+		catalogData = map[string]interface{}{}
 	}
 
 	// Pre cluster extra secrets
