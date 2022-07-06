@@ -134,7 +134,7 @@ func (v *Values) fetchAndMergeExtraConfigs(
 		}
 
 		v.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf(
-			"merged %#q in %#q of kind %#q and priority %#q", entry.Name, entry.Namespace, entry.Kind, entry.Priority,
+			"merged %#q in %#q of kind %#q and priority %d", entry.Name, entry.Namespace, entry.Kind, entry.Priority,
 		))
 	}
 
