@@ -2,6 +2,7 @@ package values
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/giantswarm/apiextensions-application/api/v1alpha1"
 	"github.com/giantswarm/microerror"
@@ -113,7 +114,7 @@ func extractNonNestedData(data map[string]string) (map[string]interface{}, error
 func (v *Values) fetchAndMergeExtraConfigs(
 	ctx context.Context,
 	extraConfigs []v1alpha1.AppExtraConfig,
-	dataFetcherMethod func(ctx context.Context, configMapName, configMapNamespace string) (map[string]string, error),
+	dataFetcherMethod func(ctx context.Context, name, namespace string) (map[string]string, error),
 	destinationData map[string]interface{},
 ) (error, bool) {
 	for _, entry := range extraConfigs {
@@ -124,14 +125,21 @@ func (v *Values) fetchAndMergeExtraConfigs(
 
 		data, err := extractNonNestedData(rawData)
 		if err != nil {
-			return microerror.Maskf(parsingError, "failed to parse %#q config map in %#q, logs: %s", entry.Name, entry.Namespace, err.Error()), true
+			return microerror.Maskf(parsingError, "failed to parse %#q in %#q, logs: %s", entry.Name, entry.Namespace, err.Error()), true
 		}
 
 		err = mergo.Merge(&destinationData, data, mergo.WithOverride)
 		if err != nil {
 			return microerror.Mask(err), true
 		}
+
+		v.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf(
+			"merged %#q in %#q of kind %#q and priority %#q", entry.Name, entry.Namespace, entry.Kind, entry.Priority,
+		))
 	}
+
+	v.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("finished merging %d extra configs", len(extraConfigs)))
+
 	return nil, false
 }
 
