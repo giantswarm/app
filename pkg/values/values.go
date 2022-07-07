@@ -111,12 +111,16 @@ func extractNonNestedData(data map[string]string) (map[string]interface{}, error
 	return rawMapData, nil
 }
 
+// fetchAndMergeExtraConfigs loops the given list of extra configs, fetches their data with the given method
+// and merges them into the given destination, modifying it inplace
 func (v *Values) fetchAndMergeExtraConfigs(
 	ctx context.Context,
 	extraConfigs []v1alpha1.AppExtraConfig,
 	dataFetcherMethod func(ctx context.Context, name, namespace string) (map[string]string, error),
 	destinationData map[string]interface{},
 ) (error, bool) {
+	v.logger.LogCtx(ctx, "level", "debug", "message", "checking next layer of extra configs...")
+
 	for _, entry := range extraConfigs {
 		rawData, err := dataFetcherMethod(ctx, entry.Name, entry.Namespace)
 		if err != nil {
@@ -138,7 +142,9 @@ func (v *Values) fetchAndMergeExtraConfigs(
 		))
 	}
 
-	v.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("finished merging %d extra configs", len(extraConfigs)))
+	v.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf(
+		"finished merging %d extra config(s) in this extra configs layer", len(extraConfigs),
+	))
 
 	return nil, false
 }
