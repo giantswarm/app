@@ -118,23 +118,23 @@ func (v *Values) fetchAndMergeExtraConfigs(
 	extraConfigs []v1alpha1.AppExtraConfig,
 	dataFetcherMethod func(ctx context.Context, name, namespace string) (map[string]string, error),
 	destinationData map[string]interface{},
-) (error, bool) {
+) error {
 	v.logger.LogCtx(ctx, "level", "debug", "message", "checking next layer of extra configs...")
 
 	for _, entry := range extraConfigs {
 		rawData, err := dataFetcherMethod(ctx, entry.Name, entry.Namespace)
 		if err != nil {
-			return microerror.Mask(err), true
+			return microerror.Mask(err)
 		}
 
 		data, err := extractNonNestedData(rawData)
 		if err != nil {
-			return microerror.Maskf(parsingError, "failed to parse %#q in %#q, logs: %s", entry.Name, entry.Namespace, err.Error()), true
+			return microerror.Maskf(parsingError, "failed to parse %#q in %#q, logs: %s", entry.Name, entry.Namespace, err.Error())
 		}
 
 		err = mergo.Merge(&destinationData, data, mergo.WithOverride)
 		if err != nil {
-			return microerror.Mask(err), true
+			return microerror.Mask(err)
 		}
 
 		v.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf(
@@ -146,7 +146,7 @@ func (v *Values) fetchAndMergeExtraConfigs(
 		"finished merging %d extra config(s) in this extra configs layer", len(extraConfigs),
 	))
 
-	return nil, false
+	return nil
 }
 
 // toStringMap converts from a byte slice map to a string map.
