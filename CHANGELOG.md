@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Implement merging algorithm of multi layer App CR extra configuration layers RFC, see: https://github.com/giantswarm/rfc/tree/main/multi-layer-app-config#enhancing-app-cr
+
 ## [6.11.1] - 2022-06-15
 
 ### Removed
