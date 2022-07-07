@@ -13,7 +13,7 @@ import (
 	"github.com/giantswarm/app/v6/pkg/key"
 )
 
-// MergeSecretData merges the data from the catalog, app and user secretss
+// MergeSecretData merges the data from the catalog, app, user and extra config secrets
 // and returns a single set of values.
 func (v *Values) MergeSecretData(ctx context.Context, app v1alpha1.App, catalog v1alpha1.Catalog) (map[string]interface{}, error) {
 	appSecretName := key.AppSecretName(app)

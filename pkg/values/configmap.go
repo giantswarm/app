@@ -18,7 +18,7 @@ const (
 	secret    = "secret"
 )
 
-// MergeConfigMapData merges the data from the catalog, app and user configmaps
+// MergeConfigMapData merges the data from the catalog, app, user and extra config configmaps
 // and returns a single set of values.
 func (v *Values) MergeConfigMapData(ctx context.Context, app v1alpha1.App, catalog v1alpha1.Catalog) (map[string]interface{}, error) {
 	appConfigMapName := key.AppConfigMapName(app)
@@ -49,15 +49,11 @@ func (v *Values) MergeConfigMapData(ctx context.Context, app v1alpha1.App, catal
 		catalogData = map[string]interface{}{}
 	}
 
-	v.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("State of merge at catalog: %#q", catalogData))
-
 	// Pre cluster extra config maps
 	err, done := v.fetchAndMergeExtraConfigs(ctx, getPreClusterExtraConfigMapEntries(extraConfigs), v.getConfigMap, catalogData)
 	if done {
 		return nil, err
 	}
-
-	v.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("State of merge at 1-50: %#q", catalogData))
 
 	// We get the app level values if configured.
 	rawAppData, err := v.getConfigMapForApp(ctx, app)
@@ -75,15 +71,11 @@ func (v *Values) MergeConfigMapData(ctx context.Context, app v1alpha1.App, catal
 		return nil, microerror.Mask(err)
 	}
 
-	v.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("State of merge at cluster: %#q", catalogData))
-
 	// Post cluster / pre user extra config maps
 	err, done = v.fetchAndMergeExtraConfigs(ctx, getPostClusterPreUserExtraConfigMapEntries(extraConfigs), v.getConfigMap, catalogData)
 	if done {
 		return nil, err
 	}
-
-	v.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("State of merge at 51-100: %#q", catalogData))
 
 	// We get the user level values if configured and merge them.
 	if key.UserConfigMapName(app) != "" {
@@ -103,15 +95,11 @@ func (v *Values) MergeConfigMapData(ctx context.Context, app v1alpha1.App, catal
 		}
 	}
 
-	v.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("State of merge at user: %#q", catalogData))
-
 	// Post user extra config maps
 	err, done = v.fetchAndMergeExtraConfigs(ctx, getPostUserExtraConfigMapEntries(extraConfigs), v.getConfigMap, catalogData)
 	if done {
 		return nil, err
 	}
-
-	v.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("State of merge at 101-150: %#q", catalogData))
 
 	return catalogData, nil
 }
