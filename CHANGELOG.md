@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.12.0] - 2022-07-08
+
 ### Added
 
 - Implement merging algorithm of multi layer App CR extra configuration layers RFC, see: https://github.com/giantswarm/rfc/tree/main/multi-layer-app-config#enhancing-app-cr
@@ -378,7 +380,8 @@ since there can be a delay creating them on cluster creation.
 
 - First release
 
-[Unreleased]: https://github.com/giantswarm/app/compare/v6.11.1...HEAD
+[Unreleased]: https://github.com/giantswarm/app/compare/v6.12.0...HEAD
+[6.12.0]: https://github.com/giantswarm/app/compare/v6.11.1...v6.12.0
 [6.11.1]: https://github.com/giantswarm/app/compare/v6.11.0...v6.11.1
 [6.11.0]: https://github.com/giantswarm/app/compare/v6.10.0...v6.11.0
 [6.10.0]: https://github.com/giantswarm/app/compare/v6.9.0...v6.10.0
