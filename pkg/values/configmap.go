@@ -18,14 +18,16 @@ const (
 	secret    = "secret"
 )
 
-// MergeConfigMapData merges the data from the catalog, app and user configmaps
+// MergeConfigMapData merges the data from the catalog, app, user and extra config configmaps
 // and returns a single set of values.
 func (v *Values) MergeConfigMapData(ctx context.Context, app v1alpha1.App, catalog v1alpha1.Catalog) (map[string]interface{}, error) {
 	appConfigMapName := key.AppConfigMapName(app)
 	catalogConfigMapName := key.CatalogConfigMapName(catalog)
 	userConfigMapName := key.UserConfigMapName(app)
 
-	if appConfigMapName == "" && catalogConfigMapName == "" && userConfigMapName == "" {
+	extraConfigs := key.ExtraConfigs(app)
+
+	if appConfigMapName == "" && catalogConfigMapName == "" && userConfigMapName == "" && len(extraConfigs) == 0 {
 		// Return early as there is no config.
 		return nil, nil
 	}
@@ -39,6 +41,18 @@ func (v *Values) MergeConfigMapData(ctx context.Context, app v1alpha1.App, catal
 	catalogData, err := extractData(configmap, "catalog", rawCatalogData)
 	if err != nil {
 		return nil, microerror.Mask(err)
+	}
+
+	if catalogData == nil {
+		// If there is no catalog data then treat it as an empty map otherwise `mergo.Merge` will silently
+		// fail to merge the first layers: `dst = nil; mergo.Merge(dst, MAP_OF_DATA)` and `dst` is still nil
+		catalogData = map[string]interface{}{}
+	}
+
+	// Pre cluster extra config maps
+	err = v.fetchAndMergeExtraConfigs(ctx, getPreClusterExtraConfigMapEntries(extraConfigs), v.getConfigMap, catalogData)
+	if err != nil {
+		return nil, err
 	}
 
 	// We get the app level values if configured.
@@ -57,6 +71,12 @@ func (v *Values) MergeConfigMapData(ctx context.Context, app v1alpha1.App, catal
 		return nil, microerror.Mask(err)
 	}
 
+	// Post cluster / pre user extra config maps
+	err = v.fetchAndMergeExtraConfigs(ctx, getPostClusterPreUserExtraConfigMapEntries(extraConfigs), v.getConfigMap, catalogData)
+	if err != nil {
+		return nil, err
+	}
+
 	// We get the user level values if configured and merge them.
 	if key.UserConfigMapName(app) != "" {
 		rawUserData, err := v.getUserConfigMapForApp(ctx, app)
@@ -73,6 +93,12 @@ func (v *Values) MergeConfigMapData(ctx context.Context, app v1alpha1.App, catal
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
+	}
+
+	// Post user extra config maps
+	err = v.fetchAndMergeExtraConfigs(ctx, getPostUserExtraConfigMapEntries(extraConfigs), v.getConfigMap, catalogData)
+	if err != nil {
+		return nil, err
 	}
 
 	return catalogData, nil

@@ -2,6 +2,7 @@ package values
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/giantswarm/apiextensions-application/api/v1alpha1"
 	"github.com/giantswarm/microerror"
@@ -87,6 +88,65 @@ func extractData(resourceType, name string, data map[string]string) (map[string]
 	}
 
 	return rawMapData, nil
+}
+
+func extractNonNestedData(data map[string]string) (map[string]interface{}, error) {
+	var err error
+	var rawMapData map[string]interface{}
+
+	if data == nil {
+		return rawMapData, nil
+	}
+
+	var rawData []byte
+	for _, v := range data {
+		rawData = []byte(v)
+	}
+
+	err = yaml.Unmarshal(rawData, &rawMapData)
+	if err != nil {
+		return nil, err
+	}
+
+	return rawMapData, nil
+}
+
+// fetchAndMergeExtraConfigs loops the given list of extra configs, fetches their data with the given method
+// and merges them into the given destination, modifying it inplace
+func (v *Values) fetchAndMergeExtraConfigs(
+	ctx context.Context,
+	extraConfigs []v1alpha1.AppExtraConfig,
+	dataFetcherMethod func(ctx context.Context, name, namespace string) (map[string]string, error),
+	destinationData map[string]interface{},
+) error {
+	v.logger.LogCtx(ctx, "level", "debug", "message", "checking next layer of extra configs...")
+
+	for _, entry := range extraConfigs {
+		rawData, err := dataFetcherMethod(ctx, entry.Name, entry.Namespace)
+		if err != nil {
+			return microerror.Mask(err)
+		}
+
+		data, err := extractNonNestedData(rawData)
+		if err != nil {
+			return microerror.Maskf(parsingError, "failed to parse %#q in %#q, logs: %s", entry.Name, entry.Namespace, err.Error())
+		}
+
+		err = mergo.Merge(&destinationData, data, mergo.WithOverride)
+		if err != nil {
+			return microerror.Mask(err)
+		}
+
+		v.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf(
+			"merged %#q in %#q of kind %#q and priority %d", entry.Name, entry.Namespace, entry.Kind, entry.Priority,
+		))
+	}
+
+	v.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf(
+		"finished merging %d extra config(s) in this extra configs layer", len(extraConfigs),
+	))
+
+	return nil
 }
 
 // toStringMap converts from a byte slice map to a string map.

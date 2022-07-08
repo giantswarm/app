@@ -13,14 +13,16 @@ import (
 	"github.com/giantswarm/app/v6/pkg/key"
 )
 
-// MergeSecretData merges the data from the catalog, app and user secretss
+// MergeSecretData merges the data from the catalog, app, user and extra config secrets
 // and returns a single set of values.
 func (v *Values) MergeSecretData(ctx context.Context, app v1alpha1.App, catalog v1alpha1.Catalog) (map[string]interface{}, error) {
 	appSecretName := key.AppSecretName(app)
 	catalogSecretName := key.CatalogSecretName(catalog)
 	userSecretName := key.UserSecretName(app)
 
-	if appSecretName == "" && catalogSecretName == "" && userSecretName == "" {
+	extraConfigs := key.ExtraConfigs(app)
+
+	if appSecretName == "" && catalogSecretName == "" && userSecretName == "" && len(extraConfigs) == 0 {
 		// Return early as there is no secret.
 		return nil, nil
 	}
@@ -34,6 +36,18 @@ func (v *Values) MergeSecretData(ctx context.Context, app v1alpha1.App, catalog 
 	catalogData, err := extractData(secret, "catalog", toStringMap(rawCatalogData))
 	if err != nil {
 		return nil, microerror.Mask(err)
+	}
+
+	if catalogData == nil {
+		// If there is no catalog data then treat it as an empty map otherwise `mergo.Merge` will silently
+		// fail to merge the first layers: `dst = nil; mergo.Merge(dst, MAP_OF_DATA)` and `dst` is still nil
+		catalogData = map[string]interface{}{}
+	}
+
+	// Pre cluster extra secrets
+	err = v.fetchAndMergeExtraConfigs(ctx, getPreClusterExtraSecretEntries(extraConfigs), v.getSecretAsString, catalogData)
+	if err != nil {
+		return nil, err
 	}
 
 	// We get the app level secrets if configured.
@@ -52,6 +66,12 @@ func (v *Values) MergeSecretData(ctx context.Context, app v1alpha1.App, catalog 
 	err = mergo.Merge(&catalogData, appData, mergo.WithOverride)
 	if err != nil {
 		return nil, microerror.Mask(err)
+	}
+
+	// Post cluster / pre user extra secrets
+	err = v.fetchAndMergeExtraConfigs(ctx, getPostClusterPreUserExtraSecretEntries(extraConfigs), v.getSecretAsString, catalogData)
+	if err != nil {
+		return nil, err
 	}
 
 	// We get the user level values if configured and merge them.
@@ -74,7 +94,23 @@ func (v *Values) MergeSecretData(ctx context.Context, app v1alpha1.App, catalog 
 		}
 	}
 
+	// Post user extra secrets
+	err = v.fetchAndMergeExtraConfigs(ctx, getPostUserExtraSecretEntries(extraConfigs), v.getSecretAsString, catalogData)
+	if err != nil {
+		return nil, err
+	}
+
 	return catalogData, nil
+}
+
+func (v *Values) getSecretAsString(ctx context.Context, secretName, secretNamespace string) (map[string]string, error) {
+	data, err := v.getSecret(ctx, secretName, secretNamespace)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return toStringMap(data), nil
 }
 
 func (v *Values) getSecret(ctx context.Context, secretName, secretNamespace string) (map[string][]byte, error) {
