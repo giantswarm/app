@@ -87,6 +87,11 @@ func (v *Validator) ValidateApp(ctx context.Context, app v1alpha1.App) (bool, er
 		return false, microerror.Mask(err)
 	}
 
+	err = v.validateUniqueInClusterAppName(ctx, app)
+	if err != nil {
+		return false, microerror.Mask(err)
+	}
+
 	return true, nil
 }
 
