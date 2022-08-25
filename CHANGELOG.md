@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.13.0] - 2022-08-25
+
 ### Added
 
 - Add a new validation rule for App Crs that checks for unique name of in-cluster Apps across the management cluster and rejects the request if it does not pass
@@ -384,7 +386,8 @@ since there can be a delay creating them on cluster creation.
 
 - First release
 
-[Unreleased]: https://github.com/giantswarm/app/compare/v6.12.0...HEAD
+[Unreleased]: https://github.com/giantswarm/app/compare/v6.13.0...HEAD
+[6.13.0]: https://github.com/giantswarm/app/compare/v6.12.0...v6.13.0
 [6.12.0]: https://github.com/giantswarm/app/compare/v6.11.1...v6.12.0
 [6.11.1]: https://github.com/giantswarm/app/compare/v6.11.0...v6.11.1
 [6.11.0]: https://github.com/giantswarm/app/compare/v6.10.0...v6.11.0
