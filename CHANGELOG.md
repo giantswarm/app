@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add a new validation rule for App Crs that checks for unique name of in-cluster Apps across the management cluster and rejects the request if it does not pass
+
 ## [6.12.0] - 2022-07-08
 
 ### Added
