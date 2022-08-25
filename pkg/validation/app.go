@@ -473,7 +473,10 @@ func (v *Validator) validateSecretExists(ctx context.Context, name, namespace, k
 }
 
 func (v *Validator) validateUniqueInClusterAppName(ctx context.Context, cr v1alpha1.App) error {
-	if !key.InCluster(cr) {
+	// WARNING: This part assumes knowledge of the internal workings of app-operator and the App Platform
+	specialNamespace := "giantswarm"
+
+	if !key.InCluster(cr) && cr.Namespace != specialNamespace {
 		return nil
 	}
 
@@ -502,8 +505,18 @@ func (v *Validator) validateUniqueInClusterAppName(ctx context.Context, cr v1alp
 		//
 		// See: https://github.com/kubernetes-sigs/controller-runtime/issues/1376
 		// See: https://github.com/kubernetes-sigs/controller-runtime/issues/866
-		if inspectedApp.Name == cr.Name && key.InCluster(inspectedApp) {
-			return microerror.Maskf(validationError, "in-cluster apps must be given a unique name, found an app named %#q as well in the %#q namespace", inspectedApp.Name, inspectedApp.Namespace)
+		if inspectedApp.Name == cr.Name {
+			if inspectedApp.Namespace == specialNamespace {
+				return microerror.Maskf(validationError, "found another app named %#q installed into the %#q namespace", inspectedApp.Name, specialNamespace)
+			}
+
+			if key.InCluster(inspectedApp) {
+				if cr.Namespace == specialNamespace {
+					return microerror.Maskf(validationError, "there is in-cluster app named %#q already installed in the %#q namespace that would cause name collision with the currently applied app named %#q in the %#q namespace", inspectedApp.Name, inspectedApp.Namespace, cr.Name, cr.Namespace)
+				}
+
+				return microerror.Maskf(validationError, "in-cluster apps must be given a unique name, found an app named %#q as well in the %#q namespace", inspectedApp.Name, inspectedApp.Namespace)
+			}
 		}
 	}
 

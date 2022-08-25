@@ -1776,6 +1776,72 @@ func Test_ValidateUniqueInClusterAppName(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "case 6: cover the edge case of installing another app with the same name in the special giantswarm namespace",
+			obj: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "security-pack",
+					Namespace: "abc01",
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "giantswarm",
+					Name:      "security-pack",
+					Namespace: "abc01",
+					Version:   "1.2.0",
+					KubeConfig: v1alpha1.AppSpecKubeConfig{
+						InCluster: true,
+					},
+				},
+			},
+			apps: []*v1alpha1.App{
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "security-pack",
+						Namespace: "giantswarm",
+					},
+					Spec: v1alpha1.AppSpec{
+						Catalog:   "giantswarm",
+						Name:      "another-app",
+						Namespace: "giantswarm",
+						Version:   "2.4.0",
+					},
+				},
+			},
+			expectedErr: "found another app named `security-pack` installed into the `giantswarm` namespace",
+		},
+		{
+			name: "case 7: there is an in-cluster app installed and a non-in-cluster app is applied to the giantswarm namespace with the same name",
+			obj: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "security-pack",
+					Namespace: "giantswarm",
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "giantswarm",
+					Name:      "another-app",
+					Namespace: "giantswarm",
+					Version:   "2.4.0",
+				},
+			},
+			apps: []*v1alpha1.App{
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "security-pack",
+						Namespace: "abc01",
+					},
+					Spec: v1alpha1.AppSpec{
+						Catalog:   "giantswarm",
+						Name:      "security-pack",
+						Namespace: "abc01",
+						Version:   "1.2.0",
+						KubeConfig: v1alpha1.AppSpecKubeConfig{
+							InCluster: true,
+						},
+					},
+				},
+			},
+			expectedErr: "there is in-cluster app named `security-pack` already installed in the `abc01` namespace that would cause name collision with the currently applied app named `security-pack` in the `giantswarm` namespace",
+		},
 	}
 
 	for _, tc := range tests {
