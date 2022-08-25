@@ -517,7 +517,7 @@ func (v *Validator) validateUniqueInClusterAppName(ctx context.Context, cr v1alp
 
 			if key.InCluster(inspectedApp) {
 				if cr.Namespace == specialNamespace {
-					return microerror.Maskf(validationError, "there is in-cluster app named %#q already installed in the %#q namespace that would cause name collision with the currently applied app named %#q in the %#q namespace", inspectedApp.Name, inspectedApp.Namespace, cr.Name, cr.Namespace)
+					return microerror.Maskf(validationError, "there is in-cluster app named %#q already installed in the %#q namespace that would cause name collision with the currently submitted app named %#q in the %#q namespace", inspectedApp.Name, inspectedApp.Namespace, cr.Name, cr.Namespace)
 				}
 
 				return microerror.Maskf(validationError, "in-cluster apps must be given a unique name, found an app named %#q as well in the %#q namespace", inspectedApp.Name, inspectedApp.Namespace)

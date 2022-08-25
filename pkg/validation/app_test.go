@@ -1840,7 +1840,7 @@ func Test_ValidateUniqueInClusterAppName(t *testing.T) {
 					},
 				},
 			},
-			expectedErr: "there is in-cluster app named `security-pack` already installed in the `abc01` namespace that would cause name collision with the currently applied app named `security-pack` in the `giantswarm` namespace",
+			expectedErr: "there is in-cluster app named `security-pack` already installed in the `abc01` namespace that would cause name collision with the currently submitted app named `security-pack` in the `giantswarm` namespace",
 		},
 		{
 			name: "case 8: there is an in-cluster app installed and a non-in-cluster app with the same name is applied to NOT the giantswarm namespace",
