@@ -1587,6 +1587,339 @@ func Test_ValidateNamespace(t *testing.T) {
 	}
 }
 
+func Test_ValidateUniqueInClusterAppName(t *testing.T) {
+	ctx := context.Background()
+
+	tests := []struct {
+		name        string
+		obj         v1alpha1.App
+		apps        []*v1alpha1.App
+		expectedErr string
+	}{
+		{
+			name: "case 0: not an in-cluster app",
+			obj: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "not-security-pack",
+					Namespace: "abc01",
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "giantswarm",
+					Name:      "not-security-pack",
+					Namespace: "abc01",
+					Version:   "1.2.0",
+				},
+			},
+			apps: []*v1alpha1.App{
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "not-security-pack",
+						Namespace: "another-namespace",
+					},
+					Spec: v1alpha1.AppSpec{
+						Catalog:   "giantswarm",
+						Name:      "not-security-pack",
+						Namespace: "another-namespace",
+						Version:   "1.2.0",
+					},
+				},
+			},
+		},
+		{
+			name: "case 1: in-cluster app with a non-unique name",
+			obj: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "security-pack",
+					Namespace: "abc01",
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "giantswarm",
+					Name:      "security-pack",
+					Namespace: "abc01",
+					Version:   "1.2.0",
+					KubeConfig: v1alpha1.AppSpecKubeConfig{
+						InCluster: true,
+					},
+				},
+			},
+			apps: []*v1alpha1.App{
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "security-pack",
+						Namespace: "another-namespace",
+					},
+					Spec: v1alpha1.AppSpec{
+						Catalog:   "giantswarm",
+						Name:      "security-pack",
+						Namespace: "another-namespace",
+						Version:   "1.2.0",
+						KubeConfig: v1alpha1.AppSpecKubeConfig{
+							InCluster: true,
+						},
+					},
+				},
+			},
+			expectedErr: "in-cluster apps must be given a unique name, found an app named `security-pack` as well in the `another-namespace` namespace",
+		},
+		{
+			name: "case 3: in-cluster app with a name is updated",
+			obj: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "security-pack",
+					Namespace: "abc01",
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "giantswarm",
+					Name:      "security-pack",
+					Namespace: "abc01",
+					// The version is updated, the app already exists
+					Version: "1.3.0",
+					KubeConfig: v1alpha1.AppSpecKubeConfig{
+						InCluster: true,
+					},
+				},
+			},
+			apps: []*v1alpha1.App{
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "security-pack",
+						Namespace: "abc01",
+					},
+					Spec: v1alpha1.AppSpec{
+						Catalog:   "giantswarm",
+						Name:      "security-pack",
+						Namespace: "abc01",
+						Version:   "1.2.0",
+						KubeConfig: v1alpha1.AppSpecKubeConfig{
+							InCluster: true,
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "case 4: in-cluster app with no name collision",
+			obj: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "abc01-security-pack",
+					Namespace: "abc01",
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "giantswarm",
+					Name:      "security-pack",
+					Namespace: "abc01",
+					Version:   "1.2.0",
+					KubeConfig: v1alpha1.AppSpecKubeConfig{
+						InCluster: true,
+					},
+				},
+			},
+			apps: []*v1alpha1.App{
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "qwe99-security-pack",
+						Namespace: "qwe99",
+					},
+					Spec: v1alpha1.AppSpec{
+						Catalog:   "giantswarm",
+						Name:      "security-pack",
+						Namespace: "qwe99",
+						Version:   "1.2.0",
+						KubeConfig: v1alpha1.AppSpecKubeConfig{
+							InCluster: true,
+						},
+					},
+				},
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "totally-unrelated-app",
+						Namespace: "xyz",
+					},
+					Spec: v1alpha1.AppSpec{
+						Catalog:   "giantswarm-test",
+						Name:      "random-other-app",
+						Namespace: "xyz",
+						Version:   "12.3.8",
+					},
+				},
+			},
+		},
+		{
+			name: "case 5: there is another app with the same name in a different namespace but it is not an in-cluster app",
+			obj: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "security-pack",
+					Namespace: "abc01",
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "giantswarm",
+					Name:      "security-pack",
+					Namespace: "abc01",
+					Version:   "1.2.0",
+					KubeConfig: v1alpha1.AppSpecKubeConfig{
+						InCluster: true,
+					},
+				},
+			},
+			apps: []*v1alpha1.App{
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "security-pack",
+						Namespace: "qwe99",
+					},
+					Spec: v1alpha1.AppSpec{
+						Catalog:   "giantswarm",
+						Name:      "another-app-name",
+						Namespace: "qwe99",
+						Version:   "42.0.1",
+					},
+				},
+			},
+		},
+		{
+			name: "case 6: cover the edge case of installing another app with the same name in the special giantswarm namespace",
+			obj: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "security-pack",
+					Namespace: "abc01",
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "giantswarm",
+					Name:      "security-pack",
+					Namespace: "abc01",
+					Version:   "1.2.0",
+					KubeConfig: v1alpha1.AppSpecKubeConfig{
+						InCluster: true,
+					},
+				},
+			},
+			apps: []*v1alpha1.App{
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "security-pack",
+						Namespace: "giantswarm",
+					},
+					Spec: v1alpha1.AppSpec{
+						Catalog:   "giantswarm",
+						Name:      "another-app",
+						Namespace: "giantswarm",
+						Version:   "2.4.0",
+					},
+				},
+			},
+			expectedErr: "found another app named `security-pack` installed into the `giantswarm` namespace",
+		},
+		{
+			name: "case 7: there is an in-cluster app installed and a non-in-cluster app with the same name is applied to the giantswarm namespace",
+			obj: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "security-pack",
+					Namespace: "giantswarm",
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "giantswarm",
+					Name:      "another-app",
+					Namespace: "giantswarm",
+					Version:   "2.4.0",
+				},
+			},
+			apps: []*v1alpha1.App{
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "security-pack",
+						Namespace: "abc01",
+					},
+					Spec: v1alpha1.AppSpec{
+						Catalog:   "giantswarm",
+						Name:      "security-pack",
+						Namespace: "abc01",
+						Version:   "1.2.0",
+						KubeConfig: v1alpha1.AppSpecKubeConfig{
+							InCluster: true,
+						},
+					},
+				},
+			},
+			expectedErr: "there is in-cluster app named `security-pack` already installed in the `abc01` namespace that would cause name collision with the currently submitted app named `security-pack` in the `giantswarm` namespace",
+		},
+		{
+			name: "case 8: there is an in-cluster app installed and a non-in-cluster app with the same name is applied to NOT the giantswarm namespace",
+			obj: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "security-pack",
+					Namespace: "random-namespace",
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "giantswarm",
+					Name:      "another-app",
+					Namespace: "random-namespace",
+					Version:   "2.4.0",
+				},
+			},
+			apps: []*v1alpha1.App{
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "security-pack",
+						Namespace: "abc01",
+					},
+					Spec: v1alpha1.AppSpec{
+						Catalog:   "giantswarm",
+						Name:      "security-pack",
+						Namespace: "abc01",
+						Version:   "1.2.0",
+						KubeConfig: v1alpha1.AppSpecKubeConfig{
+							InCluster: true,
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			g8sObjs := make([]runtime.Object, 0)
+
+			for _, app := range tc.apps {
+				g8sObjs = append(g8sObjs, app)
+			}
+
+			scheme := runtime.NewScheme()
+			_ = v1alpha1.AddToScheme(scheme)
+
+			fakeCtrlClient := fake.NewFakeClientWithScheme(scheme, g8sObjs...)
+
+			c := Config{
+				G8sClient: fakeCtrlClient,
+				K8sClient: clientgofake.NewSimpleClientset(),
+				Logger:    microloggertest.New(),
+
+				ProjectName: "app-admission-controller",
+				Provider:    "aws",
+			}
+			r, err := NewValidator(c)
+			if err != nil {
+				t.Fatalf("error == %#v, want nil", err)
+			}
+
+			err = r.validateUniqueInClusterAppName(ctx, tc.obj)
+			switch {
+			case err != nil && tc.expectedErr == "":
+				t.Fatalf("error == %#v, want nil", err)
+			case err == nil && tc.expectedErr != "":
+				t.Fatalf("error == nil, want non-nil")
+			}
+
+			if err != nil && tc.expectedErr != "" {
+				if !strings.Contains(err.Error(), tc.expectedErr) {
+					t.Fatalf("error == %#v, want %#v ", err.Error(), tc.expectedErr)
+				}
+
+			}
+		})
+	}
+}
+
 func newTestCatalog(name, namespace string) *v1alpha1.Catalog {
 	return &v1alpha1.Catalog{
 		ObjectMeta: metav1.ObjectMeta{

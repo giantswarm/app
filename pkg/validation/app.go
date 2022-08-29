@@ -87,6 +87,11 @@ func (v *Validator) ValidateApp(ctx context.Context, app v1alpha1.App) (bool, er
 		return false, microerror.Mask(err)
 	}
 
+	err = v.validateUniqueInClusterAppName(ctx, app)
+	if err != nil {
+		return false, microerror.Mask(err)
+	}
+
 	return true, nil
 }
 
@@ -467,6 +472,57 @@ func (v *Validator) validateSecretExists(ctx context.Context, name, namespace, k
 	_, err := v.k8sClient.CoreV1().Secrets(namespace).Get(ctx, name, metav1.GetOptions{})
 	if err != nil {
 		return microerror.Mask(err)
+	}
+
+	return nil
+}
+
+func (v *Validator) validateUniqueInClusterAppName(ctx context.Context, cr v1alpha1.App) error {
+	// WARNING: This part assumes knowledge of the internal workings of app-operator and the App Platform
+	specialNamespace := "giantswarm"
+
+	if !key.InCluster(cr) && cr.Namespace != specialNamespace {
+		return nil
+	}
+
+	apps := &v1alpha1.AppList{}
+
+	fieldName := "metadata.name"
+	fieldValue := cr.Name
+
+	err := v.g8sClient.List(ctx, apps, &client.ListOptions{
+		FieldSelector: fields.OneTermEqualSelector(fieldName, fieldValue),
+	})
+	if err != nil {
+		return microerror.Maskf(validationError, "failed to list apps with %#q set to %#q to validate unique in-cluster app name rule, %#v", fieldName, fieldValue, err)
+	}
+
+	for _, inspectedApp := range apps.Items {
+		// If it is the same app (we are handling an update event for example) then skip over
+		if inspectedApp.Namespace == cr.Namespace {
+			continue
+		}
+
+		// Found another app that is in-cluster and bears the same name, you shall not pass!
+		//
+		// The extra check for comparing the names is redundant, it is added because of a long-standing bug in
+		// the fake kubernetes client used in tests.
+		//
+		// See: https://github.com/kubernetes-sigs/controller-runtime/issues/1376
+		// See: https://github.com/kubernetes-sigs/controller-runtime/issues/866
+		if inspectedApp.Name == cr.Name {
+			if inspectedApp.Namespace == specialNamespace {
+				return microerror.Maskf(validationError, "found another app named %#q installed into the %#q namespace", inspectedApp.Name, specialNamespace)
+			}
+
+			if key.InCluster(inspectedApp) {
+				if cr.Namespace == specialNamespace {
+					return microerror.Maskf(validationError, "there is in-cluster app named %#q already installed in the %#q namespace that would cause name collision with the currently submitted app named %#q in the %#q namespace", inspectedApp.Name, inspectedApp.Namespace, cr.Name, cr.Namespace)
+				}
+
+				return microerror.Maskf(validationError, "in-cluster apps must be given a unique name, found an app named %#q as well in the %#q namespace", inspectedApp.Name, inspectedApp.Namespace)
+			}
+		}
 	}
 
 	return nil
