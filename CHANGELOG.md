@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.14.0] - 2022-09-13
+
+### Changed
+
+- Don't look for the `ingress-controller-values` ConfigMap cluster values when NGINX apps is installed for CAPI clusters. Instead look for the standard `<cluster_name>-cluster-values` ConfigMap.
+
 ## [6.13.0] - 2022-08-25
 
 ### Added
@@ -386,7 +392,8 @@ since there can be a delay creating them on cluster creation.
 
 - First release
 
-[Unreleased]: https://github.com/giantswarm/app/compare/v6.13.0...HEAD
+[Unreleased]: https://github.com/giantswarm/app/compare/v6.14.0...HEAD
+[6.14.0]: https://github.com/giantswarm/app/compare/v6.13.0...v6.14.0
 [6.13.0]: https://github.com/giantswarm/app/compare/v6.12.0...v6.13.0
 [6.12.0]: https://github.com/giantswarm/app/compare/v6.11.1...v6.12.0
 [6.11.1]: https://github.com/giantswarm/app/compare/v6.11.0...v6.11.1
