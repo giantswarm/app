@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [6.14.0] - 2022-09-13
 
+### Changed
+
+- Don't look for the `ingress-controller-values` ConfigMap cluster values when NGINX apps is installed for CAPI clusters. Instead look for the standard `<cluster_name>-cluster-values` ConfigMap.
+
 ## [6.13.0] - 2022-08-25
 
 ### Added
