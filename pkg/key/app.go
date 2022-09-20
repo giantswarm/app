@@ -5,6 +5,8 @@ import (
 	"strings"
 	"time"
 
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 	"github.com/giantswarm/apiextensions-application/api/v1alpha1"
 	"github.com/giantswarm/k8smetadata/pkg/annotation"
 	"github.com/giantswarm/k8smetadata/pkg/label"
@@ -124,6 +126,10 @@ func InCluster(customResource v1alpha1.App) bool {
 
 func InstallSkipCRDs(customResource v1alpha1.App) bool {
 	return customResource.Spec.Install.SkipCRDs
+}
+
+func InstallTimeout(customResource v1alpha1.App) *metav1.Duration {
+	return customResource.Spec.Install.Timeout
 }
 
 func IsAppCordoned(customResource v1alpha1.App) bool {
