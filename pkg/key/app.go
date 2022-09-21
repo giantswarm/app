@@ -196,6 +196,10 @@ func ReleaseName(customResource v1alpha1.App) string {
 	return customResource.Spec.Name
 }
 
+func RollbackTimeout(customResource v1alpha1.App) *metav1.Duration {
+	return customResource.Spec.Rollback.Timeout
+}
+
 func ToApp(v interface{}) (v1alpha1.App, error) {
 	customResource, ok := v.(*v1alpha1.App)
 	if !ok {
@@ -207,6 +211,14 @@ func ToApp(v interface{}) (v1alpha1.App, error) {
 	}
 
 	return *customResource, nil
+}
+
+func UninstallTimeout(customResource v1alpha1.App) *metav1.Duration {
+	return customResource.Spec.Uninstall.Timeout
+}
+
+func UpgradeTimeout(customResource v1alpha1.App) *metav1.Duration {
+	return customResource.Spec.Upgrade.Timeout
 }
 
 func UserConfigMapName(customResource v1alpha1.App) string {
