@@ -128,8 +128,8 @@ github.com/fsnotify/fsnotify v1.4.9 h1:hsms1Qyu0jgnwNXIxa+/V/PDsU6CfLf6CNO8H7IWo
 github.com/fsnotify/fsnotify v1.4.9/go.mod h1:znqG4EE+3YCdAaPaxE2ZRY/06pZUdp0tY4IgpuI1SZQ=
 github.com/ghodss/yaml v0.0.0-20150909031657-73d445a93680/go.mod h1:4dBDuWmgqj2HViK6kFavaiC9ZROes6MMH2rRYeMEF04=
 github.com/ghodss/yaml v1.0.0/go.mod h1:4dBDuWmgqj2HViK6kFavaiC9ZROes6MMH2rRYeMEF04=
-github.com/giantswarm/apiextensions-application v0.5.2-0.20220921154426-226cdfe10d6e h1:Vz8ZWVHYIHQoP7Y3c6VoKPohs7YIjBidufk60xThmLA=
-github.com/giantswarm/apiextensions-application v0.5.2-0.20220921154426-226cdfe10d6e/go.mod h1:O6mg+EdXC9CyTLgi0d3rf6QTXrQX/79iw4kjMJRinig=
+github.com/giantswarm/apiextensions-application v0.5.2-0.20220921182257-2bcda82ec5f7 h1:HPUanKJNm5Vl//UWgfS4xWGPXD16c5b64V5EAd535AU=
+github.com/giantswarm/apiextensions-application v0.5.2-0.20220921182257-2bcda82ec5f7/go.mod h1:O6mg+EdXC9CyTLgi0d3rf6QTXrQX/79iw4kjMJRinig=
 github.com/giantswarm/k8smetadata v0.6.0/go.mod h1:k3DYCMdspxhk7efLkQdX1b8UZ71ijOCG3ZoIU8+5xgw=
 github.com/giantswarm/k8smetadata v0.9.2 h1:10lbS5DRJNES4iytNxc/5+3lsZfx+t+RvP1qZF2ymvc=
 github.com/giantswarm/k8smetadata v0.9.2/go.mod h1:k3DYCMdspxhk7efLkQdX1b8UZ71ijOCG3ZoIU8+5xgw=
