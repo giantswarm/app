@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"strconv"
 	"testing"
+	"time"
 
 	"github.com/giantswarm/apiextensions-application/api/v1alpha1"
 	"github.com/giantswarm/k8smetadata/pkg/annotation"
@@ -455,6 +456,131 @@ func Test_ToApp(t *testing.T) {
 
 			if !reflect.DeepEqual(result, tc.expectedObject) {
 				t.Fatalf("Custom Object == %#v, want %#v", result, tc.expectedObject)
+			}
+		})
+	}
+}
+
+func Test_Timeouts(t *testing.T) {
+	type expectedTimeouts struct {
+		Install   *metav1.Duration
+		Rollback  *metav1.Duration
+		Uninstall *metav1.Duration
+		Upgrade   *metav1.Duration
+	}
+
+	testCases := []struct {
+		name     string
+		obj      v1alpha1.App
+		expected expectedTimeouts
+	}{
+		{
+			name: "flawless, no timeouts",
+			obj: v1alpha1.App{
+				Spec: v1alpha1.AppSpec{},
+			},
+			expected: expectedTimeouts{},
+		},
+		{
+			name: "flawless, all timeouts set",
+			obj: v1alpha1.App{
+				Spec: v1alpha1.AppSpec{
+					Install: v1alpha1.AppSpecInstall{
+						Timeout: &metav1.Duration{Duration: 360 * time.Second},
+					},
+					Rollback: v1alpha1.AppSpecRollback{
+						Timeout: &metav1.Duration{Duration: 420 * time.Second},
+					},
+					Uninstall: v1alpha1.AppSpecUninstall{
+						Timeout: &metav1.Duration{Duration: 480 * time.Second},
+					},
+					Upgrade: v1alpha1.AppSpecUpgrade{
+						Timeout: &metav1.Duration{Duration: 540 * time.Second},
+					},
+				},
+			},
+			expected: expectedTimeouts{
+				Install:   &metav1.Duration{Duration: 360 * time.Second},
+				Rollback:  &metav1.Duration{Duration: 420 * time.Second},
+				Uninstall: &metav1.Duration{Duration: 480 * time.Second},
+				Upgrade:   &metav1.Duration{Duration: 540 * time.Second},
+			},
+		},
+		{
+			name: "flawless, mix of timeouts",
+			obj: v1alpha1.App{
+				Spec: v1alpha1.AppSpec{
+					Install: v1alpha1.AppSpecInstall{
+						Timeout: &metav1.Duration{Duration: 360 * time.Second},
+					},
+					Upgrade: v1alpha1.AppSpecUpgrade{
+						Timeout: &metav1.Duration{Duration: 540 * time.Second},
+					},
+				},
+			},
+			expected: expectedTimeouts{
+				Install: &metav1.Duration{Duration: 360 * time.Second},
+				Upgrade: &metav1.Duration{Duration: 540 * time.Second},
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			if tc.expected.Install != nil {
+				if InstallTimeout(tc.obj) == nil {
+					t.Fatalf("Install Timeout is nil, want %#q", (*tc.expected.Install).Duration)
+				}
+
+				if InstallTimeout(tc.obj).Duration != (*tc.expected.Install).Duration {
+					t.Fatalf("Install Timeout is %#q, want %#q", InstallTimeout(tc.obj).Duration, (*tc.expected.Install).Duration)
+				}
+			} else {
+				if InstallTimeout(tc.obj) != nil {
+					t.Fatalf("Install Timeout is %#q, want nil", InstallTimeout(tc.obj).Duration)
+				}
+			}
+
+			if tc.expected.Rollback != nil {
+				if RollbackTimeout(tc.obj) == nil {
+					t.Fatalf("Rollback Timeout is nil, want %#q", (*tc.expected.Rollback).Duration)
+				}
+
+				if RollbackTimeout(tc.obj).Duration != (*tc.expected.Rollback).Duration {
+					t.Fatalf("Rollback Timeout is %#q, want %#q", RollbackTimeout(tc.obj).Duration, (*tc.expected.Rollback).Duration)
+				}
+			} else {
+				if RollbackTimeout(tc.obj) != nil {
+					t.Fatalf("Rollback Timeout is %#q, want nil", RollbackTimeout(tc.obj).Duration)
+				}
+			}
+
+			if tc.expected.Uninstall != nil {
+				if UninstallTimeout(tc.obj) == nil {
+					t.Fatalf("Uninstall Timeout is nil, want %#q", (*tc.expected.Uninstall).Duration)
+				}
+
+				if UninstallTimeout(tc.obj).Duration != (*tc.expected.Uninstall).Duration {
+					t.Fatalf("Uninstall Timeout is %#q, want %#q", UninstallTimeout(tc.obj).Duration, (*tc.expected.Uninstall).Duration)
+				}
+			} else {
+				if UninstallTimeout(tc.obj) != nil {
+					t.Fatalf("Uninstall Timeout is %#q, want nil", UninstallTimeout(tc.obj).Duration)
+				}
+			}
+
+			if tc.expected.Upgrade != nil {
+				if UpgradeTimeout(tc.obj) == nil {
+					t.Fatalf("Upgrade Timeout is nil, want %#q", (*tc.expected.Upgrade).Duration)
+				}
+
+				if UpgradeTimeout(tc.obj).Duration != (*tc.expected.Upgrade).Duration {
+					t.Fatalf("Upgrade Timeout is %#q, want %#q", UpgradeTimeout(tc.obj).Duration, (*tc.expected.Upgrade).Duration)
+				}
+			} else {
+				if UpgradeTimeout(tc.obj) != nil {
+					t.Fatalf("Upgrade Timeout is %#q, want nil", UpgradeTimeout(tc.obj).Duration)
+				}
 			}
 		})
 	}

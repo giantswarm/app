@@ -5,6 +5,8 @@ import (
 	"strings"
 	"time"
 
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 	"github.com/giantswarm/apiextensions-application/api/v1alpha1"
 	"github.com/giantswarm/k8smetadata/pkg/annotation"
 	"github.com/giantswarm/k8smetadata/pkg/label"
@@ -126,6 +128,10 @@ func InstallSkipCRDs(customResource v1alpha1.App) bool {
 	return customResource.Spec.Install.SkipCRDs
 }
 
+func InstallTimeout(customResource v1alpha1.App) *metav1.Duration {
+	return customResource.Spec.Install.Timeout
+}
+
 func IsAppCordoned(customResource v1alpha1.App) bool {
 	_, reasonOk := customResource.Annotations[annotation.AppOperatorCordonReason]
 	_, untilOk := customResource.Annotations[annotation.AppOperatorCordonUntil]
@@ -190,6 +196,10 @@ func ReleaseName(customResource v1alpha1.App) string {
 	return customResource.Spec.Name
 }
 
+func RollbackTimeout(customResource v1alpha1.App) *metav1.Duration {
+	return customResource.Spec.Rollback.Timeout
+}
+
 func ToApp(v interface{}) (v1alpha1.App, error) {
 	customResource, ok := v.(*v1alpha1.App)
 	if !ok {
@@ -201,6 +211,14 @@ func ToApp(v interface{}) (v1alpha1.App, error) {
 	}
 
 	return *customResource, nil
+}
+
+func UninstallTimeout(customResource v1alpha1.App) *metav1.Duration {
+	return customResource.Spec.Uninstall.Timeout
+}
+
+func UpgradeTimeout(customResource v1alpha1.App) *metav1.Duration {
+	return customResource.Spec.Upgrade.Timeout
 }
 
 func UserConfigMapName(customResource v1alpha1.App) string {
