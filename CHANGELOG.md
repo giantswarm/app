@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Added
 
-- Adding support for `timeout` installation option in App CR.
+- Adding support for timeout fields in the App CR.
 
 ## [6.14.0] - 2022-09-13
 
