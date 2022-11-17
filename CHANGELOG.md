@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.15.1] - 2022-11-17
+
 ### Changed
 
 - Adapt ClusterSingleton for CAPI.
@@ -402,7 +404,8 @@ since there can be a delay creating them on cluster creation.
 
 - First release
 
-[Unreleased]: https://github.com/giantswarm/app/compare/v6.15.0...HEAD
+[Unreleased]: https://github.com/giantswarm/app/compare/v6.15.1...HEAD
+[6.15.1]: https://github.com/giantswarm/app/compare/v6.15.0...v6.15.1
 [6.15.0]: https://github.com/giantswarm/app/compare/v6.14.0...v6.15.0
 [6.14.0]: https://github.com/giantswarm/app/compare/v6.13.0...v6.14.0
 [6.13.0]: https://github.com/giantswarm/app/compare/v6.12.0...v6.13.0
