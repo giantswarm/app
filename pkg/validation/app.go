@@ -369,7 +369,7 @@ func (v *Validator) validateMetadataConstraints(ctx context.Context, cr v1alpha1
 		if app.Spec.Name == cr.Spec.Name {
 			if isClusterSingleton(entry, cr, app) {
 				return microerror.Maskf(validationError, "app %#q can only be installed once in cluster %#q",
-					cr.Spec.Name, cr.Namespace)
+					cr.Spec.Name, key.ClusterID(cr))
 			}
 
 			if isNamespaceSingleton(entry, cr, app) {
@@ -538,12 +538,11 @@ func contains(s []string, e string) bool {
 
 func isClusterSingleton(entry v1alpha1.AppCatalogEntry, cr, app v1alpha1.App) bool {
 	if entry.Spec.Restrictions.ClusterSingleton {
-		if key.IsInOrgNamespace(cr) &&
+		if !key.IsInOrgNamespace(cr) {
+			return true
+		} else if key.IsInOrgNamespace(cr) &&
 			key.ClusterID(cr) == key.ClusterID(app) ||
 			cr.Spec.KubeConfig.Context.Name == app.Spec.KubeConfig.Context.Name {
-			return true
-		}
-		if !key.IsInOrgNamespace(cr) {
 			return true
 		}
 	}
@@ -551,10 +550,6 @@ func isClusterSingleton(entry v1alpha1.AppCatalogEntry, cr, app v1alpha1.App) bo
 }
 
 func isNamespaceSingleton(entry v1alpha1.AppCatalogEntry, cr, app v1alpha1.App) bool {
-	if entry.Spec.Restrictions.NamespaceSingleton {
-		if app.Spec.Namespace == cr.Spec.Namespace {
-			return true
-		}
-	}
-	return false
+
+	return entry.Spec.Restrictions.NamespaceSingleton && app.Spec.Namespace == cr.Spec.Namespace
 }

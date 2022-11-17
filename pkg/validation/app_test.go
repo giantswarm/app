@@ -1194,6 +1194,7 @@ func Test_ValidateMetadataConstraints(t *testing.T) {
 					Namespace: "eggs2",
 					Labels: map[string]string{
 						label.AppOperatorVersion: "2.6.0",
+						label.Cluster:            "eggs2",
 					},
 				},
 				Spec: v1alpha1.AppSpec{
@@ -1221,6 +1222,9 @@ func Test_ValidateMetadataConstraints(t *testing.T) {
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "kiam",
 					Namespace: "eggs2",
+					Labels: map[string]string{
+						label.Cluster: "eggs2",
+					},
 				},
 				Spec: v1alpha1.AppSpec{
 					Catalog:   "giantswarm",
@@ -1248,6 +1252,9 @@ func Test_ValidateMetadataConstraints(t *testing.T) {
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "kiam",
 					Namespace: "eggs2",
+					Labels: map[string]string{
+						label.Cluster: "eggs2",
+					},
 				},
 				Spec: v1alpha1.AppSpec{
 					Catalog:   "giantswarm",
@@ -1261,6 +1268,9 @@ func Test_ValidateMetadataConstraints(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name:      "another-kiam",
 						Namespace: "eggs2",
+						Labels: map[string]string{
+							label.Cluster: "eggs2",
+						},
 					},
 					Spec: v1alpha1.AppSpec{
 						Catalog:   "giantswarm",
@@ -1289,6 +1299,9 @@ func Test_ValidateMetadataConstraints(t *testing.T) {
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "kiam",
 					Namespace: "eggs2",
+					Labels: map[string]string{
+						label.Cluster: "eggs2",
+					},
 				},
 				Spec: v1alpha1.AppSpec{
 					Catalog:   "giantswarm",
@@ -1302,6 +1315,9 @@ func Test_ValidateMetadataConstraints(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name:      "another-kiam",
 						Namespace: "eggs2",
+						Labels: map[string]string{
+							label.Cluster: "eggs2",
+						},
 					},
 					Spec: v1alpha1.AppSpec{
 						Catalog:   "giantswarm",
@@ -1314,6 +1330,9 @@ func Test_ValidateMetadataConstraints(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name:      "another-kiam-1",
 						Namespace: "eggs2",
+						Labels: map[string]string{
+							label.Cluster: "eggs2",
+						},
 					},
 					Spec: v1alpha1.AppSpec{
 						Catalog:   "giantswarm",
@@ -1342,6 +1361,9 @@ func Test_ValidateMetadataConstraints(t *testing.T) {
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "kiam",
 					Namespace: "eggs2",
+					Labels: map[string]string{
+						label.Cluster: "eggs2",
+					},
 				},
 				Spec: v1alpha1.AppSpec{
 					Catalog:   "giantswarm",
@@ -1362,6 +1384,111 @@ func Test_ValidateMetadataConstraints(t *testing.T) {
 				},
 			},
 			expectedErr: "validation error: app `kiam` can only be installed for providers [`azure`] not `aws`",
+		},
+		{
+			name: "case 5: cluster singleton constraint in org namespace",
+			obj: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "kiam",
+					Namespace: "org-test",
+					Labels: map[string]string{
+						label.Cluster: "eggs2",
+					},
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "giantswarm",
+					Name:      "kiam",
+					Namespace: "kube-system",
+					KubeConfig: v1alpha1.AppSpecKubeConfig{
+						Context: v1alpha1.AppSpecKubeConfigContext{Name: "eggs2-admin"},
+					},
+					Version: "1.4.0",
+				},
+			},
+			apps: []*v1alpha1.App{
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "another-kiam",
+						Namespace: "org-test",
+						Labels: map[string]string{
+							label.Cluster: "eggs3",
+						},
+					},
+					Spec: v1alpha1.AppSpec{
+						Catalog:   "giantswarm",
+						Name:      "kiam",
+						Namespace: "giantswarm",
+						KubeConfig: v1alpha1.AppSpecKubeConfig{
+							Context: v1alpha1.AppSpecKubeConfigContext{Name: "eggs3-admin"},
+						},
+						Version: "1.3.0-rc1",
+					},
+				},
+			},
+			catalogEntry: &v1alpha1.AppCatalogEntry{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "giantswarm-kiam-1.4.0",
+					Namespace: metav1.NamespaceDefault,
+				},
+				Spec: v1alpha1.AppCatalogEntrySpec{
+					Restrictions: &v1alpha1.AppCatalogEntrySpecRestrictions{
+						ClusterSingleton: true,
+					},
+				},
+			},
+		},
+		{
+			name: "case 6: cluster singleton constraint in org namespace",
+			obj: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "kiam",
+					Namespace: "org-test",
+					Labels: map[string]string{
+						label.Cluster: "eggs2",
+					},
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "giantswarm",
+					Name:      "kiam",
+					Namespace: "kube-system",
+					KubeConfig: v1alpha1.AppSpecKubeConfig{
+						Context: v1alpha1.AppSpecKubeConfigContext{Name: "eggs2-admin"},
+					},
+					Version: "1.4.0",
+				},
+			},
+			apps: []*v1alpha1.App{
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "another-kiam",
+						Namespace: "org-test",
+						Labels: map[string]string{
+							label.Cluster: "eggs2",
+						},
+					},
+					Spec: v1alpha1.AppSpec{
+						Catalog:   "giantswarm",
+						Name:      "kiam",
+						Namespace: "giantswarm",
+						KubeConfig: v1alpha1.AppSpecKubeConfig{
+							Context: v1alpha1.AppSpecKubeConfigContext{Name: "eggs2-admin"},
+						},
+						Version: "1.3.0-rc1",
+					},
+				},
+			},
+			catalogEntry: &v1alpha1.AppCatalogEntry{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "giantswarm-kiam-1.4.0",
+					Namespace: metav1.NamespaceDefault,
+				},
+				Spec: v1alpha1.AppCatalogEntrySpec{
+					Restrictions: &v1alpha1.AppCatalogEntrySpecRestrictions{
+						ClusterSingleton: true,
+					},
+				},
+			},
+			expectedErr: "app `kiam` can only be installed once in cluster `eggs2`",
 		},
 	}
 
