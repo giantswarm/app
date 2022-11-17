@@ -367,15 +367,14 @@ func (v *Validator) validateMetadataConstraints(ctx context.Context, cr v1alpha1
 
 	for _, app := range apps {
 		if app.Spec.Name == cr.Spec.Name {
-			if entry.Spec.Restrictions.ClusterSingleton {
+			if isClusterSingleton(entry, cr, app) {
 				return microerror.Maskf(validationError, "app %#q can only be installed once in cluster %#q",
-					cr.Spec.Name, cr.Namespace)
+					cr.Spec.Name, key.ClusterID(cr))
 			}
-			if entry.Spec.Restrictions.NamespaceSingleton {
-				if app.Spec.Namespace == cr.Spec.Namespace {
-					return microerror.Maskf(validationError, "app %#q can only be installed only once in namespace %#q",
-						cr.Spec.Name, key.Namespace(cr))
-				}
+
+			if isNamespaceSingleton(entry, cr, app) {
+				return microerror.Maskf(validationError, "app %#q can only be installed only once in namespace %#q",
+					cr.Spec.Name, key.Namespace(cr))
 			}
 		}
 	}
@@ -535,4 +534,19 @@ func contains(s []string, e string) bool {
 		}
 	}
 	return false
+}
+
+func isClusterSingleton(entry v1alpha1.AppCatalogEntry, cr, app v1alpha1.App) bool {
+	if entry.Spec.Restrictions.ClusterSingleton {
+		if !key.IsInOrgNamespace(cr) {
+			return true
+		}
+		return key.ClusterID(cr) == key.ClusterID(app) || cr.Spec.KubeConfig.Context.Name == app.Spec.KubeConfig.Context.Name
+	}
+	return false
+}
+
+func isNamespaceSingleton(entry v1alpha1.AppCatalogEntry, cr, app v1alpha1.App) bool {
+
+	return entry.Spec.Restrictions.NamespaceSingleton && app.Spec.Namespace == cr.Spec.Namespace
 }
