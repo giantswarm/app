@@ -537,16 +537,10 @@ func contains(s []string, e string) bool {
 }
 
 func isClusterSingleton(entry v1alpha1.AppCatalogEntry, cr, app v1alpha1.App) bool {
-	if entry.Spec.Restrictions.ClusterSingleton {
-		if !key.IsInOrgNamespace(cr) {
-			return true
-		} else if key.IsInOrgNamespace(cr) &&
-			key.ClusterID(cr) == key.ClusterID(app) ||
-			cr.Spec.KubeConfig.Context.Name == app.Spec.KubeConfig.Context.Name {
-			return true
-		}
+	if !key.IsInOrgNamespace(cr) {
+		return true
 	}
-	return false
+	return key.ClusterID(cr) == key.ClusterID(app) || cr.Spec.KubeConfig.Context.Name == app.Spec.KubeConfig.Context.Name
 }
 
 func isNamespaceSingleton(entry v1alpha1.AppCatalogEntry, cr, app v1alpha1.App) bool {
