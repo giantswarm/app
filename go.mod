@@ -67,6 +67,7 @@ replace (
 	github.com/prometheus/client_golang v1.7.1 => github.com/prometheus/client_golang v1.12.2
 	github.com/spf13/viper => github.com/spf13/viper v1.14.0
 	go.mongodb.org/mongo-driver v1.1.2 => go.mongodb.org/mongo-driver v1.9.1
+	golang.org/x/net v0.3.0 => golang.org/x/net v0.4.0
 	// Use fork of CAPI with Kubernetes 1.18 support.
 	sigs.k8s.io/cluster-api => github.com/giantswarm/cluster-api v0.3.10-gs
 )
