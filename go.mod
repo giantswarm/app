@@ -57,7 +57,7 @@ replace (
 	github.com/Microsoft/hcsshim v0.8.7 => github.com/Microsoft/hcsshim v0.8.10
 	github.com/bketelsen/crypt => github.com/bketelsen/crypt v0.0.5
 	github.com/dgrijalva/jwt-go => github.com/dgrijalva/jwt-go/v4 v4.0.0-preview1
-	github.com/docker/docker => github.com/moby/moby v20.10.21+incompatible
+	github.com/docker/docker => github.com/moby/moby v20.10.22+incompatible
 	github.com/gogo/protobuf v1.3.1 => github.com/gogo/protobuf v1.3.2
 	github.com/gorilla/websocket => github.com/gorilla/websocket v1.5.0
 	github.com/miekg/dns v1.0.14 => github.com/miekg/dns v1.1.50
