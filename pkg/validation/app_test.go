@@ -771,6 +771,47 @@ func Test_ValidateApp(t *testing.T) {
 			expectedErr: "validation error: user configmap must be named `kiam-user-values` for app in default catalog",
 		},
 		{
+			name: "spec.userConfig.configMap.name without the cluster prefix is allowed",
+			obj: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "demo01-observability-bundle",
+					Namespace: "demo01",
+					Labels: map[string]string{
+						label.AppOperatorVersion: "0.0.0",
+						label.Cluster:            "demo01",
+					},
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "default",
+					Name:      "observability-bundle",
+					Namespace: "demo01",
+					KubeConfig: v1alpha1.AppSpecKubeConfig{
+						InCluster: false,
+						Secret: v1alpha1.AppSpecKubeConfigSecret{
+							Name:      "demo01-kubeconfig",
+							Namespace: "demo01",
+						},
+					},
+					UserConfig: v1alpha1.AppSpecUserConfig{
+						ConfigMap: v1alpha1.AppSpecUserConfigConfigMap{
+							Name:      "observability-bundle-user-values",
+							Namespace: "demo01",
+						},
+					},
+					Version: "1.2.2",
+				},
+			},
+			catalogs: []*v1alpha1.Catalog{
+				newTestCatalog("default", "giantswarm"),
+			},
+			configMaps: []*corev1.ConfigMap{
+				newTestConfigMap("observability-bundle-user-values", "demo01"),
+			},
+			secrets: []*corev1.Secret{
+				newTestSecret("demo01-kubeconfig", "demo01"),
+			},
+		},
+		{
 			name: "spec.userConfig.secret.name incorrect for default catalog app",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
@@ -800,6 +841,45 @@ func Test_ValidateApp(t *testing.T) {
 				newTestCatalog("default", "giantswarm"),
 			},
 			expectedErr: "validation error: user secret must be named `kiam-user-secrets` for app in default catalog",
+		},
+		{
+			name: "spec.userConfig.secret.name without the cluster prefix is allowed",
+			obj: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "demo01-observability-bundle",
+					Namespace: "demo01",
+					Labels: map[string]string{
+						label.AppOperatorVersion: "0.0.0",
+						label.Cluster:            "demo01",
+					},
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "default",
+					Name:      "observability-bundle",
+					Namespace: "demo01",
+					KubeConfig: v1alpha1.AppSpecKubeConfig{
+						InCluster: false,
+						Secret: v1alpha1.AppSpecKubeConfigSecret{
+							Name:      "demo01-kubeconfig",
+							Namespace: "demo01",
+						},
+					},
+					UserConfig: v1alpha1.AppSpecUserConfig{
+						Secret: v1alpha1.AppSpecUserConfigSecret{
+							Name:      "observability-bundle-user-secrets",
+							Namespace: "demo01",
+						},
+					},
+					Version: "1.2.2",
+				},
+			},
+			catalogs: []*v1alpha1.Catalog{
+				newTestCatalog("default", "giantswarm"),
+			},
+			secrets: []*corev1.Secret{
+				newTestSecret("demo01-kubeconfig", "demo01"),
+				newTestSecret("observability-bundle-user-secrets", "demo01"),
+			},
 		},
 		{
 			name: "metadata.name exceeds max length",
