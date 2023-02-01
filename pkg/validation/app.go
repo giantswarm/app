@@ -3,6 +3,7 @@ package validation
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/giantswarm/apiextensions-application/api/v1alpha1"
 	"github.com/giantswarm/k8smetadata/pkg/label"
@@ -397,8 +398,36 @@ func (v *Validator) validateUserConfig(ctx context.Context, cr v1alpha1.App) err
 		// managed by cluster-operator. So we don't need to restrict
 		// the name.
 		if key.CatalogName(cr) == defaultCatalogName && key.AppName(cr) != nginxIngressControllerAppName {
+			// This check is for `cluster-operator` only. For CAPI clusters, that does not rely on
+			// `cluster-operator`, the names could be any, but since it hasn't been conditioned earlier,
+			// making the whole function conditional now, when CAPI is well-established, may have some
+			// hard-to-predict consequences. Hence it is safer to let the function operate as usual,
+			// but in addition put some extra conditions like below.
+
+			// User ConfigMap name must, in general, match the '<App_CR_name>-user-values',
+			// with one exception below.
 			configMapName := fmt.Sprintf("%s-user-values", cr.Name)
-			if key.UserConfigMapName(cr) != configMapName {
+
+			nameMismatch := key.UserConfigMapName(cr) != configMapName
+
+			// The Cluster Operator may be told to create in-cluster app (aka bundle) for the WC,
+			// what requires special naming, like adding prefix or suffix, because otherwise a conflict
+			// may arise in within the MC, see:
+			// https://github.com/giantswarm/cluster-operator/blob/1681bd32d19e4fda44993d7629eed227ff3cdc59/service/controller/resource/app/desired.go#L216,
+			// Some default apps may hence carry names prefixed with the cluster ID, which are different from
+			// names of these apps as configured in the Release CR (without prefix). This is a problem, because
+			// Cluster Operator uses Release CR-originated names, to define user ConfigMap names. This in turn,
+			// fails the above condition, so another check is needed against name without the prefix.
+			if !key.IsInOrgNamespace(cr) && key.ClusterLabel(cr) != "" {
+				configMapName = strings.TrimPrefix(
+					configMapName,
+					fmt.Sprintf("%s-", key.ClusterLabel(cr)),
+				)
+
+				nameMismatch = nameMismatch && key.UserConfigMapName(cr) != configMapName
+			}
+
+			if nameMismatch {
 				return microerror.Maskf(validationError, "user configmap must be named %#q for app in default catalog", configMapName)
 			}
 		}
@@ -413,8 +442,36 @@ func (v *Validator) validateUserConfig(ctx context.Context, cr v1alpha1.App) err
 
 	if key.UserSecretName(cr) != "" {
 		if key.CatalogName(cr) == defaultCatalogName {
+			// This check is for `cluster-operator` only. For CAPI clusters, that does not rely on
+			// `cluster-operator`, the names could be any, but since it hasn't been conditioned earlier,
+			// making the whole function conditional now, when CAPI is well-established, may have some
+			// hard-to-predict consequences. Hence it is safer to let the function operate as usual,
+			// but in addition put some extra conditions like below.
+
+			// User Secret name must, in general, match the '<App_CR_name>-user-secrets',
+			// with one exception below.
 			secretName := fmt.Sprintf("%s-user-secrets", cr.Name)
-			if key.UserSecretName(cr) != secretName {
+
+			nameMismatch := key.UserSecretName(cr) != secretName
+
+			// The Cluster Operator may be told to create in-cluster app (aka bundle) for the WC,
+			// what requires special naming, like adding prefix or suffix, because otherwise a conflict
+			// may arise in within the MC, see:
+			// https://github.com/giantswarm/cluster-operator/blob/1681bd32d19e4fda44993d7629eed227ff3cdc59/service/controller/resource/app/desired.go#L216,
+			// Some default apps may hence carry names prefixed with the cluster ID, which are different from
+			// names of these apps as configured in the Release CR (without prefix). This is a problem, because
+			// Cluster Operator uses Release CR-originated names, to define user Secret names. This in turn,
+			// fails the above condition, so another check is needed against name without the prefix.
+			if !key.IsInOrgNamespace(cr) && key.ClusterLabel(cr) != "" {
+				secretName = strings.TrimPrefix(
+					secretName,
+					fmt.Sprintf("%s-", key.ClusterLabel(cr)),
+				)
+
+				nameMismatch = nameMismatch && key.UserSecretName(cr) != secretName
+			}
+
+			if nameMismatch {
 				return microerror.Maskf(validationError, "user secret must be named %#q for app in default catalog", secretName)
 			}
 		}
