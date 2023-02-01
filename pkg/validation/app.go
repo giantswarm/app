@@ -410,9 +410,11 @@ func (v *Validator) validateUserConfig(ctx context.Context, cr v1alpha1.App) err
 
 			nameMismatch := key.UserConfigMapName(cr) != configMapName
 
-			// As the result of misconfiguration for the legacy clusters, see
+			// The Cluster Operator may be told to create in-cluster app (aka bundle) for the WC,
+			// what requires special naming, like adding prefix or suffix, because otherwise a conflict
+			// may arise in within the MC, see:
 			// https://github.com/giantswarm/cluster-operator/blob/1681bd32d19e4fda44993d7629eed227ff3cdc59/service/controller/resource/app/desired.go#L216,
-			// some default apps may carry names prefixed with the cluster ID, which are different from
+			// Some default apps may hence carry names prefixed with the cluster ID, which are different from
 			// names of these apps as configured in the Release CR (without prefix). This is a problem, because
 			// Cluster Operator uses Release CR-originated names, to define user ConfigMap names. This in turn,
 			// fails the above condition, so another check is needed against name without the prefix.
@@ -452,9 +454,11 @@ func (v *Validator) validateUserConfig(ctx context.Context, cr v1alpha1.App) err
 
 			nameMismatch := key.UserSecretName(cr) != secretName
 
-			// As the result of misconfiguration for the legacy clusters, see
+			// The Cluster Operator may be told to create in-cluster app (aka bundle) for the WC,
+			// what requires special naming, like adding prefix or suffix, because otherwise a conflict
+			// may arise in within the MC, see:
 			// https://github.com/giantswarm/cluster-operator/blob/1681bd32d19e4fda44993d7629eed227ff3cdc59/service/controller/resource/app/desired.go#L216,
-			// some default apps may carry names prefixed with the cluster ID, which are different from
+			// Some default apps may hence carry names prefixed with the cluster ID, which are different from
 			// names of these apps as configured in the Release CR (without prefix). This is a problem, because
 			// Cluster Operator uses Release CR-originated names, to define user Secret names. This in turn,
 			// fails the above condition, so another check is needed against name without the prefix.
