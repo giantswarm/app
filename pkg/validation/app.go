@@ -11,6 +11,7 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
+	"k8s.io/apimachinery/pkg/labels"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/giantswarm/app/v6/pkg/key"
@@ -348,13 +349,23 @@ func (v *Validator) validateMetadataConstraints(ctx context.Context, cr v1alpha1
 
 	var apps []v1alpha1.App
 	if entry.Spec.Restrictions.ClusterSingleton || entry.Spec.Restrictions.NamespaceSingleton {
-		fieldSelector, err := fields.ParseSelector(fmt.Sprintf("metadata.name!=%s", cr.Name))
+
+		var labelSelector labels.Selector
+		if key.IsInOrgNamespace(cr) {
+			labelSelector, err = labels.Parse(fmt.Sprintf("%s=%s", label.Cluster, key.ClusterID(cr)))
+			if err != nil {
+				return microerror.Mask(err)
+			}
+		}
+
+		fieldSelector, err := fields.ParseSelector(fmt.Sprintf("metadata.name!=%s", cr.Spec.Name))
 		if err != nil {
 			return microerror.Mask(err)
 		}
 
 		lo := client.ListOptions{
 			FieldSelector: fieldSelector,
+			LabelSelector: labelSelector,
 			Namespace:     cr.Namespace,
 		}
 		var appList v1alpha1.AppList
@@ -367,16 +378,22 @@ func (v *Validator) validateMetadataConstraints(ctx context.Context, cr v1alpha1
 	}
 
 	for _, app := range apps {
-		if app.Spec.Name == cr.Spec.Name {
-			if isClusterSingleton(entry, cr, app) {
-				return microerror.Maskf(validationError, "app %#q can only be installed once in cluster %#q",
-					cr.Spec.Name, key.ClusterID(cr))
-			}
+		if app.Spec.Name != cr.Spec.Name {
+			continue
+		}
 
-			if isNamespaceSingleton(entry, cr, app) {
-				return microerror.Maskf(validationError, "app %#q can only be installed only once in namespace %#q",
-					cr.Spec.Name, key.Namespace(cr))
-			}
+		if entry.Spec.Restrictions.ClusterSingleton {
+			return microerror.Maskf(validationError, "app %#q can only be installed once in cluster %#q",
+				cr.Spec.Name, key.ClusterID(cr))
+		}
+
+		if !entry.Spec.Restrictions.NamespaceSingleton {
+			continue
+		}
+
+		if app.Spec.Namespace == cr.Spec.Namespace {
+			return microerror.Maskf(validationError, "app %#q can only be installed only once in namespace %#q",
+				cr.Spec.Name, key.Namespace(cr))
 		}
 	}
 
@@ -591,19 +608,4 @@ func contains(s []string, e string) bool {
 		}
 	}
 	return false
-}
-
-func isClusterSingleton(entry v1alpha1.AppCatalogEntry, cr, app v1alpha1.App) bool {
-	if entry.Spec.Restrictions.ClusterSingleton {
-		if !key.IsInOrgNamespace(cr) {
-			return true
-		}
-		return key.ClusterID(cr) == key.ClusterID(app) || cr.Spec.KubeConfig.Context.Name == app.Spec.KubeConfig.Context.Name
-	}
-	return false
-}
-
-func isNamespaceSingleton(entry v1alpha1.AppCatalogEntry, cr, app v1alpha1.App) bool {
-
-	return entry.Spec.Restrictions.NamespaceSingleton && app.Spec.Namespace == cr.Spec.Namespace
 }

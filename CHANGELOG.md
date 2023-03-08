@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Account for ClusterSingleton and NamespaceSingleton for CAPI clusters.
+
 ## [6.15.2] - 2023-02-01
 
 ## [6.15.1] - 2022-11-17
