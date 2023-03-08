@@ -1570,6 +1570,114 @@ func Test_ValidateMetadataConstraints(t *testing.T) {
 			},
 			expectedErr: "app `kiam` can only be installed once in cluster `eggs2`",
 		},
+		{
+			name: "case 7: namespace singleton constraint in org namespace (same cluster)",
+			obj: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "kiam-zero",
+					Namespace: "org-test",
+					Labels: map[string]string{
+						label.Cluster: "eggs2",
+					},
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "giantswarm",
+					Name:      "kiam",
+					Namespace: "kube-system",
+					Version:   "1.4.0",
+				},
+			},
+			apps: []*v1alpha1.App{
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "kiam-good",
+						Namespace: "org-test",
+						Labels: map[string]string{
+							label.Cluster: "eggs2",
+						},
+					},
+					Spec: v1alpha1.AppSpec{
+						Catalog:   "giantswarm",
+						Name:      "kiam",
+						Namespace: "giantswarm",
+						Version:   "1.4.0",
+					},
+				},
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "kiam-bad", // this is being installed to the same, `kube-system` namespace
+						Namespace: "org-test",
+						Labels: map[string]string{
+							label.Cluster: "eggs2",
+						},
+					},
+					Spec: v1alpha1.AppSpec{
+						Catalog:   "giantswarm",
+						Name:      "kiam",
+						Namespace: "kube-system",
+						Version:   "1.4.0",
+					},
+				},
+			},
+			catalogEntry: &v1alpha1.AppCatalogEntry{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "giantswarm-kiam-1.4.0",
+					Namespace: metav1.NamespaceDefault,
+				},
+				Spec: v1alpha1.AppCatalogEntrySpec{
+					Restrictions: &v1alpha1.AppCatalogEntrySpecRestrictions{
+						NamespaceSingleton: true,
+					},
+				},
+			},
+			expectedErr: "validation error: app `kiam` can only be installed only once in namespace `kube-system`",
+		},
+		{
+			name: "case 8: namespace singleton constraint in org namespace (different clusters)",
+			obj: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "kiam-zero",
+					Namespace: "org-test",
+					Labels: map[string]string{
+						label.Cluster: "eggs2",
+					},
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "giantswarm",
+					Name:      "kiam",
+					Namespace: "kube-system",
+					Version:   "1.4.0",
+				},
+			},
+			apps: []*v1alpha1.App{
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "kiam-good",
+						Namespace: "org-test",
+						Labels: map[string]string{
+							label.Cluster: "eggs3",
+						},
+					},
+					Spec: v1alpha1.AppSpec{
+						Catalog:   "giantswarm",
+						Name:      "kiam",
+						Namespace: "kube-system",
+						Version:   "1.4.0",
+					},
+				},
+			},
+			catalogEntry: &v1alpha1.AppCatalogEntry{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "giantswarm-kiam-1.4.0",
+					Namespace: metav1.NamespaceDefault,
+				},
+				Spec: v1alpha1.AppCatalogEntrySpec{
+					Restrictions: &v1alpha1.AppCatalogEntrySpecRestrictions{
+						NamespaceSingleton: true,
+					},
+				},
+			},
+		},
 	}
 
 	for _, tc := range tests {
