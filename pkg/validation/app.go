@@ -383,8 +383,13 @@ func (v *Validator) validateMetadataConstraints(ctx context.Context, cr v1alpha1
 		}
 
 		if entry.Spec.Restrictions.ClusterSingleton {
+			clusterId := key.ClusterID(cr)
+
+			if clusterId == "" {
+				clusterId = cr.Namespace
+			}
 			return microerror.Maskf(validationError, "app %#q can only be installed once in cluster %#q",
-				cr.Spec.Name, key.ClusterID(cr))
+				cr.Spec.Name, clusterId)
 		}
 
 		if !entry.Spec.Restrictions.NamespaceSingleton {

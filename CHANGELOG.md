@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Getting the cluster ID for all the clusters types.
+
 ## [6.15.3] - 2023-03-08
 
 ### Changed
