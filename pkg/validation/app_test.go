@@ -1332,9 +1332,6 @@ func Test_ValidateMetadataConstraints(t *testing.T) {
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "kiam",
 					Namespace: "eggs2",
-					Labels: map[string]string{
-						label.Cluster: "eggs2",
-					},
 				},
 				Spec: v1alpha1.AppSpec{
 					Catalog:   "giantswarm",
@@ -1348,9 +1345,6 @@ func Test_ValidateMetadataConstraints(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name:      "another-kiam",
 						Namespace: "eggs2",
-						Labels: map[string]string{
-							label.Cluster: "eggs2",
-						},
 					},
 					Spec: v1alpha1.AppSpec{
 						Catalog:   "giantswarm",
@@ -1379,9 +1373,6 @@ func Test_ValidateMetadataConstraints(t *testing.T) {
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "kiam",
 					Namespace: "eggs2",
-					Labels: map[string]string{
-						label.Cluster: "eggs2",
-					},
 				},
 				Spec: v1alpha1.AppSpec{
 					Catalog:   "giantswarm",
@@ -1395,9 +1386,6 @@ func Test_ValidateMetadataConstraints(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name:      "another-kiam",
 						Namespace: "eggs2",
-						Labels: map[string]string{
-							label.Cluster: "eggs2",
-						},
 					},
 					Spec: v1alpha1.AppSpec{
 						Catalog:   "giantswarm",
