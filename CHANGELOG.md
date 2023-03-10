@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.15.5] - 2023-03-10
+
 ### Fixed
 
 - Fix wrong field selector.
@@ -422,7 +424,8 @@ since there can be a delay creating them on cluster creation.
 
 - First release
 
-[Unreleased]: https://github.com/giantswarm/app/compare/v6.15.4...HEAD
+[Unreleased]: https://github.com/giantswarm/app/compare/v6.15.5...HEAD
+[6.15.5]: https://github.com/giantswarm/app/compare/v6.15.4...v6.15.5
 [6.15.4]: https://github.com/giantswarm/app/compare/v6.15.3...v6.15.4
 [6.15.3]: https://github.com/giantswarm/app/compare/v6.15.2...v6.15.3
 [6.15.2]: https://github.com/giantswarm/app/compare/v6.15.1...v6.15.2
