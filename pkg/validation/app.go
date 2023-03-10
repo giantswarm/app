@@ -358,7 +358,7 @@ func (v *Validator) validateMetadataConstraints(ctx context.Context, cr v1alpha1
 			}
 		}
 
-		fieldSelector, err := fields.ParseSelector(fmt.Sprintf("metadata.name!=%s", cr.Spec.Name))
+		fieldSelector, err := fields.ParseSelector(fmt.Sprintf("metadata.name!=%s", cr.Name))
 		if err != nil {
 			return microerror.Mask(err)
 		}
