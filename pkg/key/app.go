@@ -18,6 +18,7 @@ const (
 	// LegacyAppVersionLabel was used for app CRs deployed with Helm 2.
 	// We now always default the value for this label.
 	LegacyAppVersionLabel = "1.0.0"
+	UniqueAppVersionLabel = "0.0.0"
 )
 
 func AppConfigMapName(customResource v1alpha1.App) string {

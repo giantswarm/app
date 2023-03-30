@@ -1003,7 +1003,7 @@ func Test_ValidateApp(t *testing.T) {
 					Name:      "kiam",
 					Namespace: "org-eggs2",
 					Labels: map[string]string{
-						label.AppOperatorVersion: "2.6.0",
+						label.AppOperatorVersion: "0.0.0",
 					},
 				},
 				Spec: v1alpha1.AppSpec{
@@ -1028,7 +1028,7 @@ func Test_ValidateApp(t *testing.T) {
 					Name:      "kiam",
 					Namespace: "eggs2",
 					Labels: map[string]string{
-						label.AppOperatorVersion: "2.6.0",
+						label.AppOperatorVersion: "0.0.0",
 					},
 				},
 				Spec: v1alpha1.AppSpec{
@@ -1053,7 +1053,7 @@ func Test_ValidateApp(t *testing.T) {
 					Name:      "kiam",
 					Namespace: "org-eggs2",
 					Labels: map[string]string{
-						label.AppOperatorVersion: "2.6.0",
+						label.AppOperatorVersion: "0.0.0",
 					},
 				},
 				Spec: v1alpha1.AppSpec{
