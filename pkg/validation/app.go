@@ -26,6 +26,7 @@ const (
 	namespaceNotFoundReasonTemplate   = "namespace is not specified for %s %#q"
 	labelInvalidValueTemplate         = "label %#q has invalid value %#q"
 	labelNotFoundTemplate             = "label %#q not found"
+	labelInClusterAppTemplate         = "label %#q must be set to `0.0.0` for in-cluster app"
 	resourceNotFoundTemplate          = "%s %#q in namespace %#q not found"
 
 	defaultCatalogName            = "default"
@@ -301,6 +302,9 @@ func (v *Validator) validateClusterLabels(ctx context.Context, cr v1alpha1.App) 
 	if key.VersionLabel(cr) == key.LegacyAppVersionLabel {
 		return microerror.Maskf(validationError, labelInvalidValueTemplate, label.AppOperatorVersion, key.VersionLabel(cr))
 	}
+	if key.InCluster(cr) && key.VersionLabel(cr) != key.UniqueAppVersionLabel {
+		return microerror.Maskf(validationError, labelInClusterAppTemplate, label.AppOperatorVersion)
+	}
 
 	return nil
 }
@@ -308,6 +312,9 @@ func (v *Validator) validateClusterLabels(ctx context.Context, cr v1alpha1.App) 
 func (v *Validator) validateOrgLabels(ctx context.Context, cr v1alpha1.App) error {
 	if key.ClusterLabel(cr) == "" {
 		return microerror.Maskf(validationError, labelNotFoundTemplate, label.Cluster)
+	}
+	if key.InCluster(cr) && key.VersionLabel(cr) != key.UniqueAppVersionLabel {
+		return microerror.Maskf(validationError, labelInClusterAppTemplate, label.AppOperatorVersion)
 	}
 
 	return nil
