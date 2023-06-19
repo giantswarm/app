@@ -16,62 +16,33 @@ func Test_ClusterConfigMapName(t *testing.T) {
 		expectedValue string
 	}{
 		{
-			name: "vintage non-NGINX",
+			name: "Vintage",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "hello-world",
-					Namespace: "demowc",
+					Namespace: "demo",
 				},
 				Spec: v1alpha1.AppSpec{
-					Name: "hello-world-app",
+					Name: "hello-world",
 				},
 			},
-			expectedValue: "demowc-cluster-values",
+			expectedValue: "demo-cluster-values",
 		},
 		{
-			name: "vintage NGINX",
-			obj: v1alpha1.App{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "nginx",
-					Namespace: "demowc",
-				},
-				Spec: v1alpha1.AppSpec{
-					Name: nginxIngressControllerAppName,
-				},
-			},
-			expectedValue: ingressControllerConfigMapName,
-		},
-		{
-			name: "CAPx non-NGINX",
+			name: "CAPI",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "hello-world",
-					Namespace: "org-demoorg",
+					Namespace: "org-demo",
 					Labels: map[string]string{
-						label.Cluster: "demowc",
+						label.Cluster: "demo",
 					},
 				},
 				Spec: v1alpha1.AppSpec{
-					Name: "hello-world-app",
+					Name: "hello-world",
 				},
 			},
-			expectedValue: "demowc-cluster-values",
-		},
-		{
-			name: "CAPx NGINX",
-			obj: v1alpha1.App{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "hello-world",
-					Namespace: "org-demoorg",
-					Labels: map[string]string{
-						label.Cluster: "demowc",
-					},
-				},
-				Spec: v1alpha1.AppSpec{
-					Name: nginxIngressControllerAppName,
-				},
-			},
-			expectedValue: "demowc-cluster-values",
+			expectedValue: "demo-cluster-values",
 		},
 	}
 

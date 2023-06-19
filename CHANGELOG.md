@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+- App: Remove `nginx-ingress-controller-app` exceptions. ([#294](https://github.com/giantswarm/app/pull/294))
+
 ## [6.15.6] - 2023-03-30
 
 ### Added
