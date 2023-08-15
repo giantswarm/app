@@ -1,4 +1,4 @@
-module github.com/giantswarm/app/v6
+module github.com/giantswarm/app/v7
 
 go 1.19
 
