@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [7.0.0] - 2023-08-15
+
+### Removed
+
+- App: Remove `nginx-ingress-controller-app` exceptions. ([#294](https://github.com/giantswarm/app/pull/294))
+
+## [6.15.6] - 2023-03-30
+
+### Added
+
+- Validation for unique App Operator version label for in-cluster apps.
+
 ## [6.15.5] - 2023-03-10
 
 ### Fixed
@@ -424,7 +436,9 @@ since there can be a delay creating them on cluster creation.
 
 - First release
 
-[Unreleased]: https://github.com/giantswarm/app/compare/v6.15.5...HEAD
+[Unreleased]: https://github.com/giantswarm/app/compare/v7.0.0...HEAD
+[7.0.0]: https://github.com/giantswarm/app/compare/v6.15.6...v7.0.0
+[6.15.6]: https://github.com/giantswarm/app/compare/v6.15.5...v6.15.6
 [6.15.5]: https://github.com/giantswarm/app/compare/v6.15.4...v6.15.5
 [6.15.4]: https://github.com/giantswarm/app/compare/v6.15.3...v6.15.4
 [6.15.3]: https://github.com/giantswarm/app/compare/v6.15.2...v6.15.3

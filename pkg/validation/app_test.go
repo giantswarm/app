@@ -932,39 +932,6 @@ func Test_ValidateApp(t *testing.T) {
 			expectedErr: "validation error: label `app-operator.giantswarm.io/version` has invalid value `1.0.0`",
 		},
 		{
-			name: "nginx user values configmap name is not restricted",
-			obj: v1alpha1.App{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "kiam",
-					Namespace: "giantswarm",
-					Labels: map[string]string{
-						label.AppOperatorVersion: "0.0.0",
-					},
-				},
-				Spec: v1alpha1.AppSpec{
-					Catalog:   "default",
-					Name:      "nginx-ingress-controller-app",
-					Namespace: "kube-system",
-					KubeConfig: v1alpha1.AppSpecKubeConfig{
-						InCluster: true,
-					},
-					UserConfig: v1alpha1.AppSpecUserConfig{
-						ConfigMap: v1alpha1.AppSpecUserConfigConfigMap{
-							Name:      "nginx-ingress-user-values",
-							Namespace: "eggs2",
-						},
-					},
-					Version: "1.4.0",
-				},
-			},
-			catalogs: []*v1alpha1.Catalog{
-				newTestCatalog("default", "default"),
-			},
-			configMaps: []*corev1.ConfigMap{
-				newTestConfigMap("nginx-ingress-user-values", "eggs2"),
-			},
-		},
-		{
 			name: "spec.kubeConfig.secret no name specified",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
@@ -1003,7 +970,7 @@ func Test_ValidateApp(t *testing.T) {
 					Name:      "kiam",
 					Namespace: "org-eggs2",
 					Labels: map[string]string{
-						label.AppOperatorVersion: "2.6.0",
+						label.AppOperatorVersion: "0.0.0",
 					},
 				},
 				Spec: v1alpha1.AppSpec{
@@ -1028,7 +995,7 @@ func Test_ValidateApp(t *testing.T) {
 					Name:      "kiam",
 					Namespace: "eggs2",
 					Labels: map[string]string{
-						label.AppOperatorVersion: "2.6.0",
+						label.AppOperatorVersion: "0.0.0",
 					},
 				},
 				Spec: v1alpha1.AppSpec{
@@ -1053,7 +1020,7 @@ func Test_ValidateApp(t *testing.T) {
 					Name:      "kiam",
 					Namespace: "org-eggs2",
 					Labels: map[string]string{
-						label.AppOperatorVersion: "2.6.0",
+						label.AppOperatorVersion: "0.0.0",
 					},
 				},
 				Spec: v1alpha1.AppSpec{

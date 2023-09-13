@@ -14,7 +14,7 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/giantswarm/app/v6/pkg/key"
+	"github.com/giantswarm/app/v7/pkg/key"
 )
 
 const (
@@ -26,10 +26,10 @@ const (
 	namespaceNotFoundReasonTemplate   = "namespace is not specified for %s %#q"
 	labelInvalidValueTemplate         = "label %#q has invalid value %#q"
 	labelNotFoundTemplate             = "label %#q not found"
+	labelInClusterAppTemplate         = "label %#q must be set to `0.0.0` for in-cluster app"
 	resourceNotFoundTemplate          = "%s %#q in namespace %#q not found"
 
-	defaultCatalogName            = "default"
-	nginxIngressControllerAppName = "nginx-ingress-controller-app"
+	defaultCatalogName = "default"
 
 	// nameMaxLength is 53 characters as this is the maximum allowed for Helm
 	// release names.
@@ -301,6 +301,9 @@ func (v *Validator) validateClusterLabels(ctx context.Context, cr v1alpha1.App) 
 	if key.VersionLabel(cr) == key.LegacyAppVersionLabel {
 		return microerror.Maskf(validationError, labelInvalidValueTemplate, label.AppOperatorVersion, key.VersionLabel(cr))
 	}
+	if key.InCluster(cr) && key.VersionLabel(cr) != key.UniqueAppVersionLabel {
+		return microerror.Maskf(validationError, labelInClusterAppTemplate, label.AppOperatorVersion)
+	}
 
 	return nil
 }
@@ -308,6 +311,9 @@ func (v *Validator) validateClusterLabels(ctx context.Context, cr v1alpha1.App) 
 func (v *Validator) validateOrgLabels(ctx context.Context, cr v1alpha1.App) error {
 	if key.ClusterLabel(cr) == "" {
 		return microerror.Maskf(validationError, labelNotFoundTemplate, label.Cluster)
+	}
+	if key.InCluster(cr) && key.VersionLabel(cr) != key.UniqueAppVersionLabel {
+		return microerror.Maskf(validationError, labelInClusterAppTemplate, label.AppOperatorVersion)
 	}
 
 	return nil
@@ -416,10 +422,7 @@ func (v *Validator) validateNamespaceUpdate(ctx context.Context, app, currentApp
 
 func (v *Validator) validateUserConfig(ctx context.Context, cr v1alpha1.App) error {
 	if key.UserConfigMapName(cr) != "" {
-		// NGINX Ingress Controller is no longer a pre-installed app
-		// managed by cluster-operator. So we don't need to restrict
-		// the name.
-		if key.CatalogName(cr) == defaultCatalogName && key.AppName(cr) != nginxIngressControllerAppName {
+		if key.CatalogName(cr) == defaultCatalogName {
 			// This check is for `cluster-operator` only. For CAPI clusters, that does not rely on
 			// `cluster-operator`, the names could be any, but since it hasn't been conditioned earlier,
 			// making the whole function conditional now, when CAPI is well-established, may have some
