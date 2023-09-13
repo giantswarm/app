@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 
+	"dario.cat/mergo"
 	"github.com/giantswarm/apiextensions-application/api/v1alpha1"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	"github.com/imdario/mergo"
 	"k8s.io/client-go/kubernetes"
 	"sigs.k8s.io/yaml"
 )
