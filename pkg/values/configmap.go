@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	"dario.cat/mergo"
 	"github.com/giantswarm/apiextensions-application/api/v1alpha1"
 	"github.com/giantswarm/microerror"
-	"github.com/imdario/mergo"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
