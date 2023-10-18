@@ -9,7 +9,7 @@ require (
 	github.com/giantswarm/micrologger v0.6.0
 	github.com/giantswarm/to v0.4.0
 	github.com/google/go-cmp v0.6.0
-	github.com/google/go-github/v49 v49.1.0
+	github.com/google/go-github/v56 v56.0.0
 	github.com/imdario/mergo v0.3.16
 	golang.org/x/oauth2 v0.13.0
 	k8s.io/api v0.20.15
@@ -57,7 +57,7 @@ replace (
 	github.com/Microsoft/hcsshim v0.8.7 => github.com/Microsoft/hcsshim v0.8.10
 	github.com/bketelsen/crypt => github.com/bketelsen/crypt v0.0.5
 	github.com/dgrijalva/jwt-go => github.com/dgrijalva/jwt-go/v4 v4.0.0-preview1
-	github.com/docker/docker => github.com/moby/moby v20.10.26+incompatible
+	github.com/docker/docker => github.com/moby/moby v24.0.6+incompatible
 	github.com/gogo/protobuf v1.3.1 => github.com/gogo/protobuf v1.3.2
 	github.com/gorilla/websocket => github.com/gorilla/websocket v1.5.0
 	github.com/miekg/dns v1.0.14 => github.com/miekg/dns v1.1.50
