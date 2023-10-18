@@ -8,10 +8,10 @@ require (
 	github.com/giantswarm/microerror v0.4.0
 	github.com/giantswarm/micrologger v0.6.0
 	github.com/giantswarm/to v0.4.0
-	github.com/google/go-cmp v0.5.9
+	github.com/google/go-cmp v0.6.0
 	github.com/google/go-github/v49 v49.1.0
 	github.com/imdario/mergo v0.3.16
-	golang.org/x/oauth2 v0.8.0
+	golang.org/x/oauth2 v0.13.0
 	k8s.io/api v0.20.15
 	k8s.io/apiextensions-apiserver v0.20.15
 	k8s.io/apimachinery v0.20.15
@@ -21,7 +21,7 @@ require (
 )
 
 require (
-	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/evanphx/json-patch v4.11.0+incompatible // indirect
 	github.com/go-kit/log v0.2.0 // indirect
 	github.com/go-logfmt/logfmt v0.5.1 // indirect
@@ -43,7 +43,7 @@ require (
 	golang.org/x/text v0.13.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/protobuf v1.30.0 // indirect
+	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
@@ -57,7 +57,7 @@ replace (
 	github.com/Microsoft/hcsshim v0.8.7 => github.com/Microsoft/hcsshim v0.8.10
 	github.com/bketelsen/crypt => github.com/bketelsen/crypt v0.0.5
 	github.com/dgrijalva/jwt-go => github.com/dgrijalva/jwt-go/v4 v4.0.0-preview1
-	github.com/docker/docker => github.com/moby/moby v20.10.25+incompatible
+	github.com/docker/docker => github.com/moby/moby v20.10.26+incompatible
 	github.com/gogo/protobuf v1.3.1 => github.com/gogo/protobuf v1.3.2
 	github.com/gorilla/websocket => github.com/gorilla/websocket v1.5.0
 	github.com/miekg/dns v1.0.14 => github.com/miekg/dns v1.1.50
@@ -65,7 +65,7 @@ replace (
 	github.com/opencontainers/runc v0.1.1 => github.com/opencontainers/runc v1.0.0-rc7
 	github.com/prometheus/client_golang v1.11.0 => github.com/prometheus/client_golang v1.12.2
 	github.com/prometheus/client_golang v1.7.1 => github.com/prometheus/client_golang v1.12.2
-	github.com/spf13/viper => github.com/spf13/viper v1.16.0
+	github.com/spf13/viper => github.com/spf13/viper v1.17.0
 	go.mongodb.org/mongo-driver v1.1.2 => go.mongodb.org/mongo-driver v1.9.1
 	golang.org/x/net v0.3.0 => golang.org/x/net v0.4.0
 	// Use fork of CAPI with Kubernetes 1.18 support.
