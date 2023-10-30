@@ -33,6 +33,7 @@ func Test_ChartStatus(t *testing.T) {
 }
 
 func Test_ChartConfigMapName(t *testing.T) {
+	//nolint:gosec
 	expectedName := "my-test-app-chart-values"
 
 	obj := v1alpha1.App{

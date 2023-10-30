@@ -158,6 +158,7 @@ func IsInOrgNamespace(customResource v1alpha1.App) bool {
 // resources with Flux. We still perform the validation in app-operator which
 // sets the App CR status.
 func IsManagedBy(customResource v1alpha1.App, projectName string) bool {
+	//nolint:gosec
 	if projectName != "app-admission-controller" {
 		return false
 	}
