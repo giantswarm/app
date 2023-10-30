@@ -209,6 +209,7 @@ func Test_AppStatus(t *testing.T) {
 }
 
 func Test_CatalogName(t *testing.T) {
+	//nolint:gosec
 	expectedName := "giant-swarm-catalog-name"
 
 	obj := v1alpha1.App{
