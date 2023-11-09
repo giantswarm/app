@@ -36,11 +36,11 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	golang.org/x/crypto v0.14.0 // indirect
+	golang.org/x/crypto v0.15.0 // indirect
 	golang.org/x/net v0.17.0 // indirect
-	golang.org/x/sys v0.13.0 // indirect
-	golang.org/x/term v0.13.0 // indirect
-	golang.org/x/text v0.13.0 // indirect
+	golang.org/x/sys v0.14.0 // indirect
+	golang.org/x/term v0.14.0 // indirect
+	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
@@ -54,20 +54,15 @@ require (
 )
 
 replace (
-	github.com/Microsoft/hcsshim v0.8.7 => github.com/Microsoft/hcsshim v0.8.10
-	github.com/bketelsen/crypt => github.com/bketelsen/crypt v0.0.5
 	github.com/dgrijalva/jwt-go => github.com/dgrijalva/jwt-go/v4 v4.0.0-preview1
 	github.com/docker/docker => github.com/moby/moby v24.0.7+incompatible
-	github.com/gogo/protobuf v1.3.1 => github.com/gogo/protobuf v1.3.2
+	github.com/gogo/protobuf => github.com/gogo/protobuf v1.3.2
 	github.com/gorilla/websocket => github.com/gorilla/websocket v1.5.1
-	github.com/miekg/dns v1.0.14 => github.com/miekg/dns v1.1.50
-	github.com/miekg/dns v1.1.41 => github.com/miekg/dns v1.1.50
-	github.com/opencontainers/runc v0.1.1 => github.com/opencontainers/runc v1.0.0-rc7
-	github.com/prometheus/client_golang v1.11.0 => github.com/prometheus/client_golang v1.12.2
-	github.com/prometheus/client_golang v1.7.1 => github.com/prometheus/client_golang v1.12.2
+	github.com/miekg/dns => github.com/miekg/dns v1.1.50
+	github.com/prometheus/client_golang => github.com/prometheus/client_golang v1.12.2
 	github.com/spf13/viper => github.com/spf13/viper v1.17.0
-	go.mongodb.org/mongo-driver v1.1.2 => go.mongodb.org/mongo-driver v1.9.1
-	golang.org/x/net v0.3.0 => golang.org/x/net v0.4.0
+	go.mongodb.org/mongo-driver => go.mongodb.org/mongo-driver v1.9.1
+	golang.org/x/net => golang.org/x/net v0.18.0
 	// Use fork of CAPI with Kubernetes 1.18 support.
 	sigs.k8s.io/cluster-api => github.com/giantswarm/cluster-api v0.3.10-gs
 )
