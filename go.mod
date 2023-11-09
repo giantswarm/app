@@ -23,7 +23,7 @@ require (
 require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/evanphx/json-patch v4.11.0+incompatible // indirect
-	github.com/go-kit/log v0.2.0 // indirect
+	github.com/go-kit/log v0.2.1 // indirect
 	github.com/go-logfmt/logfmt v0.5.1 // indirect
 	github.com/go-logr/logr v0.4.0 // indirect
 	github.com/go-stack/stack v1.8.1 // indirect
@@ -59,7 +59,7 @@ replace (
 	github.com/gogo/protobuf => github.com/gogo/protobuf v1.3.2
 	github.com/gorilla/websocket => github.com/gorilla/websocket v1.5.1
 	github.com/miekg/dns => github.com/miekg/dns v1.1.50
-	github.com/prometheus/client_golang => github.com/prometheus/client_golang v1.12.2
+	github.com/prometheus/client_golang => github.com/prometheus/client_golang v1.17.0
 	github.com/spf13/viper => github.com/spf13/viper v1.17.0
 	go.mongodb.org/mongo-driver => go.mongodb.org/mongo-driver v1.9.1
 	golang.org/x/net => golang.org/x/net v0.18.0
