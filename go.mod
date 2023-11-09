@@ -61,7 +61,7 @@ replace (
 	github.com/miekg/dns => github.com/miekg/dns v1.1.56
 	github.com/prometheus/client_golang => github.com/prometheus/client_golang v1.17.0
 	github.com/spf13/viper => github.com/spf13/viper v1.17.0
-	go.mongodb.org/mongo-driver => go.mongodb.org/mongo-driver v1.9.1
+	go.mongodb.org/mongo-driver => go.mongodb.org/mongo-driver v1.12.1
 	golang.org/x/net => golang.org/x/net v0.18.0
 	// Use fork of CAPI with Kubernetes 1.18 support.
 	sigs.k8s.io/cluster-api => github.com/giantswarm/cluster-api v0.3.10-gs
