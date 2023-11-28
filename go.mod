@@ -36,10 +36,10 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	golang.org/x/crypto v0.15.0 // indirect
+	golang.org/x/crypto v0.16.0 // indirect
 	golang.org/x/net v0.18.0 // indirect
-	golang.org/x/sys v0.14.0 // indirect
-	golang.org/x/term v0.14.0 // indirect
+	golang.org/x/sys v0.15.0 // indirect
+	golang.org/x/term v0.15.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
@@ -62,7 +62,7 @@ replace (
 	github.com/prometheus/client_golang => github.com/prometheus/client_golang v1.17.0
 	github.com/spf13/viper => github.com/spf13/viper v1.17.0
 	go.mongodb.org/mongo-driver => go.mongodb.org/mongo-driver v1.12.1
-	golang.org/x/net => golang.org/x/net v0.18.0
+	golang.org/x/net => golang.org/x/net v0.19.0
 	// Use fork of CAPI with Kubernetes 1.18 support.
 	sigs.k8s.io/cluster-api => github.com/giantswarm/cluster-api v0.3.10-gs
 )
