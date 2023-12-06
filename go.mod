@@ -41,7 +41,7 @@ require (
 	golang.org/x/sys v0.15.0 // indirect
 	golang.org/x/term v0.15.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
-	golang.org/x/time v0.3.0 // indirect
+	golang.org/x/time v0.5.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
@@ -60,7 +60,7 @@ replace (
 	github.com/gorilla/websocket => github.com/gorilla/websocket v1.5.1
 	github.com/miekg/dns => github.com/miekg/dns v1.1.57
 	github.com/prometheus/client_golang => github.com/prometheus/client_golang v1.17.0
-	github.com/spf13/viper => github.com/spf13/viper v1.17.0
+	github.com/spf13/viper => github.com/spf13/viper v1.18.0
 	go.mongodb.org/mongo-driver => go.mongodb.org/mongo-driver v1.12.1
 	golang.org/x/net => golang.org/x/net v0.19.0
 	// Use fork of CAPI with Kubernetes 1.18 support.
