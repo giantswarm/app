@@ -60,7 +60,7 @@ replace (
 	github.com/gorilla/websocket => github.com/gorilla/websocket v1.5.1
 	github.com/miekg/dns => github.com/miekg/dns v1.1.57
 	github.com/prometheus/client_golang => github.com/prometheus/client_golang v1.17.0
-	github.com/spf13/viper => github.com/spf13/viper v1.18.0
+	github.com/spf13/viper => github.com/spf13/viper v1.18.1
 	go.mongodb.org/mongo-driver => go.mongodb.org/mongo-driver v1.12.1
 	golang.org/x/net => golang.org/x/net v0.19.0
 	// Use fork of CAPI with Kubernetes 1.18 support.
