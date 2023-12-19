@@ -4,8 +4,8 @@ go 1.19
 
 require (
 	github.com/giantswarm/apiextensions-application v0.6.0
-	github.com/giantswarm/k8smetadata v0.13.0
-	github.com/giantswarm/microerror v0.4.0
+	github.com/giantswarm/k8smetadata v0.23.0
+	github.com/giantswarm/microerror v0.4.1
 	github.com/giantswarm/micrologger v0.6.0
 	github.com/giantswarm/to v0.4.0
 	github.com/google/go-cmp v0.6.0
@@ -64,5 +64,5 @@ replace (
 	go.mongodb.org/mongo-driver => go.mongodb.org/mongo-driver v1.13.1
 	golang.org/x/net => golang.org/x/net v0.19.0
 	// Use fork of CAPI with Kubernetes 1.18 support.
-	sigs.k8s.io/cluster-api => github.com/giantswarm/cluster-api v0.3.10-gs
+	sigs.k8s.io/cluster-api => github.com/giantswarm/cluster-api v0.4.8
 )
