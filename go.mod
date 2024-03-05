@@ -1,6 +1,8 @@
 module github.com/giantswarm/app/v7
 
-go 1.19
+go 1.21
+
+toolchain go1.22.0
 
 require (
 	github.com/giantswarm/apiextensions-application v0.6.0
@@ -9,7 +11,7 @@ require (
 	github.com/giantswarm/micrologger v0.6.0
 	github.com/giantswarm/to v0.4.0
 	github.com/google/go-cmp v0.6.0
-	github.com/google/go-github/v59 v59.0.0
+	github.com/google/go-github/v60 v60.0.0
 	github.com/imdario/mergo v0.3.16
 	golang.org/x/oauth2 v0.17.0
 	k8s.io/api v0.20.15
