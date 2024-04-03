@@ -68,3 +68,5 @@ replace (
 	// Use fork of CAPI with Kubernetes 1.18 support.
 	sigs.k8s.io/cluster-api => github.com/giantswarm/cluster-api v0.4.8
 )
+
+replace google.golang.org/protobuf v1.32.0 => google.golang.org/protobuf v1.33.0
