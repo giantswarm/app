@@ -5,7 +5,7 @@ go 1.21
 toolchain go1.22.0
 
 require (
-	github.com/giantswarm/apiextensions-application v0.6.0
+	github.com/giantswarm/apiextensions-application v0.6.1
 	github.com/giantswarm/k8smetadata v0.24.0
 	github.com/giantswarm/microerror v0.4.1
 	github.com/giantswarm/micrologger v0.6.0
@@ -44,7 +44,7 @@ require (
 	golang.org/x/term v0.19.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
-	google.golang.org/protobuf v1.32.0 // indirect
+	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
@@ -55,17 +55,17 @@ require (
 )
 
 replace (
-	github.com/dgrijalva/jwt-go => github.com/dgrijalva/jwt-go/v4 v4.0.0-preview1
+	github.com/dgrijalva/jwt-go => github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/docker/docker => github.com/moby/moby v26.0.1+incompatible
 	github.com/gogo/protobuf => github.com/gogo/protobuf v1.3.2
+	github.com/golang/protobuf => github.com/golang/protobuf v1.5.4
 	github.com/gorilla/websocket => github.com/gorilla/websocket v1.5.1
 	github.com/miekg/dns => github.com/miekg/dns v1.1.58
 	github.com/prometheus/client_golang => github.com/prometheus/client_golang v1.19.0
 	github.com/spf13/viper => github.com/spf13/viper v1.18.2
 	go.mongodb.org/mongo-driver => go.mongodb.org/mongo-driver v1.15.0
 	golang.org/x/net => golang.org/x/net v0.24.0
+	google.golang.org/protobuf v1.32.0 => google.golang.org/protobuf v1.33.0
 	// Use fork of CAPI with Kubernetes 1.18 support.
 	sigs.k8s.io/cluster-api => github.com/giantswarm/cluster-api v0.4.8
 )
-
-replace google.golang.org/protobuf v1.32.0 => google.golang.org/protobuf v1.33.0
