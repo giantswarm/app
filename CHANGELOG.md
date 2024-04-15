@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [7.0.1] - 2024-04-15
+
+- Dependency updates
+
 ## [7.0.0] - 2023-08-15
 
 ### Removed
@@ -436,7 +440,8 @@ since there can be a delay creating them on cluster creation.
 
 - First release
 
-[Unreleased]: https://github.com/giantswarm/app/compare/v7.0.0...HEAD
+[Unreleased]: https://github.com/giantswarm/app/compare/v7.0.1...HEAD
+[7.0.1]: https://github.com/giantswarm/app/compare/v7.0.0...v7.0.1
 [7.0.0]: https://github.com/giantswarm/app/compare/v6.15.6...v7.0.0
 [6.15.6]: https://github.com/giantswarm/app/compare/v6.15.5...v6.15.6
 [6.15.5]: https://github.com/giantswarm/app/compare/v6.15.4...v6.15.5
