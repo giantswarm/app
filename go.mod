@@ -56,7 +56,7 @@ require (
 
 replace (
 	github.com/dgrijalva/jwt-go => github.com/golang-jwt/jwt/v5 v5.2.1
-	github.com/docker/docker => github.com/moby/moby v26.0.2+incompatible
+	github.com/docker/docker => github.com/moby/moby v26.1.0+incompatible
 	github.com/gogo/protobuf => github.com/gogo/protobuf v1.3.2
 	github.com/golang/protobuf => github.com/golang/protobuf v1.5.4
 	github.com/gorilla/websocket => github.com/gorilla/websocket v1.5.1
