@@ -13,7 +13,7 @@ require (
 	github.com/google/go-cmp v0.6.0
 	github.com/google/go-github/v61 v61.0.0
 	github.com/imdario/mergo v0.3.16
-	golang.org/x/oauth2 v0.19.0
+	golang.org/x/oauth2 v0.20.0
 	k8s.io/api v0.20.15
 	k8s.io/apiextensions-apiserver v0.20.15
 	k8s.io/apimachinery v0.20.15
