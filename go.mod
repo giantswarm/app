@@ -61,7 +61,7 @@ replace (
 	github.com/golang/protobuf => github.com/golang/protobuf v1.5.4
 	github.com/gorilla/websocket => github.com/gorilla/websocket v1.5.1
 	github.com/miekg/dns => github.com/miekg/dns v1.1.59
-	github.com/prometheus/client_golang => github.com/prometheus/client_golang v1.19.0
+	github.com/prometheus/client_golang => github.com/prometheus/client_golang v1.19.1
 	github.com/spf13/viper => github.com/spf13/viper v1.18.2
 	go.mongodb.org/mongo-driver => go.mongodb.org/mongo-driver v1.15.0
 	golang.org/x/net => golang.org/x/net v0.25.0
