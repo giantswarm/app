@@ -39,7 +39,7 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	golang.org/x/crypto v0.24.0 // indirect
-	golang.org/x/net v0.25.0 // indirect
+	golang.org/x/net v0.26.0 // indirect
 	golang.org/x/sys v0.21.0 // indirect
 	golang.org/x/term v0.21.0 // indirect
 	golang.org/x/text v0.16.0 // indirect
@@ -60,7 +60,7 @@ replace (
 	github.com/gogo/protobuf => github.com/gogo/protobuf v1.3.2
 	github.com/golang/protobuf => github.com/golang/protobuf v1.5.4
 	github.com/gorilla/websocket => github.com/gorilla/websocket v1.5.2
-	github.com/miekg/dns => github.com/miekg/dns v1.1.59
+	github.com/miekg/dns => github.com/miekg/dns v1.1.61
 	github.com/prometheus/client_golang => github.com/prometheus/client_golang v1.19.1
 	github.com/spf13/viper => github.com/spf13/viper v1.19.0
 	go.mongodb.org/mongo-driver => go.mongodb.org/mongo-driver v1.16.0
