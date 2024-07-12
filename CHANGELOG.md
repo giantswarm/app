@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Update tests in `pkg/key/validation` for `sigs.k8s.io/controller-runtime` v0.18.4
+
 ## [7.0.2] - 2024-06-04
 
 - Dependency updates
