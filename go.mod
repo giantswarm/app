@@ -14,10 +14,10 @@ require (
 	github.com/google/go-github/v63 v63.0.0
 	github.com/imdario/mergo v0.3.16
 	golang.org/x/oauth2 v0.21.0
-	k8s.io/api v0.30.2
-	k8s.io/apiextensions-apiserver v0.30.2
-	k8s.io/apimachinery v0.30.2
-	k8s.io/client-go v0.30.2
+	k8s.io/api v0.30.3
+	k8s.io/apiextensions-apiserver v0.30.3
+	k8s.io/apimachinery v0.30.3
+	k8s.io/client-go v0.30.3
 	sigs.k8s.io/controller-runtime v0.6.5
 	sigs.k8s.io/yaml v1.4.0
 )
