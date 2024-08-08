@@ -71,7 +71,7 @@ replace (
 	github.com/miekg/dns => github.com/miekg/dns v1.1.61
 	github.com/prometheus/client_golang => github.com/prometheus/client_golang v1.19.1
 	github.com/spf13/viper => github.com/spf13/viper v1.19.0
-	go.mongodb.org/mongo-driver => go.mongodb.org/mongo-driver v1.16.0
+	go.mongodb.org/mongo-driver => go.mongodb.org/mongo-driver v1.16.1
 	golang.org/x/net => golang.org/x/net v0.28.0
 	google.golang.org/protobuf v1.32.0 => google.golang.org/protobuf v1.33.0
 	// Use fork of CAPI with Kubernetes 1.18 support.
