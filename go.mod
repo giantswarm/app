@@ -47,9 +47,9 @@ require (
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	golang.org/x/net v0.27.0 // indirect
-	golang.org/x/sys v0.25.0 // indirect
-	golang.org/x/term v0.24.0 // indirect
-	golang.org/x/text v0.18.0 // indirect
+	golang.org/x/sys v0.26.0 // indirect
+	golang.org/x/term v0.25.0 // indirect
+	golang.org/x/text v0.19.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
 	google.golang.org/protobuf v1.34.2 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
@@ -72,7 +72,7 @@ replace (
 	github.com/prometheus/client_golang => github.com/prometheus/client_golang v1.20.4
 	github.com/spf13/viper => github.com/spf13/viper v1.19.0
 	go.mongodb.org/mongo-driver => go.mongodb.org/mongo-driver v1.17.1
-	golang.org/x/net => golang.org/x/net v0.29.0
+	golang.org/x/net => golang.org/x/net v0.30.0
 	google.golang.org/protobuf v1.32.0 => google.golang.org/protobuf v1.33.0
 	// Use fork of CAPI with Kubernetes 1.18 support.
 	sigs.k8s.io/cluster-api => github.com/giantswarm/cluster-api v1.5.0
