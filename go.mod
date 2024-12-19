@@ -75,5 +75,5 @@ replace (
 	golang.org/x/net => golang.org/x/net v0.33.0
 	google.golang.org/protobuf v1.32.0 => google.golang.org/protobuf v1.33.0
 	// Use fork of CAPI with Kubernetes 1.18 support.
-	sigs.k8s.io/cluster-api => github.com/giantswarm/cluster-api v1.5.0
+	sigs.k8s.io/cluster-api => github.com/giantswarm/cluster-api v1.7.8
 )
