@@ -1083,7 +1083,7 @@ func Test_ValidateApp(t *testing.T) {
 			scheme := runtime.NewScheme()
 			_ = v1alpha1.AddToScheme(scheme)
 
-			fakeCtrlClient := fake.NewFakeClientWithScheme(scheme, g8sObjs...)
+			fakeCtrlClient := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(g8sObjs...).Build()
 
 			c := Config{
 				G8sClient: fakeCtrlClient,
@@ -1190,7 +1190,7 @@ func Test_ValidateAppUpdate(t *testing.T) {
 			scheme := runtime.NewScheme()
 			_ = v1alpha1.AddToScheme(scheme)
 
-			fakeCtrlClient := fake.NewFakeClientWithScheme(scheme)
+			fakeCtrlClient := fake.NewClientBuilder().WithScheme(scheme).Build()
 
 			c := Config{
 				G8sClient: fakeCtrlClient,
@@ -1650,7 +1650,7 @@ func Test_ValidateMetadataConstraints(t *testing.T) {
 			scheme := runtime.NewScheme()
 			_ = v1alpha1.AddToScheme(scheme)
 
-			fakeCtrlClient := fake.NewFakeClientWithScheme(scheme, g8sObjs...)
+			fakeCtrlClient := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(g8sObjs...).Build()
 
 			c := Config{
 				G8sClient: fakeCtrlClient,
@@ -1824,7 +1824,7 @@ func Test_ValidateNamespace(t *testing.T) {
 			scheme := runtime.NewScheme()
 			_ = v1alpha1.AddToScheme(scheme)
 
-			fakeCtrlClient := fake.NewFakeClientWithScheme(scheme, g8sObjs...)
+			fakeCtrlClient := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(g8sObjs...).Build()
 
 			c := Config{
 				G8sClient: fakeCtrlClient,
@@ -2157,7 +2157,7 @@ func Test_ValidateUniqueInClusterAppName(t *testing.T) {
 			scheme := runtime.NewScheme()
 			_ = v1alpha1.AddToScheme(scheme)
 
-			fakeCtrlClient := fake.NewFakeClientWithScheme(scheme, g8sObjs...)
+			fakeCtrlClient := fake.NewClientBuilder().WithScheme(sscheme).WithRuntimeObjects(g8sObjs...).Build()
 
 			c := Config{
 				G8sClient: fakeCtrlClient,
