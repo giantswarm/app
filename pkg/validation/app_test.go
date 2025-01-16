@@ -15,6 +15,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgofake "k8s.io/client-go/kubernetes/fake"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake" //nolint:staticcheck
 )
 
@@ -1660,10 +1661,10 @@ func Test_ValidateMetadataConstraints(t *testing.T) {
 			}
 
 			fakeCtrlClient := fake.NewClientBuilder().
-								WithScheme(scheme).
-								WithRuntimeObjects(g8sObjs...).
-								WithIndex(&v1alpha1.App{}, "metadata.name", appNameIndexer).
-								Build()
+					WithScheme(scheme).
+					WithRuntimeObjects(g8sObjs...).
+					WithIndex(&v1alpha1.App{}, "metadata.name", appNameIndexer).
+					Build()
 
 			c := Config{
 				G8sClient: fakeCtrlClient,
