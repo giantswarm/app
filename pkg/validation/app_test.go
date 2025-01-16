@@ -2157,7 +2157,7 @@ func Test_ValidateUniqueInClusterAppName(t *testing.T) {
 			scheme := runtime.NewScheme()
 			_ = v1alpha1.AddToScheme(scheme)
 
-			fakeCtrlClient := fake.NewClientBuilder().WithScheme(sscheme).WithRuntimeObjects(g8sObjs...).Build()
+			fakeCtrlClient := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(g8sObjs...).Build()
 
 			c := Config{
 				G8sClient: fakeCtrlClient,
