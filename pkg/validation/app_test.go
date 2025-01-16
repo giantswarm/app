@@ -1084,7 +1084,20 @@ func Test_ValidateApp(t *testing.T) {
 			scheme := runtime.NewScheme()
 			_ = v1alpha1.AddToScheme(scheme)
 
-			fakeCtrlClient := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(g8sObjs...).Build()
+			appNameIndexer := func(obj client.Object) []string {
+				app, ok := obj.(*v1alpha1.App)
+				if !ok {
+					t.Fatalf("got %T object, want %T object", obj, v1alpha1.App{})
+				}
+
+				return []string{app.Name}
+			}
+
+			fakeCtrlClient := fake.NewClientBuilder().
+				WithScheme(scheme).
+				WithRuntimeObjects(g8sObjs...).
+				WithIndex(&v1alpha1.App{}, "metadata.name", appNameIndexer).
+				Build()
 
 			c := Config{
 				G8sClient: fakeCtrlClient,
