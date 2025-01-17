@@ -21,6 +21,17 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client/fake" //nolint:staticcheck
 )
 
+// This client has been added as a way to work around the error coming from here:
+// https://github.com/kubernetes-sigs/controller-runtime/blob/v0.16.3/pkg/client/fake/client.go#L595
+//
+// (ljakimczuk): Fake client of the Controller Runtime version we have been using so far (v0.6.5) did
+// not support field selectors, hence our tests were working smooth, for such selectors were ignored.
+// The new version supports them, but requires registering the appropriate indexing function, but
+// apparently only selection by the '==' and '=' operators are allowed, and we use more, hence tests
+// fail. Due to lack of other smart ideas, I decided to create this wrapper for fake client, which
+// captures the List() call and prunes out unsupported selectors before calling the actual List() of
+// the fake client.
+
 type fakierClient struct {
 	client.Client
 }
