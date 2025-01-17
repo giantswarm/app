@@ -21,7 +21,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client/fake" //nolint:staticcheck
 )
 
-type fakierClient struct{
+type fakierClient struct {
 	client.Client
 }
 
@@ -29,11 +29,11 @@ func (m *fakierClient) List(ctx context.Context, obj client.ObjectList, opts ...
 	listOpts := client.ListOptions{}
 	listOpts.ApplyOptions(opts)
 
-	// create new selector by filtering out selection other than by the '==' or '=' operators
+	// create new selector by filtering out selections other than by the '==' or '=' operators
 	newFieldSelectorsStr := []string{}
 	for _, r := range listOpts.FieldSelector.Requirements() {
 		if r.Operator == selection.Equals || r.Operator == selection.DoubleEquals {
-			newFieldSelectorsStr = append(newFieldSelectorsStr,fmt.Sprintf("%s%s%s",r.Field,r.Operator,r.Value))
+			newFieldSelectorsStr = append(newFieldSelectorsStr,fmt.Sprintf("%s%s%s", r.Field, r.Operator, r.Value))
 		}
 	}
 
@@ -50,6 +50,7 @@ func (m *fakierClient) List(ctx context.Context, obj client.ObjectList, opts ...
 		listOpts.FieldSelector = newFieldSelectors
 	}
 
+	// run the actual List() of the fake client
 	return m.Client.List(ctx, obj, &listOpts)
 }
 
