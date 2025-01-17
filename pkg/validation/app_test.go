@@ -13,11 +13,54 @@ import (
 	"github.com/giantswarm/micrologger/microloggertest"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/selection"
 	clientgofake "k8s.io/client-go/kubernetes/fake"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake" //nolint:staticcheck
 )
+
+type fakierClient struct{
+	client.Client
+}
+
+func (m *fakierClient) List(ctx context.Context, obj client.ObjectList, opts ...client.ListOption) error {
+	listOpts := client.ListOptions{}
+	listOpts.ApplyOptions(opts)
+
+	// create new selector by filtering out selection other than by the '==' or '=' operators
+	newFieldSelectorsStr := []string{}
+	for _, r := range listOpts.FieldSelector.Requirements() {
+		if r.Operator == selection.Equals || r.Operator == selection.DoubleEquals {
+			newFieldSelectorsStr = append(newFieldSelectorsStr,fmt.Sprintf("%s%s%s",r.Field,r.Operator,r.Value))
+		}
+	}
+
+	// parse the new selector
+	newFieldSelectors, err := fields.ParseSelector(strings.Join(newFieldSelectorsStr,","))
+	if err != nil {
+		return err
+	}
+
+	// do not pass empty string, for it leads to an error anyway
+	if newFieldSelectors.Empty() {
+		listOpts.FieldSelector = nil
+	} else {
+		listOpts.FieldSelector = newFieldSelectors
+	}
+
+	return m.Client.List(ctx,obj,&listOpts)
+}
+
+var appNameIndexer func(obj client.Object) []string = func(obj client.Object) []string {
+	app, ok := obj.(*v1alpha1.App)
+	if !ok {
+		panic(fmt.Errorf("got %T object, want %T object", obj, v1alpha1.App{}))
+	}
+
+	return []string{app.Name}
+}
 
 func Test_ValidateApp(t *testing.T) {
 	ctx := context.Background()
@@ -1084,15 +1127,6 @@ func Test_ValidateApp(t *testing.T) {
 			scheme := runtime.NewScheme()
 			_ = v1alpha1.AddToScheme(scheme)
 
-			appNameIndexer := func(obj client.Object) []string {
-				app, ok := obj.(*v1alpha1.App)
-				if !ok {
-					t.Fatalf("got %T object, want %T object", obj, v1alpha1.App{})
-				}
-
-				return []string{app.Name}
-			}
-
 			fakeCtrlClient := fake.NewClientBuilder().
 				WithScheme(scheme).
 				WithRuntimeObjects(g8sObjs...).
@@ -1664,15 +1698,6 @@ func Test_ValidateMetadataConstraints(t *testing.T) {
 			scheme := runtime.NewScheme()
 			_ = v1alpha1.AddToScheme(scheme)
 
-			appNameIndexer := func(obj client.Object) []string {
-				app, ok := obj.(*v1alpha1.App)
-				if !ok {
-					t.Fatalf("got %T object, want %T object", obj, v1alpha1.App{})
-				}
-
-				return []string{app.Name}
-			}
-
 			fakeCtrlClient := fake.NewClientBuilder().
 				WithScheme(scheme).
 				WithRuntimeObjects(g8sObjs...).
@@ -1680,7 +1705,7 @@ func Test_ValidateMetadataConstraints(t *testing.T) {
 				Build()
 
 			c := Config{
-				G8sClient: fakeCtrlClient,
+				G8sClient: &fakierClient{fakeCtrlClient},
 				K8sClient: clientgofake.NewSimpleClientset(),
 				Logger:    microloggertest.New(),
 
@@ -1854,7 +1879,7 @@ func Test_ValidateNamespace(t *testing.T) {
 			fakeCtrlClient := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(g8sObjs...).Build()
 
 			c := Config{
-				G8sClient: fakeCtrlClient,
+				G8sClient: &fakierClient{fakeCtrlClient},
 				K8sClient: clientgofake.NewSimpleClientset(),
 				Logger:    microloggertest.New(),
 
@@ -2184,10 +2209,14 @@ func Test_ValidateUniqueInClusterAppName(t *testing.T) {
 			scheme := runtime.NewScheme()
 			_ = v1alpha1.AddToScheme(scheme)
 
-			fakeCtrlClient := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(g8sObjs...).Build()
+			fakeCtrlClient := fake.NewClientBuilder().
+				WithScheme(scheme).
+				WithRuntimeObjects(g8sObjs...).
+				WithIndex(&v1alpha1.App{}, "metadata.name", appNameIndexer).
+				Build()
 
 			c := Config{
-				G8sClient: fakeCtrlClient,
+				G8sClient: &fakierClient{fakeCtrlClient},
 				K8sClient: clientgofake.NewSimpleClientset(),
 				Logger:    microloggertest.New(),
 
