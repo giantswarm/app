@@ -38,7 +38,7 @@ func (m *fakierClient) List(ctx context.Context, obj client.ObjectList, opts ...
 	}
 
 	// parse the new selector
-	newFieldSelectors, err := fields.ParseSelector(strings.Join(newFieldSelectorsStr,","))
+	newFieldSelectors, err := fields.ParseSelector(strings.Join(newFieldSelectorsStr, ","))
 	if err != nil {
 		return err
 	}
@@ -50,7 +50,7 @@ func (m *fakierClient) List(ctx context.Context, obj client.ObjectList, opts ...
 		listOpts.FieldSelector = newFieldSelectors
 	}
 
-	return m.Client.List(ctx,obj,&listOpts)
+	return m.Client.List(ctx, obj, &listOpts)
 }
 
 var appNameIndexer func(obj client.Object) []string = func(obj client.Object) []string {
