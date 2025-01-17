@@ -33,7 +33,7 @@ func (m *fakierClient) List(ctx context.Context, obj client.ObjectList, opts ...
 	newFieldSelectorsStr := []string{}
 	for _, r := range listOpts.FieldSelector.Requirements() {
 		if r.Operator == selection.Equals || r.Operator == selection.DoubleEquals {
-			newFieldSelectorsStr = append(newFieldSelectorsStr,fmt.Sprintf("%s%s%s", r.Field, r.Operator, r.Value))
+			newFieldSelectorsStr = append(newFieldSelectorsStr, fmt.Sprintf("%s%s%s", r.Field, r.Operator, r.Value))
 		}
 	}
 
