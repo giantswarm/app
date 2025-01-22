@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [7.0.3] - 2025-01-22
+
 ## [7.0.2] - 2024-06-04
 
 - Dependency updates
@@ -444,7 +446,8 @@ since there can be a delay creating them on cluster creation.
 
 - First release
 
-[Unreleased]: https://github.com/giantswarm/app/compare/v7.0.2...HEAD
+[Unreleased]: https://github.com/giantswarm/app/compare/v7.0.3...HEAD
+[7.0.3]: https://github.com/giantswarm/app/compare/v7.0.2...v7.0.3
 [7.0.2]: https://github.com/giantswarm/app/compare/v7.0.1...v7.0.2
 [7.0.1]: https://github.com/giantswarm/app/compare/v7.0.0...v7.0.1
 [7.0.0]: https://github.com/giantswarm/app/compare/v6.15.6...v7.0.0
