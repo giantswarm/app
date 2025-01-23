@@ -20,7 +20,7 @@ func (v *Values) MergeSecretData(ctx context.Context, app v1alpha1.App, catalog 
 	catalogSecretName := key.CatalogSecretName(catalog)
 	userSecretName := key.UserSecretName(app)
 
-	extraConfigs := key.ExtraConfigs(app)
+	extraConfigs := key.SecretExtraConfigs(app)
 
 	if appSecretName == "" && catalogSecretName == "" && userSecretName == "" && len(extraConfigs) == 0 {
 		// Return early as there is no secret.
