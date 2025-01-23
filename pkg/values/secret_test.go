@@ -19,7 +19,6 @@ func Test_MergeSecretData(t *testing.T) {
 		name         string
 		app          v1alpha1.App
 		catalog      v1alpha1.Catalog
-		configMaps   []*corev1.ConfigMap
 		secrets      []*corev1.Secret
 		expectedData map[string]interface{}
 		errorMatcher func(error) bool
