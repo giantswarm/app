@@ -416,12 +416,12 @@ func Test_SecretExtraConfigs(t *testing.T) {
 	testCases := []struct {
 		name          string
 		obj           v1alpha1.App
-		expectedList []v1alpha1.AppExtraConfig
+		expectedList  []v1alpha1.AppExtraConfig
 	}{
 		{
 			name:          "case 0: no extra Secrets",
 			obj:           v1alpha1.App{},
-			expectedList: []v1alpha1.AppExtraConfig{},
+			expectedList:  []v1alpha1.AppExtraConfig{},
 		},
 		{
 			name: "case 1: extra configs has Secrets and ConfigMaps",
@@ -429,13 +429,13 @@ func Test_SecretExtraConfigs(t *testing.T) {
 				Spec: v1alpha1.AppSpec{
 					ExtraConfigs: []v1alpha1.AppExtraConfig{
 						v1alpha1.AppExtraConfig{
-							Kind: "configMap",
-							Name: "test",
+							Kind:      "configMap",
+							Name:      "test",
 							Namespace: "test",
 						},
 						v1alpha1.AppExtraConfig{
-							Kind: "secret",
-							Name: "test",
+							Kind:      "secret",
+							Name:      "test",
 							Namespace: "test",
 						},
 					},
@@ -443,8 +443,8 @@ func Test_SecretExtraConfigs(t *testing.T) {
 			},
 			expectedList: []v1alpha1.AppExtraConfig{
 				v1alpha1.AppExtraConfig{
-					Kind: "secret",
-					Name: "test",
+					Kind:      "secret",
+					Name:      "test",
 					Namespace: "test",
 				},
 			},
@@ -455,8 +455,8 @@ func Test_SecretExtraConfigs(t *testing.T) {
 				Spec: v1alpha1.AppSpec{
 					ExtraConfigs: []v1alpha1.AppExtraConfig{
 						v1alpha1.AppExtraConfig{
-							Kind: "secret",
-							Name: "test",
+							Kind:      "secret",
+							Name:      "test",
 							Namespace: "test",
 						},
 					},
@@ -464,8 +464,8 @@ func Test_SecretExtraConfigs(t *testing.T) {
 			},
 			expectedList: []v1alpha1.AppExtraConfig{
 				v1alpha1.AppExtraConfig{
-					Kind: "secret",
-					Name: "test",
+					Kind:      "secret",
+					Name:      "test",
 					Namespace: "test",
 				},
 			},
@@ -476,8 +476,8 @@ func Test_SecretExtraConfigs(t *testing.T) {
 				Spec: v1alpha1.AppSpec{
 					ExtraConfigs: []v1alpha1.AppExtraConfig{
 						v1alpha1.AppExtraConfig{
-							Kind: "configMap",
-							Name: "test",
+							Kind:      "configMap",
+							Name:      "test",
 							Namespace: "test",
 						},
 					},
@@ -493,7 +493,7 @@ func Test_SecretExtraConfigs(t *testing.T) {
 
 			extraConfigs := SecretExtraConfigs(tc.obj)
 
-			if !reflect.DeepEqual(extraConfigs,tc.expectedList) {
+			if !reflect.DeepEqual(extraConfigs, tc.expectedList) {
 				t.Fatalf("List equals == %#v, want %#v", extraConfigs, tc.expectedList)
 			}
 		})

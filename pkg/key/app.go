@@ -207,7 +207,7 @@ func SecretExtraConfigs(customResource v1alpha1.App) []v1alpha1.AppExtraConfig {
 
 	for _, v := range customResource.Spec.ExtraConfigs {
 		if v.Kind == "secret" {
-			extraConfigs = append(extraConfigs,v)
+			extraConfigs = append(extraConfigs, v)
 		}
 	}
 
