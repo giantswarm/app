@@ -202,6 +202,18 @@ func RollbackTimeout(customResource v1alpha1.App) *metav1.Duration {
 	return customResource.Spec.Rollback.Timeout
 }
 
+func SecretExtraConfigs(customResource v1alpha1.App) []v1alpha1.AppExtraConfig {
+	extraConfigs := []v1alpha1.AppExtraConfig{}
+
+	for _, v := range customResource.Spec.ExtraConfigs {
+		if v.Kind == "secret" {
+			extraConfigs = append(extraConfigs,v)
+		}
+	}
+
+	return extraConfigs
+}
+
 func ToApp(v interface{}) (v1alpha1.App, error) {
 	customResource, ok := v.(*v1alpha1.App)
 	if !ok {

@@ -412,6 +412,94 @@ func Test_Namespace(t *testing.T) {
 	}
 }
 
+func Test_SecretExtraConfigs(t *testing.T) {
+	testCases := []struct {
+		name          string
+		obj           v1alpha1.App
+		expectedList []v1alpha1.AppExtraConfig
+	}{
+		{
+			name:          "case 0: no extra Secrets",
+			obj:           v1alpha1.App{},
+			expectedList: []v1alpha1.AppExtraConfig{},
+		},
+		{
+			name: "case 1: extra configs has Secrets and ConfigMaps",
+			obj: v1alpha1.App{
+				Spec: v1alpha1.AppSpec{
+					ExtraConfigs: []v1alpha1.AppExtraConfig{
+						v1alpha1.AppExtraConfig{
+							Kind: "configMap",
+							Name: "test",
+							Namespace: "test",
+						},
+						v1alpha1.AppExtraConfig{
+							Kind: "secret",
+							Name: "test",
+							Namespace: "test",
+						},
+					},
+				},
+			},
+			expectedList: []v1alpha1.AppExtraConfig{
+				v1alpha1.AppExtraConfig{
+					Kind: "secret",
+					Name: "test",
+					Namespace: "test",
+				},
+			},
+		},
+		{
+			name: "case 2: extra configs has Secrets only",
+			obj: v1alpha1.App{
+				Spec: v1alpha1.AppSpec{
+					ExtraConfigs: []v1alpha1.AppExtraConfig{
+						v1alpha1.AppExtraConfig{
+							Kind: "secret",
+							Name: "test",
+							Namespace: "test",
+						},
+					},
+				},
+			},
+			expectedList: []v1alpha1.AppExtraConfig{
+				v1alpha1.AppExtraConfig{
+					Kind: "secret",
+					Name: "test",
+					Namespace: "test",
+				},
+			},
+		},
+		{
+			name: "case 3: extra configs has ConfigMaps only",
+			obj: v1alpha1.App{
+				Spec: v1alpha1.AppSpec{
+					ExtraConfigs: []v1alpha1.AppExtraConfig{
+						v1alpha1.AppExtraConfig{
+							Kind: "configMap",
+							Name: "test",
+							Namespace: "test",
+						},
+					},
+				},
+			},
+			expectedList: []v1alpha1.AppExtraConfig{},
+		},
+	}
+
+	for i, tc := range testCases {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			t.Log(tc.name)
+
+			extraConfigs := SecretExtraConfigs(tc.obj)
+
+			if !reflect.DeepEqual(extraConfigs,tc.expectedList) {
+				t.Fatalf("List equals == %#v, want %#v", extraConfigs, tc.expectedList)
+			}
+		})
+	}
+}
+
 func Test_ToApp(t *testing.T) {
 	testCases := []struct {
 		name           string
