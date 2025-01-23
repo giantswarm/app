@@ -414,14 +414,14 @@ func Test_Namespace(t *testing.T) {
 
 func Test_SecretExtraConfigs(t *testing.T) {
 	testCases := []struct {
-		name          string
-		obj           v1alpha1.App
-		expectedList  []v1alpha1.AppExtraConfig
+		name         string
+		obj          v1alpha1.App
+		expectedList []v1alpha1.AppExtraConfig
 	}{
 		{
-			name:          "case 0: no extra Secrets",
-			obj:           v1alpha1.App{},
-			expectedList:  []v1alpha1.AppExtraConfig{},
+			name:         "case 0: no extra Secrets",
+			obj:          v1alpha1.App{},
+			expectedList: []v1alpha1.AppExtraConfig{},
 		},
 		{
 			name: "case 1: extra configs has Secrets and ConfigMaps",

@@ -19,6 +19,7 @@ func Test_MergeSecretData(t *testing.T) {
 		name         string
 		app          v1alpha1.App
 		catalog      v1alpha1.Catalog
+		configMaps   []*corev1.ConfigMap
 		secrets      []*corev1.Secret
 		expectedData map[string]interface{}
 		errorMatcher func(error) bool
@@ -548,6 +549,33 @@ func Test_MergeSecretData(t *testing.T) {
 				"foo":   "baz",
 				"hello": "world",
 			},
+		},
+		{
+			name: "case multi layer 8: no extra secrets",
+			app: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "my-test-app",
+					Namespace: "giantswarm",
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "test-catalog",
+					Name:      "test-app",
+					Namespace: "giantswarm",
+					ExtraConfigs: []v1alpha1.AppExtraConfig{
+						{
+							Kind:      "configMap",
+							Name:      "test-config-map",
+							Namespace: "giantswarm",
+						},
+					},
+				},
+			},
+			catalog: v1alpha1.Catalog{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: "test-catalog",
+				},
+			},
+			expectedData: nil, // we do not want the map[string]interface{}{} here
 		},
 	}
 	ctx := context.Background()
