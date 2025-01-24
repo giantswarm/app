@@ -69,7 +69,6 @@ replace (
 	github.com/gogo/protobuf => github.com/gogo/protobuf v1.3.2
 	github.com/golang/protobuf => github.com/golang/protobuf v1.5.4
 	github.com/gorilla/websocket => github.com/gorilla/websocket v1.5.3
-	github.com/miekg/dns => github.com/miekg/dns v1.1.63
 	github.com/prometheus/client_golang => github.com/prometheus/client_golang v1.20.5
 	github.com/spf13/viper => github.com/spf13/viper v1.19.0
 	golang.org/x/net => golang.org/x/net v0.34.0
