@@ -25,7 +25,7 @@ func (v *Values) MergeConfigMapData(ctx context.Context, app v1alpha1.App, catal
 	catalogConfigMapName := key.CatalogConfigMapName(catalog)
 	userConfigMapName := key.UserConfigMapName(app)
 
-	extraConfigs := key.ExtraConfigs(app)
+	extraConfigs := key.ConfigMapExtraConfigs(app)
 
 	if appConfigMapName == "" && catalogConfigMapName == "" && userConfigMapName == "" && len(extraConfigs) == 0 {
 		// Return early as there is no config.

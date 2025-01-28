@@ -251,6 +251,7 @@ func Test_MergeConfigMapData(t *testing.T) {
 					Namespace: "giantswarm",
 					ExtraConfigs: []v1alpha1.AppExtraConfig{
 						{
+							Kind:      "configMap",
 							Name:      "pre-cluster-overrides",
 							Namespace: "giantswarm",
 						},
@@ -290,11 +291,13 @@ func Test_MergeConfigMapData(t *testing.T) {
 					},
 					ExtraConfigs: []v1alpha1.AppExtraConfig{
 						{
+							Kind:      "configMap",
 							Name:      "post-cluster-overrides",
 							Namespace: "giantswarm",
 							Priority:  v1alpha1.ConfigPriorityCluster + 1,
 						},
 						{
+							Kind:      "configMap",
 							Name:      "pre-cluster-overrides",
 							Namespace: "giantswarm",
 						},
@@ -349,20 +352,24 @@ func Test_MergeConfigMapData(t *testing.T) {
 					},
 					ExtraConfigs: []v1alpha1.AppExtraConfig{
 						{
+							Kind:      "configMap",
 							Name:      "post-user-overrides-2",
 							Namespace: "giantswarm",
 							Priority:  v1alpha1.ConfigPriorityMaximum,
 						},
 						{
+							Kind:      "configMap",
 							Name:      "post-cluster-overrides",
 							Namespace: "giantswarm",
 							Priority:  v1alpha1.ConfigPriorityCluster + 1,
 						},
 						{
+							Kind:      "configMap",
 							Name:      "pre-cluster-overrides",
 							Namespace: "giantswarm",
 						},
 						{
+							Kind:      "configMap",
 							Name:      "post-user-overrides-1",
 							Namespace: "giantswarm",
 							Priority:  v1alpha1.ConfigPriorityUser + 1,
@@ -419,6 +426,7 @@ func Test_MergeConfigMapData(t *testing.T) {
 					Namespace: "giantswarm",
 					ExtraConfigs: []v1alpha1.AppExtraConfig{
 						{
+							Kind:      "configMap",
 							Name:      "post-user-overrides",
 							Namespace: "giantswarm",
 							Priority:  v1alpha1.ConfigPriorityMaximum,
@@ -448,6 +456,7 @@ func Test_MergeConfigMapData(t *testing.T) {
 					Namespace: "giantswarm",
 					ExtraConfigs: []v1alpha1.AppExtraConfig{
 						{
+							Kind:      "configMap",
 							Name:      "pre-cluster-overrides",
 							Namespace: "giantswarm",
 						},
@@ -479,10 +488,12 @@ func Test_MergeConfigMapData(t *testing.T) {
 					Namespace: "giantswarm",
 					ExtraConfigs: []v1alpha1.AppExtraConfig{
 						{
+							Kind:      "configMap",
 							Name:      "pre-cluster-overrides-1",
 							Namespace: "giantswarm",
 						},
 						{
+							Kind:      "configMap",
 							Name:      "pre-cluster-overrides-2",
 							Namespace: "giantswarm",
 						},
@@ -506,6 +517,33 @@ func Test_MergeConfigMapData(t *testing.T) {
 				"foo":   "baz",
 				"hello": "world",
 			},
+		},
+		{
+			name: "case multi layer 8: no secret configs",
+			app: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "my-test-app",
+					Namespace: "giantswarm",
+				},
+				Spec: v1alpha1.AppSpec{
+					Catalog:   "test-catalog",
+					Name:      "test-app",
+					Namespace: "giantswarm",
+					ExtraConfigs: []v1alpha1.AppExtraConfig{
+						{
+							Kind:      "secret",
+							Name:      "test-secret",
+							Namespace: "giantswarm",
+						},
+					},
+				},
+			},
+			catalog: v1alpha1.Catalog{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: "test-catalog",
+				},
+			},
+			expectedData: nil,
 		},
 	}
 
@@ -541,7 +579,7 @@ func Test_MergeConfigMapData(t *testing.T) {
 				t.Fatalf("expected nil map got %#v", result)
 			}
 			if result == nil && tc.expectedData != nil {
-				t.Fatal("expected non-nil gmap got nil")
+				t.Fatal("expected non-nil map got nil")
 			}
 
 			if tc.expectedData != nil {

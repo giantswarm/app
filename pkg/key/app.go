@@ -105,6 +105,18 @@ func ClusterValuesConfigMapName(customResource v1alpha1.App) string {
 	return fmt.Sprintf("%s-cluster-values", customResource.GetNamespace())
 }
 
+func ConfigMapExtraConfigs(customResource v1alpha1.App) []v1alpha1.AppExtraConfig {
+	extraConfigs := []v1alpha1.AppExtraConfig{}
+
+	for _, v := range customResource.Spec.ExtraConfigs {
+		if v.Kind == "configMap" {
+			extraConfigs = append(extraConfigs, v)
+		}
+	}
+
+	return extraConfigs
+}
+
 func CordonReason(customResource v1alpha1.App) string {
 	return customResource.GetAnnotations()[annotation.ChartOperatorCordonReason]
 }
