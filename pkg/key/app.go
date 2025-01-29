@@ -105,6 +105,18 @@ func ClusterValuesConfigMapName(customResource v1alpha1.App) string {
 	return fmt.Sprintf("%s-cluster-values", customResource.GetNamespace())
 }
 
+func ConfigMapExtraConfigs(customResource v1alpha1.App) []v1alpha1.AppExtraConfig {
+	extraConfigs := []v1alpha1.AppExtraConfig{}
+
+	for _, v := range customResource.Spec.ExtraConfigs {
+		if v.Kind != "secret" {
+			extraConfigs = append(extraConfigs, v)
+		}
+	}
+
+	return extraConfigs
+}
+
 func CordonReason(customResource v1alpha1.App) string {
 	return customResource.GetAnnotations()[annotation.ChartOperatorCordonReason]
 }
@@ -200,6 +212,18 @@ func ReleaseName(customResource v1alpha1.App) string {
 
 func RollbackTimeout(customResource v1alpha1.App) *metav1.Duration {
 	return customResource.Spec.Rollback.Timeout
+}
+
+func SecretExtraConfigs(customResource v1alpha1.App) []v1alpha1.AppExtraConfig {
+	extraConfigs := []v1alpha1.AppExtraConfig{}
+
+	for _, v := range customResource.Spec.ExtraConfigs {
+		if v.Kind == "secret" {
+			extraConfigs = append(extraConfigs, v)
+		}
+	}
+
+	return extraConfigs
 }
 
 func ToApp(v interface{}) (v1alpha1.App, error) {
