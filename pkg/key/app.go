@@ -109,7 +109,13 @@ func ConfigMapExtraConfigs(customResource v1alpha1.App) []v1alpha1.AppExtraConfi
 	extraConfigs := []v1alpha1.AppExtraConfig{}
 
 	for _, v := range customResource.Spec.ExtraConfigs {
-		if v.Kind == "configMap" {
+		// According to the
+		// https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/#defaulting
+		// the `v.Kind == ""` is not really needed, for even if object was
+		// originally provided with empty kind, it should get stored in the ETCD
+		// with a default value. Adding this condition anyway, for we have already
+		// used similar ones in different places.
+		if v.Kind == "configMap" || v.Kind == "" {
 			extraConfigs = append(extraConfigs, v)
 		}
 	}
