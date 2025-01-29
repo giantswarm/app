@@ -109,19 +109,7 @@ func ConfigMapExtraConfigs(customResource v1alpha1.App) []v1alpha1.AppExtraConfi
 	extraConfigs := []v1alpha1.AppExtraConfig{}
 
 	for _, v := range customResource.Spec.ExtraConfigs {
-		// According to the Kubernetes docs,
-		// https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/#defaulting,
-		// the `v.Kind == ""` is not needed, for even if an extra config item was originally
-		// provided with the empty kind, it should get stored in the ETCD with a default
-		// value of the `configMap`, according to our configuration, thanks to the defaulting.
-		//
-		// We configure default value here:
-		// https://github.com/giantswarm/apiextensions-application/blob/main/api/v1alpha1/app_types.go#L142
-		//
-		// I am adding this condition anyway, for we have already used similar ones in different places,
-		// which makes it unclear to me whether we have discovered Kubernetes does not perform defaulting
-		// in certain scenarios, or we added this purely as extra-precaution messure.
-		if v.Kind == "configMap" || v.Kind == "" {
+		if v.Kind != "secret" {
 			extraConfigs = append(extraConfigs, v)
 		}
 	}
