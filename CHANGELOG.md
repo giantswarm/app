@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [7.0.4] - 2025-01-30
 
+### Added
+
+- Add `ConfigMapExtraConfigs` and `SecretExtraConfigs` functions.
+
 ## [7.0.3] - 2025-01-22
 
 ## [7.0.2] - 2024-06-04
