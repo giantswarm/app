@@ -11,7 +11,7 @@ require (
 	github.com/giantswarm/micrologger v1.1.2
 	github.com/giantswarm/to v0.4.2
 	github.com/google/go-cmp v0.6.0
-	github.com/google/go-github/v68 v68.0.0
+	github.com/google/go-github/v69 v69.0.0
 	github.com/imdario/mergo v0.3.16
 	golang.org/x/oauth2 v0.26.0
 	k8s.io/api v0.30.3
