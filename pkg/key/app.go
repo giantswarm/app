@@ -118,11 +118,11 @@ func ConfigMapExtraConfigs(customResource v1alpha1.App) []v1alpha1.AppExtraConfi
 }
 
 func CordonReason(customResource v1alpha1.App) string {
-	return customResource.GetAnnotations()[annotation.ChartOperatorCordonReason]
+	return customResource.GetAnnotations()[annotation.AppOperatorCordonReason]
 }
 
 func CordonUntil(customResource v1alpha1.App) string {
-	return customResource.GetAnnotations()[annotation.ChartOperatorCordonUntil]
+	return customResource.GetAnnotations()[annotation.AppOperatorCordonUntil]
 }
 
 func CordonUntilDate() string {
