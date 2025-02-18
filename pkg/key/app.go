@@ -146,14 +146,9 @@ func InstallTimeout(customResource v1alpha1.App) *metav1.Duration {
 }
 
 func IsAppCordoned(customResource v1alpha1.App) bool {
-	_, reasonOk := customResource.Annotations[annotation.AppOperatorCordonReason]
-	_, untilOk := customResource.Annotations[annotation.AppOperatorCordonUntil]
+	_, ok := customResource.Annotations[annotation.AppOperatorCordonUntil]
 
-	if reasonOk && untilOk {
-		return true
-	}
-
-	return false
+	return ok
 }
 
 func IsDeleted(customResource v1alpha1.App) bool {

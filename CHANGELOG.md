@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Make the `cordon-until` the only required annotation to cordon an app.
+
 ## [7.0.4] - 2025-01-30
 
 ### Added
