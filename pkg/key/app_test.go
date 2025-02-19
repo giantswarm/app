@@ -374,6 +374,18 @@ func Test_IsAppCordoned(t *testing.T) {
 					},
 				},
 			},
+			expectedResult: false,
+		},
+		{
+			name: "case 0: app cordoned",
+			chart: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Annotations: map[string]string{
+						annotation.AppOperatorCordonReason: "testing manual upgrade",
+						annotation.AppOperatorCordonUntil:  "2030-12-31T23:59:59Z",
+					},
+				},
+			},
 			expectedResult: true,
 		},
 		{
@@ -384,7 +396,7 @@ func Test_IsAppCordoned(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := IsAppCordoned(tt.chart); got != tt.expectedResult {
+			if got, _ := IsAppCordoned(tt.chart); got != tt.expectedResult {
 				t.Errorf("IsCordoned() = %v, want %v", got, tt.expectedResult)
 			}
 		})

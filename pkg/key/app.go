@@ -145,10 +145,20 @@ func InstallTimeout(customResource v1alpha1.App) *metav1.Duration {
 	return customResource.Spec.Install.Timeout
 }
 
-func IsAppCordoned(customResource v1alpha1.App) bool {
-	_, ok := customResource.Annotations[annotation.AppOperatorCordonUntil]
+func IsAppCordoned(customResource v1alpha1.App) (bool, error) {
+	cordoned := false
 
-	return ok
+	cordonedUntilStr, ok := customResource.Annotations[annotation.AppOperatorCordonUntil]
+	if ok {
+		cordonedUntil, err := time.Parse(time.RFC3339, cordonedUntilStr)
+		if err != nil {
+			return true, err
+		}
+
+		cordoned = time.Now().Before(cordonedUntil)
+	}
+
+	return cordoned, nil
 }
 
 func IsDeleted(customResource v1alpha1.App) bool {
