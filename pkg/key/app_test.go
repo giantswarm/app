@@ -318,7 +318,7 @@ func Test_CordonReason(t *testing.T) {
 	obj := v1alpha1.App{
 		ObjectMeta: metav1.ObjectMeta{
 			Annotations: map[string]string{
-				annotation.ChartOperatorCordonReason: "manual upgrade",
+				annotation.AppOperatorCordonReason: "manual upgrade",
 			},
 		},
 	}
@@ -334,7 +334,7 @@ func Test_CordonUntil(t *testing.T) {
 	obj := v1alpha1.App{
 		ObjectMeta: metav1.ObjectMeta{
 			Annotations: map[string]string{
-				annotation.ChartOperatorCordonUntil: "2019-12-31T23:59:59Z",
+				annotation.AppOperatorCordonUntil: "2019-12-31T23:59:59Z",
 			},
 		},
 	}
