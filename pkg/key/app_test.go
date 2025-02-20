@@ -361,12 +361,12 @@ func Test_InCluster(t *testing.T) {
 func Test_IsAppCordoned(t *testing.T) {
 	tests := []struct {
 		name           string
-		chart          v1alpha1.App
+		app          v1alpha1.App
 		expectedResult bool
 	}{
 		{
 			name: "case 0: app cordoned",
-			chart: v1alpha1.App{
+			app: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Annotations: map[string]string{
 						annotation.AppOperatorCordonReason: "testing manual upgrade",
@@ -378,7 +378,7 @@ func Test_IsAppCordoned(t *testing.T) {
 		},
 		{
 			name: "case 1: app cordoned",
-			chart: v1alpha1.App{
+			app: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Annotations: map[string]string{
 						annotation.AppOperatorCordonReason: "testing manual upgrade",
@@ -390,13 +390,25 @@ func Test_IsAppCordoned(t *testing.T) {
 		},
 		{
 			name:           "case 2: chart did not cordon",
-			chart:          v1alpha1.App{},
+			app: v1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Annotations: map[string]string{
+						annotation.AppOperatorCordonReason: "testing manual upgrade",
+						annotation.AppOperatorCordonUntil:  "",
+					},
+				},
+			},
+			expectedResult: false,
+		},
+		{
+			name:           "case 3: chart did not cordon",
+			app:          v1alpha1.App{},
 			expectedResult: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := IsAppCordoned(tt.chart); got != tt.expectedResult {
+			if got, _ := IsAppCordoned(tt.app); got != tt.expectedResult {
 				t.Errorf("IsCordoned() = %v, want %v", got, tt.expectedResult)
 			}
 		})

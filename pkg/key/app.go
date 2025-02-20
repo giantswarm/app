@@ -148,8 +148,8 @@ func InstallTimeout(customResource v1alpha1.App) *metav1.Duration {
 func IsAppCordoned(customResource v1alpha1.App) (bool, error) {
 	cordoned := false
 
-	cordonedUntilStr, ok := customResource.Annotations[annotation.AppOperatorCordonUntil]
-	if ok {
+	cordonedUntilStr := CordonUntil(customResource)
+	if cordonedUntilStr != "" {
 		cordonedUntil, err := time.Parse(time.RFC3339, cordonedUntilStr)
 		if err != nil {
 			return true, err
