@@ -366,7 +366,7 @@ func Test_IsAppCordoned(t *testing.T) {
 	}{
 		{
 			name: "case 0: app cordoned",
-			app:  v1alpha1.App{
+			app: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Annotations: map[string]string{
 						annotation.AppOperatorCordonReason: "testing manual upgrade",
@@ -378,7 +378,7 @@ func Test_IsAppCordoned(t *testing.T) {
 		},
 		{
 			name: "case 1: app cordoned",
-			app:  v1alpha1.App{
+			app: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Annotations: map[string]string{
 						annotation.AppOperatorCordonReason: "testing manual upgrade",
@@ -390,7 +390,7 @@ func Test_IsAppCordoned(t *testing.T) {
 		},
 		{
 			name: "case 2: chart did not cordon",
-			app:  v1alpha1.App{
+			app: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Annotations: map[string]string{
 						annotation.AppOperatorCordonReason: "testing manual upgrade",
