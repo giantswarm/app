@@ -361,12 +361,12 @@ func Test_InCluster(t *testing.T) {
 func Test_IsAppCordoned(t *testing.T) {
 	tests := []struct {
 		name           string
-		app          v1alpha1.App
+		app            v1alpha1.App
 		expectedResult bool
 	}{
 		{
 			name: "case 0: app cordoned",
-			app: v1alpha1.App{
+			app:  v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Annotations: map[string]string{
 						annotation.AppOperatorCordonReason: "testing manual upgrade",
@@ -378,7 +378,7 @@ func Test_IsAppCordoned(t *testing.T) {
 		},
 		{
 			name: "case 1: app cordoned",
-			app: v1alpha1.App{
+			app:  v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Annotations: map[string]string{
 						annotation.AppOperatorCordonReason: "testing manual upgrade",
@@ -389,8 +389,8 @@ func Test_IsAppCordoned(t *testing.T) {
 			expectedResult: true,
 		},
 		{
-			name:           "case 2: chart did not cordon",
-			app: v1alpha1.App{
+			name: "case 2: chart did not cordon",
+			app:  v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Annotations: map[string]string{
 						annotation.AppOperatorCordonReason: "testing manual upgrade",
@@ -402,7 +402,7 @@ func Test_IsAppCordoned(t *testing.T) {
 		},
 		{
 			name:           "case 3: chart did not cordon",
-			app:          v1alpha1.App{},
+			app:            v1alpha1.App{},
 			expectedResult: false,
 		},
 	}
