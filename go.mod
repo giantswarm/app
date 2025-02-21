@@ -10,7 +10,7 @@ require (
 	github.com/giantswarm/microerror v0.4.1
 	github.com/giantswarm/micrologger v1.1.2
 	github.com/giantswarm/to v0.4.2
-	github.com/google/go-cmp v0.6.0
+	github.com/google/go-cmp v0.7.0
 	github.com/google/go-github/v69 v69.1.0
 	github.com/imdario/mergo v0.3.16
 	golang.org/x/oauth2 v0.26.0
