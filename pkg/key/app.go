@@ -118,11 +118,11 @@ func ConfigMapExtraConfigs(customResource v1alpha1.App) []v1alpha1.AppExtraConfi
 }
 
 func CordonReason(customResource v1alpha1.App) string {
-	return customResource.GetAnnotations()[annotation.ChartOperatorCordonReason]
+	return customResource.GetAnnotations()[annotation.AppOperatorCordonReason]
 }
 
 func CordonUntil(customResource v1alpha1.App) string {
-	return customResource.GetAnnotations()[annotation.ChartOperatorCordonUntil]
+	return customResource.GetAnnotations()[annotation.AppOperatorCordonUntil]
 }
 
 func CordonUntilDate() string {
@@ -145,15 +145,20 @@ func InstallTimeout(customResource v1alpha1.App) *metav1.Duration {
 	return customResource.Spec.Install.Timeout
 }
 
-func IsAppCordoned(customResource v1alpha1.App) bool {
-	_, reasonOk := customResource.Annotations[annotation.AppOperatorCordonReason]
-	_, untilOk := customResource.Annotations[annotation.AppOperatorCordonUntil]
+func IsAppCordoned(customResource v1alpha1.App) (bool, error) {
+	cordoned := false
 
-	if reasonOk && untilOk {
-		return true
+	cordonedUntilStr := CordonUntil(customResource)
+	if cordonedUntilStr != "" {
+		cordonedUntil, err := time.Parse(time.RFC3339, cordonedUntilStr)
+		if err != nil {
+			return true, err
+		}
+
+		cordoned = time.Now().Before(cordonedUntil)
 	}
 
-	return false
+	return cordoned, nil
 }
 
 func IsDeleted(customResource v1alpha1.App) bool {
