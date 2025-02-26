@@ -365,7 +365,7 @@ func Test_IsAppCordoned(t *testing.T) {
 		expectedResult bool
 	}{
 		{
-			name: "case 0: app cordoned",
+			name: "case 0: cordon has expired",
 			app: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Annotations: map[string]string{
@@ -389,7 +389,7 @@ func Test_IsAppCordoned(t *testing.T) {
 			expectedResult: true,
 		},
 		{
-			name: "case 2: chart did not cordon",
+			name: "case 2: app not cordoned, annotation with empty value",
 			app: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Annotations: map[string]string{
@@ -401,7 +401,7 @@ func Test_IsAppCordoned(t *testing.T) {
 			expectedResult: false,
 		},
 		{
-			name:           "case 3: chart did not cordon",
+			name:           "case 3: app not cordoned, no annotation set",
 			app:            v1alpha1.App{},
 			expectedResult: false,
 		},
