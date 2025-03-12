@@ -290,7 +290,7 @@ func Test_ValidateApp(t *testing.T) {
 			expectedErr: "validation error: catalog `missing` not found",
 		},
 		{
-			name: "spec.config.configMap not found",
+			name: "spec.config.configMap not found should not result in an error",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "dex-app-unique",
@@ -318,7 +318,6 @@ func Test_ValidateApp(t *testing.T) {
 			catalogs: []*v1alpha1.Catalog{
 				newTestCatalog("control-plane-catalog", "giantswarm"),
 			},
-			expectedErr: "app config map not found error: configmap `dex-app-values` in namespace `giantswarm` not found",
 		},
 		{
 			name: "spec.config.configMap no namespace specified",
@@ -352,7 +351,7 @@ func Test_ValidateApp(t *testing.T) {
 			expectedErr: "validation error: namespace is not specified for configmap `dex-app-values`",
 		},
 		{
-			name: "spec.config.secret not found",
+			name: "spec.config.secret not found should not result in an error",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "dex-app-unique",
@@ -380,7 +379,6 @@ func Test_ValidateApp(t *testing.T) {
 			catalogs: []*v1alpha1.Catalog{
 				newTestCatalog("control-plane-catalog", "giantswarm"),
 			},
-			expectedErr: "validation error: secret `dex-app-secrets` in namespace `giantswarm` not found",
 		},
 		{
 			name: "spec.config.secret no namespace specified",
@@ -544,7 +542,7 @@ func Test_ValidateApp(t *testing.T) {
 			expectedErr: "validation error: namespace is not specified for kubeconfig secret `eggs2-kubeconfig`",
 		},
 		{
-			name: "spec.userConfig.configMap not found",
+			name: "spec.userConfig.configMap not found should not raise an error",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "dex-app-unique",
@@ -572,7 +570,6 @@ func Test_ValidateApp(t *testing.T) {
 			catalogs: []*v1alpha1.Catalog{
 				newTestCatalog("control-plane-catalog", "default"),
 			},
-			expectedErr: "validation error: configmap `dex-app-user-values` in namespace `giantswarm` not found",
 		},
 		{
 			name: "missing spec.userConfig.configMap allowed when managed by Flux on conditional validation",
@@ -607,38 +604,6 @@ func Test_ValidateApp(t *testing.T) {
 			enableManagedByLabel: true,
 		},
 		{
-			name: "missing spec.userConfig.configMap not allowed when managed by Flux on unconditional validation",
-			obj: v1alpha1.App{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "dex-app-unique",
-					Namespace: "giantswarm",
-					Labels: map[string]string{
-						label.AppOperatorVersion: "0.0.0",
-						label.ManagedBy:          "flux",
-					},
-				},
-				Spec: v1alpha1.AppSpec{
-					Catalog:   "control-plane-catalog",
-					Name:      "dex-app",
-					Namespace: "giantswarm",
-					KubeConfig: v1alpha1.AppSpecKubeConfig{
-						InCluster: true,
-					},
-					UserConfig: v1alpha1.AppSpecUserConfig{
-						ConfigMap: v1alpha1.AppSpecUserConfigConfigMap{
-							Name:      "dex-app-user-values",
-							Namespace: "giantswarm",
-						},
-					},
-					Version: "1.2.2",
-				},
-			},
-			catalogs: []*v1alpha1.Catalog{
-				newTestCatalog("control-plane-catalog", "default"),
-			},
-			expectedErr: "validation error: configmap `dex-app-user-values` in namespace `giantswarm` not found",
-		},
-		{
 			name: "spec.userConfig.configMap no namespace specified",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
@@ -670,7 +635,7 @@ func Test_ValidateApp(t *testing.T) {
 			expectedErr: "validation error: namespace is not specified for configmap `dex-app-user-values`",
 		},
 		{
-			name: "spec.userConfig.secret not found",
+			name: "spec.userConfig.secret not found should not raise an error",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "dex-app-unique",
@@ -698,7 +663,6 @@ func Test_ValidateApp(t *testing.T) {
 			catalogs: []*v1alpha1.Catalog{
 				newTestCatalog("control-plane-catalog", "giantswarm"),
 			},
-			expectedErr: "validation error: secret `dex-app-user-secrets` in namespace `giantswarm` not found",
 		},
 		{
 			name: "missing spec.userConfig.secret allowed when managed by Flux on conditional validation",
@@ -731,38 +695,6 @@ func Test_ValidateApp(t *testing.T) {
 				newTestCatalog("control-plane-catalog", "giantswarm"),
 			},
 			enableManagedByLabel: true,
-		},
-		{
-			name: "missing spec.userConfig.secret not allowed when managed by Flux on unconditional validation",
-			obj: v1alpha1.App{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "dex-app-unique",
-					Namespace: "giantswarm",
-					Labels: map[string]string{
-						label.AppOperatorVersion: "0.0.0",
-						label.ManagedBy:          "flux",
-					},
-				},
-				Spec: v1alpha1.AppSpec{
-					Catalog:   "control-plane-catalog",
-					Name:      "dex-app",
-					Namespace: "giantswarm",
-					KubeConfig: v1alpha1.AppSpecKubeConfig{
-						InCluster: true,
-					},
-					UserConfig: v1alpha1.AppSpecUserConfig{
-						Secret: v1alpha1.AppSpecUserConfigSecret{
-							Name:      "dex-app-user-secrets",
-							Namespace: "giantswarm",
-						},
-					},
-					Version: "1.2.2",
-				},
-			},
-			catalogs: []*v1alpha1.Catalog{
-				newTestCatalog("control-plane-catalog", "giantswarm"),
-			},
-			expectedErr: "validation error: secret `dex-app-user-secrets` in namespace `giantswarm` not found",
 		},
 		{
 			name: "spec.userConfig.secret no namespace specified",

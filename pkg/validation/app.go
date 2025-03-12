@@ -162,21 +162,15 @@ func (v *Validator) validateCatalog(ctx context.Context, cr v1alpha1.App) error 
 
 func (v *Validator) validateConfig(ctx context.Context, cr v1alpha1.App) error {
 	if key.AppConfigMapName(cr) != "" {
-		err := v.validateConfigMapExists(ctx, key.AppConfigMapName(cr), key.AppConfigMapNamespace(cr), "configmap", cr)
-		if apierrors.IsNotFound(err) {
-			// appConfigMapNotFoundError is used rather than a validation error because
-			// during cluster creation there is a short delay while it is generated.
-			return microerror.Maskf(appConfigMapNotFoundError, resourceNotFoundTemplate, "configmap", key.AppConfigMapName(cr), key.AppConfigMapNamespace(cr))
-		} else if err != nil {
+		err := v.validateNameAndNamespaceIsSet(ctx, key.AppConfigMapName(cr), key.AppConfigMapNamespace(cr), "configmap")
+		if err != nil {
 			return microerror.Mask(err)
 		}
 	}
 
 	if key.AppSecretName(cr) != "" {
-		err := v.validateSecretExists(ctx, key.AppSecretName(cr), key.AppSecretNamespace(cr), "secret", cr)
-		if apierrors.IsNotFound(err) {
-			return microerror.Maskf(validationError, resourceNotFoundTemplate, "secret", key.AppSecretName(cr), key.AppSecretNamespace(cr))
-		} else if err != nil {
+		err := v.validateNameAndNamespaceIsSet(ctx, key.AppSecretName(cr), key.AppSecretNamespace(cr), "secret")
+		if err != nil {
 			return microerror.Mask(err)
 		}
 	}
@@ -268,7 +262,12 @@ func (v *Validator) validateNamespaceConfig(ctx context.Context, cr v1alpha1.App
 
 func (v *Validator) validateKubeConfig(ctx context.Context, cr v1alpha1.App) error {
 	if !key.InCluster(cr) {
-		err := v.validateSecretExists(ctx, key.KubeConfigSecretName(cr), key.KubeConfigSecretNamespace(cr), "kubeconfig secret", cr)
+		err := v.validateNameAndNamespaceIsSet(ctx, key.KubeConfigSecretName(cr), key.KubeConfigSecretNamespace(cr), "kubeconfig secret")
+		if err != nil {
+			return microerror.Mask(err)
+		}
+
+		err = v.validateSecretExists(ctx, key.KubeConfigSecretName(cr), key.KubeConfigSecretNamespace(cr), "kubeconfig secret", cr)
 		if apierrors.IsNotFound(err) {
 			// kubeConfigNotFoundError is used rather than a validation error because
 			// during cluster creation there is a short delay while it is generated.
@@ -457,10 +456,8 @@ func (v *Validator) validateUserConfig(ctx context.Context, cr v1alpha1.App) err
 			}
 		}
 
-		err := v.validateConfigMapExists(ctx, key.UserConfigMapName(cr), key.UserConfigMapNamespace(cr), "configmap", cr)
-		if apierrors.IsNotFound(err) {
-			return microerror.Maskf(validationError, resourceNotFoundTemplate, "configmap", key.UserConfigMapName(cr), key.UserConfigMapNamespace(cr))
-		} else if err != nil {
+		err := v.validateNameAndNamespaceIsSet(ctx, key.UserConfigMapName(cr), key.UserConfigMapNamespace(cr), "configmap")
+		if err != nil {
 			return microerror.Mask(err)
 		}
 	}
@@ -501,10 +498,8 @@ func (v *Validator) validateUserConfig(ctx context.Context, cr v1alpha1.App) err
 			}
 		}
 
-		err := v.validateSecretExists(ctx, key.UserSecretName(cr), key.UserSecretNamespace(cr), "secret", cr)
-		if apierrors.IsNotFound(err) {
-			return microerror.Maskf(validationError, resourceNotFoundTemplate, "secret", key.UserSecretName(cr), key.UserSecretNamespace(cr))
-		} else if err != nil {
+		err := v.validateNameAndNamespaceIsSet(ctx, key.UserSecretName(cr), key.UserSecretNamespace(cr), "secret")
+		if err != nil {
 			return microerror.Mask(err)
 		}
 	}
@@ -512,37 +507,19 @@ func (v *Validator) validateUserConfig(ctx context.Context, cr v1alpha1.App) err
 	return nil
 }
 
-func (v *Validator) validateConfigMapExists(ctx context.Context, name, namespace, kind string, cr v1alpha1.App) error {
+func (v *Validator) validateNameAndNamespaceIsSet(ctx context.Context, name, namespace, kind string) error {
 	if namespace == "" {
 		return microerror.Maskf(validationError, namespaceNotFoundReasonTemplate, kind, name)
 	}
 
 	if name == "" {
 		return microerror.Maskf(validationError, nameNotFoundReasonTemplate, kind)
-	}
-
-	if v.enableManagedByLabel && key.IsManagedBy(cr, v.projectName) {
-		v.logger.Debugf(ctx, "skipping validation of app '%s/%s' dependencies due to '%s=%s' label", cr.Namespace, cr.Name, label.ManagedBy, key.ManagedByLabel(cr))
-		return nil
-	}
-
-	_, err := v.k8sClient.CoreV1().ConfigMaps(namespace).Get(ctx, name, metav1.GetOptions{})
-	if err != nil {
-		return microerror.Mask(err)
 	}
 
 	return nil
 }
 
 func (v *Validator) validateSecretExists(ctx context.Context, name, namespace, kind string, cr v1alpha1.App) error {
-	if namespace == "" {
-		return microerror.Maskf(validationError, namespaceNotFoundReasonTemplate, kind, name)
-	}
-
-	if name == "" {
-		return microerror.Maskf(validationError, nameNotFoundReasonTemplate, kind)
-	}
-
 	// Check basic things, like empty name or namespace, but skip
 	// existance validation when managed by Fux.
 	if v.enableManagedByLabel && key.IsManagedBy(cr, v.projectName) {
