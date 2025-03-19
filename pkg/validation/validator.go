@@ -12,9 +12,8 @@ type Config struct {
 	K8sClient kubernetes.Interface
 	Logger    micrologger.Logger
 
-	ProjectName          string
-	Provider             string
-	EnableManagedByLabel bool
+	IsAdmissionController bool
+	Provider              string
 }
 
 type Validator struct {
@@ -22,9 +21,8 @@ type Validator struct {
 	k8sClient kubernetes.Interface
 	logger    micrologger.Logger
 
-	projectName          string
-	provider             string
-	enableManagedByLabel bool
+	isAdmissionController bool
+	provider              string
 }
 
 func NewValidator(config Config) (*Validator, error) {
@@ -37,10 +35,6 @@ func NewValidator(config Config) (*Validator, error) {
 	if config.Logger == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", config)
 	}
-
-	if config.ProjectName == "" {
-		return nil, microerror.Maskf(invalidConfigError, "%T.ProjectName must not be empty", config)
-	}
 	if config.Provider == "" {
 		return nil, microerror.Maskf(invalidConfigError, "%T.Provider must not be empty", config)
 	}
@@ -50,9 +44,8 @@ func NewValidator(config Config) (*Validator, error) {
 		k8sClient: config.K8sClient,
 		logger:    config.Logger,
 
-		projectName:          config.ProjectName,
-		provider:             config.Provider,
-		enableManagedByLabel: config.EnableManagedByLabel,
+		isAdmissionController: config.IsAdmissionController,
+		provider:              config.Provider,
 	}
 
 	return validator, nil
