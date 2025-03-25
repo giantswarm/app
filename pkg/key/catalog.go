@@ -55,7 +55,7 @@ func CatalogSecretNamespace(customResource v1alpha1.Catalog) string {
 }
 
 func CatalogType(customResource v1alpha1.Catalog) string {
-	if val, ok := customResource.ObjectMeta.Labels[label.CatalogType]; ok {
+	if val, ok := customResource.Labels[label.CatalogType]; ok {
 		return val
 	}
 
@@ -63,7 +63,7 @@ func CatalogType(customResource v1alpha1.Catalog) string {
 }
 
 func CatalogVisibility(customResource v1alpha1.Catalog) string {
-	if val, ok := customResource.ObjectMeta.Labels[label.CatalogVisibility]; ok {
+	if val, ok := customResource.Labels[label.CatalogVisibility]; ok {
 		return val
 	}
 
@@ -73,11 +73,11 @@ func CatalogVisibility(customResource v1alpha1.Catalog) string {
 func ToCatalog(v interface{}) (v1alpha1.Catalog, error) {
 	customResource, ok := v.(*v1alpha1.Catalog)
 	if !ok {
-		return v1alpha1.Catalog{}, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", &v1alpha1.Catalog{}, v)
+		return v1alpha1.Catalog{}, microerror.Maskf(WrongTypeError, "expected '%T', got '%T'", &v1alpha1.Catalog{}, v)
 	}
 
 	if customResource == nil {
-		return v1alpha1.Catalog{}, microerror.Maskf(emptyValueError, "empty value cannot be converted to CustomObject")
+		return v1alpha1.Catalog{}, microerror.Maskf(EmptyValueError, "empty value cannot be converted to CustomObject")
 	}
 
 	return *customResource, nil
