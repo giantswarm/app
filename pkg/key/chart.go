@@ -47,12 +47,12 @@ func IsChartCordoned(customResource v1alpha1.Chart) bool {
 
 func ToChart(v interface{}) (v1alpha1.Chart, error) {
 	if v == nil {
-		return v1alpha1.Chart{}, microerror.Maskf(emptyValueError, "empty value cannot be converted to customResource")
+		return v1alpha1.Chart{}, microerror.Maskf(EmptyValueError, "empty value cannot be converted to customResource")
 	}
 
 	customResource, ok := v.(*v1alpha1.Chart)
 	if !ok {
-		return v1alpha1.Chart{}, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", &v1alpha1.Chart{}, v)
+		return v1alpha1.Chart{}, microerror.Maskf(WrongTypeError, "expected '%T', got '%T'", &v1alpha1.Chart{}, v)
 	}
 
 	return *customResource, nil

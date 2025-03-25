@@ -2,20 +2,22 @@ package key
 
 import "github.com/giantswarm/microerror"
 
-var emptyValueError = &microerror.Error{
+// EmptyValueError is returned when a value is empty.
+var EmptyValueError = &microerror.Error{
 	Kind: "emptyValueError",
 }
 
 // IsEmptyValueError asserts emptyValueError.
 func IsEmptyValueError(err error) bool {
-	return microerror.Cause(err) == emptyValueError
+	return microerror.Cause(err) == EmptyValueError
 }
 
-var wrongTypeError = &microerror.Error{
+// WrongTypeError is returned when a value has the wrong type.
+var WrongTypeError = &microerror.Error{
 	Kind: "wrongTypeError",
 }
 
-// IsWrongTypeError asserts wrongTypeError.
+// IsWrongTypeError asserts WrongTypeError.
 func IsWrongTypeError(err error) bool {
-	return microerror.Cause(err) == wrongTypeError
+	return microerror.Cause(err) == WrongTypeError
 }
