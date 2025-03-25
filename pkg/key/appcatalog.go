@@ -31,7 +31,7 @@ func AppCatalogSecretNamespace(customResource v1alpha1.AppCatalog) string {
 }
 
 func AppCatalogType(customResource v1alpha1.AppCatalog) string {
-	if val, ok := customResource.ObjectMeta.Labels[label.CatalogType]; ok {
+	if val, ok := customResource.Labels[label.CatalogType]; ok {
 		return val
 	}
 
@@ -39,7 +39,7 @@ func AppCatalogType(customResource v1alpha1.AppCatalog) string {
 }
 
 func AppCatalogVisibility(customResource v1alpha1.AppCatalog) string {
-	if val, ok := customResource.ObjectMeta.Labels[label.CatalogVisibility]; ok {
+	if val, ok := customResource.Labels[label.CatalogVisibility]; ok {
 		return val
 	}
 
