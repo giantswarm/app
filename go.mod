@@ -67,6 +67,6 @@ require (
 replace (
 	github.com/gogo/protobuf => github.com/gogo/protobuf v1.3.2
 	github.com/golang/protobuf => github.com/golang/protobuf v1.5.4
-	golang.org/x/net => golang.org/x/net v0.37.0
+	golang.org/x/net => golang.org/x/net v0.38.0
 	google.golang.org/protobuf v1.32.0 => google.golang.org/protobuf v1.33.0
 )
