@@ -78,13 +78,13 @@ func Test_ValidateApp(t *testing.T) {
 	ctx := context.Background()
 
 	tests := []struct {
-		name                 string
-		obj                  v1alpha1.App
-		catalogs             []*v1alpha1.Catalog
-		configMaps           []*corev1.ConfigMap
-		secrets              []*corev1.Secret
-		enableManagedByLabel bool
-		expectedErr          string
+		name                  string
+		obj                   v1alpha1.App
+		catalogs              []*v1alpha1.Catalog
+		configMaps            []*corev1.ConfigMap
+		secrets               []*corev1.Secret
+		isAdmissionController bool
+		expectedErr           string
 	}{
 		{
 			name: "flawless flow",
@@ -446,14 +446,13 @@ func Test_ValidateApp(t *testing.T) {
 			expectedErr: "kube config not found error: kubeconfig secret `eggs2-kubeconfig` in namespace `eggs2` not found",
 		},
 		{
-			name: "missing spec.kubeConfig.secret allowed when managed by Flux on conditional validation",
+			name: "missing spec.kubeConfig.secret allowed when in admission controller",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "kiam",
 					Namespace: "eggs2",
 					Labels: map[string]string{
 						label.AppOperatorVersion: "2.6.0",
-						label.ManagedBy:          "flux",
 					},
 				},
 				Spec: v1alpha1.AppSpec{
@@ -476,17 +475,16 @@ func Test_ValidateApp(t *testing.T) {
 			catalogs: []*v1alpha1.Catalog{
 				newTestCatalog("giantswarm", "default"),
 			},
-			enableManagedByLabel: true,
+			isAdmissionController: true,
 		},
 		{
-			name: "missing spec.kubeConfig.secret not allowed when managed by Flux on uncoditional validation",
+			name: "missing spec.kubeConfig.secret not allowed when not in admission controller",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "kiam",
 					Namespace: "eggs2",
 					Labels: map[string]string{
 						label.AppOperatorVersion: "2.6.0",
-						label.ManagedBy:          "flux",
 					},
 				},
 				Spec: v1alpha1.AppSpec{
@@ -509,7 +507,8 @@ func Test_ValidateApp(t *testing.T) {
 			catalogs: []*v1alpha1.Catalog{
 				newTestCatalog("giantswarm", "default"),
 			},
-			expectedErr: "kube config not found error: kubeconfig secret `eggs2-kubeconfig` in namespace `eggs2` not found",
+			isAdmissionController: false,
+			expectedErr:           "kube config not found error: kubeconfig secret `eggs2-kubeconfig` in namespace `eggs2` not found",
 		},
 		{
 			name: "spec.kubeConfig.secret no namespace specified",
@@ -575,14 +574,13 @@ func Test_ValidateApp(t *testing.T) {
 			expectedErr: "validation error: configmap `dex-app-user-values` in namespace `giantswarm` not found",
 		},
 		{
-			name: "missing spec.userConfig.configMap allowed when managed by Flux on conditional validation",
+			name: "missing spec.userConfig.configMap allowed when in admission controller",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "dex-app-unique",
 					Namespace: "giantswarm",
 					Labels: map[string]string{
 						label.AppOperatorVersion: "0.0.0",
-						label.ManagedBy:          "flux",
 					},
 				},
 				Spec: v1alpha1.AppSpec{
@@ -604,17 +602,16 @@ func Test_ValidateApp(t *testing.T) {
 			catalogs: []*v1alpha1.Catalog{
 				newTestCatalog("control-plane-catalog", "default"),
 			},
-			enableManagedByLabel: true,
+			isAdmissionController: true,
 		},
 		{
-			name: "missing spec.userConfig.configMap not allowed when managed by Flux on unconditional validation",
+			name: "missing spec.userConfig.configMap not allowed when not in admission controller",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "dex-app-unique",
 					Namespace: "giantswarm",
 					Labels: map[string]string{
 						label.AppOperatorVersion: "0.0.0",
-						label.ManagedBy:          "flux",
 					},
 				},
 				Spec: v1alpha1.AppSpec{
@@ -636,7 +633,8 @@ func Test_ValidateApp(t *testing.T) {
 			catalogs: []*v1alpha1.Catalog{
 				newTestCatalog("control-plane-catalog", "default"),
 			},
-			expectedErr: "validation error: configmap `dex-app-user-values` in namespace `giantswarm` not found",
+			isAdmissionController: false,
+			expectedErr:           "validation error: configmap `dex-app-user-values` in namespace `giantswarm` not found",
 		},
 		{
 			name: "spec.userConfig.configMap no namespace specified",
@@ -701,14 +699,13 @@ func Test_ValidateApp(t *testing.T) {
 			expectedErr: "validation error: secret `dex-app-user-secrets` in namespace `giantswarm` not found",
 		},
 		{
-			name: "missing spec.userConfig.secret allowed when managed by Flux on conditional validation",
+			name: "missing spec.userConfig.secret allowed when in admission controller",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "dex-app-unique",
 					Namespace: "giantswarm",
 					Labels: map[string]string{
 						label.AppOperatorVersion: "0.0.0",
-						label.ManagedBy:          "flux",
 					},
 				},
 				Spec: v1alpha1.AppSpec{
@@ -730,17 +727,16 @@ func Test_ValidateApp(t *testing.T) {
 			catalogs: []*v1alpha1.Catalog{
 				newTestCatalog("control-plane-catalog", "giantswarm"),
 			},
-			enableManagedByLabel: true,
+			isAdmissionController: true,
 		},
 		{
-			name: "missing spec.userConfig.secret not allowed when managed by Flux on unconditional validation",
+			name: "missing spec.userConfig.secret not allowed when not in admission controller",
 			obj: v1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "dex-app-unique",
 					Namespace: "giantswarm",
 					Labels: map[string]string{
 						label.AppOperatorVersion: "0.0.0",
-						label.ManagedBy:          "flux",
 					},
 				},
 				Spec: v1alpha1.AppSpec{
@@ -762,7 +758,8 @@ func Test_ValidateApp(t *testing.T) {
 			catalogs: []*v1alpha1.Catalog{
 				newTestCatalog("control-plane-catalog", "giantswarm"),
 			},
-			expectedErr: "validation error: secret `dex-app-user-secrets` in namespace `giantswarm` not found",
+			isAdmissionController: false,
+			expectedErr:           "validation error: secret `dex-app-user-secrets` in namespace `giantswarm` not found",
 		},
 		{
 			name: "spec.userConfig.secret no namespace specified",
@@ -1150,9 +1147,8 @@ func Test_ValidateApp(t *testing.T) {
 				K8sClient: clientgofake.NewSimpleClientset(k8sObjs...),
 				Logger:    microloggertest.New(),
 
-				ProjectName:          "app-admission-controller",
-				Provider:             "aws",
-				EnableManagedByLabel: tc.enableManagedByLabel,
+				IsAdmissionController: tc.isAdmissionController,
+				Provider:              "aws",
 			}
 			r, err := NewValidator(c)
 			if err != nil {
@@ -1257,8 +1253,8 @@ func Test_ValidateAppUpdate(t *testing.T) {
 				K8sClient: clientgofake.NewSimpleClientset(),
 				Logger:    microloggertest.New(),
 
-				ProjectName: "app-admission-controller",
-				Provider:    "aws",
+				IsAdmissionController: true,
+				Provider:              "aws",
 			}
 			r, err := NewValidator(c)
 			if err != nil {
@@ -1721,8 +1717,8 @@ func Test_ValidateMetadataConstraints(t *testing.T) {
 				K8sClient: clientgofake.NewSimpleClientset(),
 				Logger:    microloggertest.New(),
 
-				ProjectName: "app-admission-controller",
-				Provider:    "aws",
+				IsAdmissionController: true,
+				Provider:              "aws",
 			}
 			r, err := NewValidator(c)
 			if err != nil {
@@ -1895,8 +1891,8 @@ func Test_ValidateNamespace(t *testing.T) {
 				K8sClient: clientgofake.NewSimpleClientset(),
 				Logger:    microloggertest.New(),
 
-				ProjectName: "app-admission-controller",
-				Provider:    "aws",
+				IsAdmissionController: true,
+				Provider:              "aws",
 			}
 			r, err := NewValidator(c)
 			if err != nil {
@@ -2232,8 +2228,8 @@ func Test_ValidateUniqueInClusterAppName(t *testing.T) {
 				K8sClient: clientgofake.NewSimpleClientset(),
 				Logger:    microloggertest.New(),
 
-				ProjectName: "app-admission-controller",
-				Provider:    "aws",
+				IsAdmissionController: true,
+				Provider:              "aws",
 			}
 			r, err := NewValidator(c)
 			if err != nil {
