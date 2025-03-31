@@ -112,7 +112,7 @@ func (v *Validator) ValidateAppUpdate(ctx context.Context, app, currentApp v1alp
 // https://github.com/giantswarm/giantswarm/issues/22100#issuecomment-1131723221
 func (v *Validator) validateAnnotations(ctx context.Context, cr v1alpha1.App) error {
 	namespaceAnnotation := key.AppNamespaceAnnotation(cr)
-	if namespaceAnnotation != "" && namespaceAnnotation != cr.ObjectMeta.Namespace {
+	if namespaceAnnotation != "" && namespaceAnnotation != cr.Namespace {
 		return microerror.Maskf(validationError, namespaceMismatchTemplate, namespaceAnnotation)
 	}
 
