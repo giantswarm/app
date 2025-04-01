@@ -42,7 +42,7 @@ func AppNamespaceAnnotation(customResource v1alpha1.App) string {
 }
 
 func AppKubernetesNameLabel(customResource v1alpha1.App) string {
-	if val, ok := customResource.ObjectMeta.Labels[label.AppKubernetesName]; ok {
+	if val, ok := customResource.Labels[label.AppKubernetesName]; ok {
 		return val
 	}
 
@@ -50,7 +50,7 @@ func AppKubernetesNameLabel(customResource v1alpha1.App) string {
 }
 
 func AppLabel(customResource v1alpha1.App) string {
-	if val, ok := customResource.ObjectMeta.Labels[label.App]; ok {
+	if val, ok := customResource.Labels[label.App]; ok {
 		return val
 	}
 
@@ -94,7 +94,7 @@ func ClusterID(customResource v1alpha1.App) string {
 }
 
 func ClusterLabel(customResource v1alpha1.App) string {
-	if val, ok := customResource.ObjectMeta.Labels[label.Cluster]; ok {
+	if val, ok := customResource.Labels[label.Cluster]; ok {
 		return val
 	}
 
@@ -166,7 +166,7 @@ func IsDeleted(customResource v1alpha1.App) bool {
 }
 
 func IsInOrgNamespace(customResource v1alpha1.App) bool {
-	return strings.HasPrefix(customResource.ObjectMeta.Namespace, "org-")
+	return strings.HasPrefix(customResource.Namespace, "org-")
 }
 
 func KubeConfigContextName(customResource v1alpha1.App) string {
@@ -271,7 +271,7 @@ func Version(customResource v1alpha1.App) string {
 }
 
 func VersionLabel(customResource v1alpha1.App) string {
-	if val, ok := customResource.ObjectMeta.Labels[label.AppOperatorVersion]; ok {
+	if val, ok := customResource.Labels[label.AppOperatorVersion]; ok {
 		return val
 	}
 

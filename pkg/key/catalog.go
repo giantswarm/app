@@ -55,7 +55,7 @@ func CatalogSecretNamespace(customResource v1alpha1.Catalog) string {
 }
 
 func CatalogType(customResource v1alpha1.Catalog) string {
-	if val, ok := customResource.ObjectMeta.Labels[label.CatalogType]; ok {
+	if val, ok := customResource.Labels[label.CatalogType]; ok {
 		return val
 	}
 
@@ -63,7 +63,7 @@ func CatalogType(customResource v1alpha1.Catalog) string {
 }
 
 func CatalogVisibility(customResource v1alpha1.Catalog) string {
-	if val, ok := customResource.ObjectMeta.Labels[label.CatalogVisibility]; ok {
+	if val, ok := customResource.Labels[label.CatalogVisibility]; ok {
 		return val
 	}
 
