@@ -10,7 +10,7 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/giantswarm/app/v7/pkg/key"
+	"github.com/giantswarm/app/v8/pkg/key"
 )
 
 const (

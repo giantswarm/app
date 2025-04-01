@@ -14,7 +14,7 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/giantswarm/app/v7/pkg/key"
+	"github.com/giantswarm/app/v8/pkg/key"
 )
 
 const (
