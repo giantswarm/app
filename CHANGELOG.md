@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [8.0.0] - 2025-04-01
 
+### Changed
+
+- Changed `app.Validator` interface.
+  - Replaced `projectName` string field with `isAdmissionController` boolean field.
+  - Removed `enableManagedByLabel` field.
+- When `app.Validator.isAdmissionController` is enabled, the existence checks for referenced config maps and secrets
+  under App CRs (`.spec.config`, `.spec.userConfig`, `.spec.kubeConfig.secret`) will be skipped. This makes the
+  existence of the `giantswarm.io/managed-by` label irrelevant as that was used to produce this behaviour that is
+  the default behaviour now.
+
+### Removed
+
+- Removed `key.IsManagedBy` function as it is not relevant anymore.
+
 ## [7.1.0] - 2025-02-26
 
 ### Changed
