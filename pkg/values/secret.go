@@ -124,6 +124,8 @@ func (v *Values) getSecret(ctx context.Context, secretName, secretNamespace stri
 	secret, err := v.k8sClient.CoreV1().Secrets(secretNamespace).Get(ctx, secretName, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
 		return nil, microerror.Maskf(notFoundError, "secret %#q in namespace %#q not found", secretName, secretNamespace)
+	} else if apierrors.IsForbidden(err) {
+		return nil, microerror.Maskf(forbiddenError, "secret %#q in namespace %#q forbidden", secretName, secretNamespace)
 	} else if err != nil {
 		return nil, microerror.Mask(err)
 	}

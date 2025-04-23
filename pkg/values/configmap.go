@@ -115,6 +115,8 @@ func (v *Values) getConfigMap(ctx context.Context, configMapName, configMapNames
 	configMap, err := v.k8sClient.CoreV1().ConfigMaps(configMapNamespace).Get(ctx, configMapName, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
 		return nil, microerror.Maskf(notFoundError, "configmap %#q in namespace %#q not found", configMapName, configMapNamespace)
+	} else if apierrors.IsForbidden(err) {
+		return nil, microerror.Maskf(forbiddenError, "configmap %#q in namespace %#q forbidden", configMapName, configMapNamespace)
 	} else if err != nil {
 		return nil, microerror.Mask(err)
 	}

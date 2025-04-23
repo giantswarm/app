@@ -2,6 +2,15 @@ package values
 
 import "github.com/giantswarm/microerror"
 
+var forbiddenError = &microerror.Error{
+	Kind: "forbiddenError",
+}
+
+// IsNotFound asserts notFoundError.
+func IsForbiddenError(err error) bool {
+	return microerror.Cause(err) == forbiddenError
+}
+
 var invalidConfigError = &microerror.Error{
 	Kind: "invalidConfigError",
 }
