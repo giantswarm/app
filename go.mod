@@ -2,7 +2,7 @@ module github.com/giantswarm/app/v8
 
 go 1.24.0
 
-toolchain go1.24.5
+toolchain go1.24.6
 
 require (
 	github.com/giantswarm/apiextensions-application v0.6.2
