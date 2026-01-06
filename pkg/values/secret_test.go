@@ -587,7 +587,7 @@ func Test_MergeSecretData(t *testing.T) {
 			}
 
 			c := Config{
-				K8sClient: clientgofake.NewSimpleClientset(objs...),
+				K8sClient: clientgofake.NewClientset(objs...),
 				Logger:    microloggertest.New(),
 			}
 			v, err := New(c)

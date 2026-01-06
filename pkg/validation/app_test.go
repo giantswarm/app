@@ -1144,7 +1144,7 @@ func Test_ValidateApp(t *testing.T) {
 
 			c := Config{
 				G8sClient: fakeCtrlClient,
-				K8sClient: clientgofake.NewSimpleClientset(k8sObjs...),
+				K8sClient: clientgofake.NewClientset(k8sObjs...),
 				Logger:    microloggertest.New(),
 
 				IsAdmissionController: tc.isAdmissionController,
@@ -1250,7 +1250,7 @@ func Test_ValidateAppUpdate(t *testing.T) {
 
 			c := Config{
 				G8sClient: fakeCtrlClient,
-				K8sClient: clientgofake.NewSimpleClientset(),
+				K8sClient: clientgofake.NewClientset(),
 				Logger:    microloggertest.New(),
 
 				IsAdmissionController: true,
@@ -1714,7 +1714,7 @@ func Test_ValidateMetadataConstraints(t *testing.T) {
 
 			c := Config{
 				G8sClient: &fakierClient{fakeCtrlClient},
-				K8sClient: clientgofake.NewSimpleClientset(),
+				K8sClient: clientgofake.NewClientset(),
 				Logger:    microloggertest.New(),
 
 				IsAdmissionController: true,
@@ -1888,7 +1888,7 @@ func Test_ValidateNamespace(t *testing.T) {
 
 			c := Config{
 				G8sClient: &fakierClient{fakeCtrlClient},
-				K8sClient: clientgofake.NewSimpleClientset(),
+				K8sClient: clientgofake.NewClientset(),
 				Logger:    microloggertest.New(),
 
 				IsAdmissionController: true,
@@ -2225,7 +2225,7 @@ func Test_ValidateUniqueInClusterAppName(t *testing.T) {
 
 			c := Config{
 				G8sClient: &fakierClient{fakeCtrlClient},
-				K8sClient: clientgofake.NewSimpleClientset(),
+				K8sClient: clientgofake.NewClientset(),
 				Logger:    microloggertest.New(),
 
 				IsAdmissionController: true,
