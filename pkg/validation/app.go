@@ -29,7 +29,8 @@ const (
 	labelInClusterAppTemplate         = "label %#q must be set to `0.0.0` for in-cluster app"
 	resourceNotFoundTemplate          = "%s %#q in namespace %#q not found"
 
-	defaultCatalogName = "default"
+	defaultCatalogName  = "default"
+	giantswarmNamespace = "giantswarm"
 
 	// nameMaxLength is 53 characters as this is the maximum allowed for Helm
 	// release names.
@@ -131,7 +132,7 @@ func (v *Validator) validateCatalog(ctx context.Context, cr v1alpha1.App) error 
 		if key.CatalogNamespace(cr) != "" {
 			namespaces = []string{key.CatalogNamespace(cr)}
 		} else {
-			namespaces = []string{metav1.NamespaceDefault, "giantswarm"}
+			namespaces = []string{metav1.NamespaceDefault, giantswarmNamespace}
 		}
 	}
 
@@ -214,7 +215,7 @@ func (v *Validator) validateName(ctx context.Context, cr v1alpha1.App) error {
 // or WC namespaces. Otherwise `.spec.namespace` could be exploited to override permissions.
 func (v *Validator) validateTargetNamespace(ctx context.Context, cr v1alpha1.App) error {
 	isInCluster := key.InCluster(cr)
-	isNotGs := cr.Namespace != "giantswarm"
+	isNotGs := cr.Namespace != giantswarmNamespace
 	isOutsideOrg := cr.Namespace != cr.Spec.Namespace
 
 	if isInCluster && isNotGs && isOutsideOrg {
@@ -588,7 +589,7 @@ func (v *Validator) validateSecretExists(ctx context.Context, name, namespace, k
 
 func (v *Validator) validateUniqueInClusterAppName(ctx context.Context, cr v1alpha1.App) error {
 	// WARNING: This part assumes knowledge of the internal workings of app-operator and the App Platform
-	specialNamespace := "giantswarm"
+	specialNamespace := giantswarmNamespace
 
 	if !key.InCluster(cr) && cr.Namespace != specialNamespace {
 		return nil
