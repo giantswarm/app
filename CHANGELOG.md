@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Update golang.org/x/oauth2 to v0.37.0 (giantswarm/app#689)
+
 ## [8.1.1] - 2026-02-09
 
 ### Changed
